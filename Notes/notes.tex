@@ -1,0 +1,176 @@
+\documentclass{article}
+
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0pt}
+
+% Formatting and images 
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[titletoc,title]{appendix}
+\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{soul}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{indentfirst}
+\usepackage{csquotes}
+
+%% Packages for mathematical typesetting
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{pgf}
+\usepackage{comment}
+\usepackage{float}
+\usepackage{blindtext}
+\usepackage{enumitem}
+\usepackage{bbm}
+
+\newtheorem{manualtheoreminner}{Theorem}
+\newenvironment{manualtheorem}[1]{%
+  \renewcommand\themanualtheoreminner{#1}%
+  \manualtheoreminner
+}{\endmanualtheoreminner}
+
+\newtheorem{manuallemmainner}{Lemma}
+\newenvironment{manuallemma}[1]{%
+  \renewcommand\themanuallemmainner{#1}%
+  \manuallemmainner
+}{\endmanualtheoreminner}
+
+\newtheorem{manualcorollaryinner}{Corollary}
+\newenvironment{manualcorollary}[1]{%
+  \renewcommand\themanualcorollaryinner{#1}%
+  \manualcorollaryinner
+}{\endmanualcorollaryinner}
+
+\newtheorem*{conjecture}{Conjecture}
+
+% Title content
+\title{\textbf{Notes on Kernel and Rich Limits\\ in Neural Network Training}}
+\author[]{Henry Smith}
+\affil[]{\normalsize Yale University}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\section{Kernel and Rich Regimes in Overparametrized Models, Woodworth et al. 2020}
+
+\subsection{Problem setup}
+The paper considers models $f: \mathbb{R}^p \times \mathcal{X} \rightarrow \mathbb{R}$ which map parameters $\boldsymbol{w} \in \mathbb{R}^p$ and observations $\boldsymbol{x} \in \mathcal{X}$ to predictions $f(\boldsymbol{w}, \boldsymbol{x})$. Let $F(\boldsymbol{w}) \in \{f: \mathcal{X} \rightarrow \mathbb{R} \}$ be the predictor implemented by the parameters $\boldsymbol{w}$. Of particular interest to the authors are models which are linear in the observations $\boldsymbol{x}$ (but not in the parameters $\boldsymbol{w}$). Since, in this case, $F(\boldsymbol{w})$ is in the dual space of $\mathcal{X}$, then we have that, by Riesz Representation, $F(\boldsymbol{w})(\boldsymbol{x}) = \langle\boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle$ for some $\boldsymbol{\beta}_{\boldsymbol{w}}$. The paper focuses on $D$-homogeneous models in the parameter space $\boldsymbol{w}$ as discussed in \cite{chizat2018lazy}, which satisfy $F(c \cdot \boldsymbol{w}) = c^D F(\boldsymbol{w})$ for any $c \in \mathbb{R}_+$. For $D$-homogeneous networks, it is important to note that scaling the output by a factor of $c > 0$, which is the focus of \cite{chizat2018lazy}, is equivalent to scaling the input by a factor of $c^{1/D}$. 
+
+Further, the paper considers the square loss function $L(\boldsymbol{w}) = \widetilde{L}(F(\boldsymbol{w})) = \sum_{i=1}^N(f(\boldsymbol{w}, \boldsymbol{x}_n) - y_n)^2$ for the model $F$ over the training set $(\boldsymbol{x}_1, y_1), \ldots, (\boldsymbol{x}_N, y_N).$ Woodworth and colleagues minimize the loss $L$ using the gradient flow dynamics, which can be thought of as gradient descent with the stepsize $\eta$ limiting to 0. More explicitly, the gradient flow dynamics are
+\begin{align*}
+    \dot{\boldsymbol{w}}(t) = - \nabla L(\boldsymbol{w}(t)).
+\end{align*}
+
+The principal result of \cite{chizat2018lazy} is that, under suitable conditions, the gradient flow dynamics on $\boldsymbol{w}$ approach those of a linearized model as the scale of initialization approaches infinity. To capture the scale of initialization, the authors consider the parameter $\alpha \in \mathbb{R}_+$. For fixed initialization scale $\alpha$, let $\boldsymbol{w}_{\alpha, \boldsymbol{w}_0}(t)$ be the gradient flow path with the initial condition $\boldsymbol{w}_{\alpha, \boldsymbol{w}_0}(0) = \alpha \boldsymbol{w}(0)$.
+
+Woodworth and colleagues are particularly interested in the case of  $N \ll p$, where there are many global minimizers of $L(\boldsymbol{w})$ with $L(\boldsymbol{w}) = 0$. That is, the model is overparameterized/underdetermined and so we can fit the observations exactly. Of particular interest to the paper is which of the global minimizers $\boldsymbol{w}_{\alpha, \boldsymbol{w}_0}^{\infty} := \lim_{t \rightarrow \infty} \boldsymbol{w}_{\alpha, \boldsymbol{w}_0}(t)$ gradient flow converges to. 
+
+
+\section{On Lazy Training in Differential Programming, Chizat, Oyallon, and Bach 2018}
+\section{Neural Tangent Kernel: Convergence and Generalization in Neural Networks, Jacot, Gabriel, and Hongler 2018}
+
+\section{Implicit Regularization in Matrix Factorization, Gunasekar et al. 2017}
+\subsection{Matrix factorization problem}
+Consider the matrix factorization problem
+\begin{align*}
+    \underset{X \succeq 0}{\min} \ F(X) = \left\Vert \mathcal{A}(X) - y \right\Vert_2^2,
+\end{align*}
+where $\mathcal{A}: \mathbb{R}^{n \times n} \rightarrow \mathbb{R}^m$ is a linear operator specified by $\mathcal{A}(X)_i = \langle A_i, X \rangle$, $A_i \in \mathbb{R}^{n \times n}$ and $y \in \mathbb{R}^m$. Here $\langle A_i, X \rangle = \sum_{k=1}^n \sum_{j=1}^n \overline{(A_i)}_{kj} X_{kj}$ is the Frobenius inner product. Moreover, the authors restrict their attention to symmetric, positive semidefinite $X$ and symmetric, linearly independent $A_i$.
+
+Instead of working with $X \in \mathbb{R}^{n \times n}$, however, the authors factor $X = UU^T$, where $U \in \mathbb{R}^{n \times d}$:
+\begin{align*}
+    \underset{X \succeq 0}{\min} \ f(X) = \left\Vert \mathcal{A}(UU^T) - y \right\Vert_2^2.
+\end{align*}
+Notice that by setting $d < n$, we are enforcing that matrix $X$ must be low-rank; for $d = n$, we reproduce the original problem.
+
+\subsection{Underdetermined problems and gradient descent}
+Gunasekar and colleagues are particularly interested in the case of $m \ll n^2$ (the number of measurement matrices $A_i$ is much smaller than the number of entries in $X$). Under this regime, the problem is undetermined and there are many global minima satisfying $\mathcal{A}(X) = y$. Indeed, for sufficiently large $d$, the authors achieve zero training error in the underdetermined problem. What they are surprised by is that for $d > m/n$ with initialization $U_0$ close to zero and small stepsize, they still achieve small relative error. For $d < m/n$, the low-rank structure of $U$ can gaurantee generalization and reconstruction (see references in paper). 
+
+By observing the nuclear norms of the solutions for the simulations, the authors hypothesize that the gradient descent solution is also the minimum nuclear norm solution when $U$ is full dimensional, the stepsize is sufficiently small, and the initialization approaches zero. That is, they suggest that under suitable conditions, the gradient descent solution satisfies
+\begin{align*}
+    \underset{X \succeq 0}{\text{argmin}} \ \left\Vert X \right\Vert_* \quad \text{s.t.} \ \mathcal{A}(X) = y.
+\end{align*}
+\cite{arora2019implicit} subsequently shows that this is not the case.
+
+\subsection{Key findings and results}
+Instead of proving the lofty previous result, the authors settle on the following conjecture:
+\begin{conjecture}
+For any full rank $X_{\text{init}}$, if $\widehat{X} = \lim_{a \rightarrow 0} X_{\infty}(\alpha X_{\text{init}})$ exists and is a global optima for the matrix factorization problem with $\mathcal{A}(\widehat{X}) = y$, then $\widehat{X} \in \text{argmin}_{X \succeq 0} \left \Vert X \right \Vert_* \ \text{s.t.} \ \mathcal{A}(X) = y$. 
+\end{conjecture}
+Here, $\lim_{\alpha \rightarrow 0} X_{\infty}(X_{\text{init}})$ is the limit point of the gradient flow dynamics
+\begin{align*}
+    \dot{X}_t = \mathcal{A}^*(r_t)X_t - X_t\mathcal{A}^*(r_t)
+\end{align*}
+initialized at $X_0 = X_{\text{init}}$. These dynamics are equivalent to the gradient flow on the matrix $U \in \mathbb{R}^{n \times d}$ in the matrix factorization problem:
+\begin{align*}
+    \dot{U}_t = \mathcal{A}^*(\mathcal{A}(U_t U_t^T) - y)U_t.
+\end{align*}
+
+Biting off a smaller portion of this conjecture, the authors prove the result for the case of $A_1, \ldots, A_m$ commutative matrices:
+\begin{manualtheorem}{1}\label{gunasekharthm1}
+In the case where the matrices $\{A_i\}_{i=1}^m$ commute, if $\widehat{X} = \lim_{\alpha \rightarrow 0} X_{\infty}(\alpha X_{\text{init}})$ exists and is a global optima for the matrix factorization problem with $\mathcal{A}(\widehat{X}) = y$, then $\widehat{X} \in \text{argmin}_{X \succeq 0} \left \Vert X \right \Vert_* \ \text{s.t.} \ \mathcal{A}(X) = y$.
+\end{manualtheorem}
+
+One should notice that linear regression falls under this case: when the initial matrix $X_{\text{init}}$ and \enquote{measurements} $A_i$ are diagonal matrices, then we have an equivalent parameterization of the vector least-squares problem in terms of \textit{squares of the least-squares coefficients}. \footnote{Note that, in this case, $A_1, \ldots, A_m$ are the observations and the diagonal entries of $X$ in terms of the \textit{squares of} least-squares coefficients.} Notice that we cannot work with the least-squares coefficients themselves since we require that $X$ is positive semidefinite. Recall that the least-squares problem is 
+\begin{align*}
+  \underset{\beta \in \mathbb{R}^n}{\text{argmin}} \left\Vert y - W\beta \right\Vert_2^2,
+\end{align*}
+where $W \in \mathbb{R}^{m \times n}$ is the matrix whose rows are the observations, $\beta \in \mathbb{R}^n$ is the least-squares coefficient vector, and $y\in \mathbb{R}^m$ is the response vector.
+
+As a result, we have the following Corollary to Theorem \ref{gunasekharthm1}:
+\begin{manualcorollary}{2}
+Let $x_{\infty}(x_{\text{init}})$ be the limit point of gradient flow on $\min_{u \in \mathbb{R}^n} \left\Vert A x(u) - y\right\Vert_2^2$ with initialization $x_{\text{init}}$, where $x(u)_i = u_i^2$, $A \in \mathbb{R}^{m \times n}$, and $y \in \mathbb{R}^n$. If $\lim_{\alpha \rightarrow 0}x_{\infty}(\alpha \vec{1})$ exists and $A\widehat{x}=y$, then
+$\widehat{x} \in \text{argmin}_{x \in \mathbb{R}_+^m} \left\Vert x\right\Vert_1 \ \text{s.t.} \ Ax = y.$
+\end{manualcorollary}
+Clearly, this result is crucial to the least-squares problem (as a \enquote{diagonal} neural network) considered in \cite{woodworth2020kernel}.
+
+\section{Implicit Regularization in Deep Matrix Factorization, Arora et al. 2019}
+\subsection{Matrix completion problem}
+Given a matrix $W^* \in \mathbb{R}^{m \times n}$ and a randomly chosen subset of observed entries, recover the unseen entries of $W^*$. View each entry of $W^*$ as a data point: observed entries are the training set, unobserved entries are the test set. This is an undetermined system with multiple solutions. Previous work has shown that if we assume that $W^*$ is low rank, certain technical assumptions are met, and sufficiently many entries are observed, then we can achieve approximate or exact recovery of $W^*$. \cite{gunasekar2018implicit} conjectured that under suitable conditions, the gradient descent solution for the matrix factorization problem is (always) the minimum nuclear norm solution.
+
+\subsection{Matrix completion problems as neural networks}
+One can use shallow neural networks to solve matrix completion problems. Consider parameterizing the solution $W$ as the product of two matrices $W = W_2 W_1$ and optimizing the non-convex objective for fitting the observed entries. This optimization problem can be viewed as a depth-2 linear neural network (that is, the activation functions are linear and there are no added bias terms).
+
+This two-layer problem can be naturally extended to the \textbf{deep matrix factorization problem} considered in the paper: for $W \in \mathbb{R}^{d \times d'}$, $d_1, \ldots, d_{N-1} \in \mathbb{N}$, we parameterize
+\begin{align*}
+    W = W_N W_{N-1} \cdots W_1,
+\end{align*}
+where $W_j \in \mathbb{R}^{d_j \times d_{j-1}}$ with $d_n = d, d_0 = d'$. $N$ is the \textit{depth} of the matrix factorization, matrices $W_1, \ldots, W_N$ are the \textit{factors}.
+
+\subsection{Key findings and results}
+The present paper considers whether the implicit regularization induced by a deep matrix factorization is stronger than the shallow factorization. Recall that \cite{gunasekar2018implicit} only considers the shallow factorization $X = UU^T$. The authors then study the scenario when the number of observed entries $m$ is too small for exact recovery. They show that, in this regime, matrix factorizations outperform minimum nuclear norm solutions. Further, there is a tendency towards low rank solutions $W$, which intensifies with the depth $N$ of the network. 
+
+The first original result of the paper extends Theorem 1 from \cite{gunasekar2018implicit} for depth-$N$ matrix completion problems:
+\begin{manualtheorem}{2}
+Suppose $N \geq 3$ and the matrices $A_1, \ldots, A_m$ commute. Then if $\bar{W}_{\text{deep}} := \lim_{\alpha \rightarrow 0} W_{\text{deep}, \infty}(\alpha)$, where $ W_{\text{deep}, \infty}(\alpha) = W_N(t) W_{N-1}(t) \cdots W_1(t)$ with $W_j(0) = \alpha I$, $\dot{W}_j(t) = -\frac{\partial \phi}{\partial W_j}(W_1(t), \ldots, W_N(t))$ $t \geq 0$, exists and is a global optimum for
+\begin{align*}
+    \min_{W \in \mathcal{S}_+^d} l(W) := \frac{1}{2} \sum_{i=1}^m (y_i - \langle A_i, W \rangle)^2,
+\end{align*}
+where $A_1 \ldots, A_m \in \mathbb{R}^{d \times d}$ are symmetric and linearly independent (and $\mathcal{S}_+^d$ is the set of symmetric, positive semidefinite matrices) with $l(\bar{W}_{\text{deep}}) = 0$, then it holds that $\bar{W}_{\text{deep}} \in \argmin_{W \in \mathcal{S}_+^d, l(W) = 0} \left\Vert W \right\Vert_*.$ Here, $\left\Vert \cdot \right\Vert_*$ denotes the nuclear norm.
+\end{manualtheorem}
+
+The authors then consider whether the gradient descent solution to the matrix factorization problem always tends to the minimum nuclear norm solution. They show that when the number of observed entries is sufficiently large relative to the rank of the matrix, factorizations of all depth admit solutions that tend to the minimum nuclear norm. However, when fewer entries are observed, neither shallow nor deep factorizations minimize the nuclear norm. This contradicts the previously mentioned conjecture made by \cite{gunasekar2018implicit}.
+
+Arora and colleagues then prove the following result:
+\begin{manualtheorem}{3}\label{arorathm3}
+The signed singular values of the product matrix W(t) evolve by 
+\begin{align*}
+    \dot{\sigma}_r(t) = -N (\sigma_r^2(t))^{1-1/N} \cdot \langle \nabla l(W(t)), u_r(t), v_r^T(t) \rangle, \qquad r = 1, \ldots, \min\{d, d'\}.
+\end{align*}
+If the matrix factorization is non-degenerate i.e. has depth $N \geq 2$, the singular values need not be signed (we can assume $\sigma_r(t) \geq 0$ for all $t$).
+\end{manualtheorem}
+Theorem \ref{arorathm3} establishes a tendency of gradient descent for matrix factorization problems to low rank solutions, which intensifies with the depth $N$ of the network. This is because the dynamics promote solutions that have a few large singular values and many small ones; the gap grows more extreme the deeper the matrix factorization (see Figure 3 on p. 9).
+
+\bibliographystyle{siam}
+\bibliography{References/biblio}
+
+\end{document}
