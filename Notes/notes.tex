@@ -86,7 +86,94 @@ where $\phi_{\boldsymbol{w}(t)}(\boldsymbol{x}) = \nabla_{\boldsymbol{w}} f(\bol
 In particular, under the kernel regime, training $f(\boldsymbol{w}, \boldsymbol{x})$ is equivalent to training the affine model $f_K(\boldsymbol{w}, \boldsymbol{x}) = \alpha^Df(\boldsymbol{w}(0), \boldsymbol{x}) + \langle \phi_{\boldsymbol{w}(0)}(\boldsymbol{x}), \boldsymbol{w} - \boldsymbol{w}(0) \rangle$ using kernelized gradient descent/flow with the kernel $K_{\boldsymbol{w}_0}$ and a bias term $f(\boldsymbol{w}_0, \boldsymbol{x})$. Observe that $\phi_{\boldsymbol{w}(t)}(\boldsymbol{x}) = \nabla_{\boldsymbol{w}(t)} f_K(\boldsymbol{w}, \boldsymbol{x}) = \phi_{\boldsymbol{w}(0)}(\boldsymbol{x})$, and so the tangent kernel is indeed constant throughout training. Minimizing the loss of this affine model with gradient flow reaches the solution nearest to initialization where distance is measured with respect to the RKHS norm determined by $K_0$. That is, $F(\boldsymbol{w}_{\alpha}^{\infty}) = \text{argmin}_h \left\Vert h - F(\apha \boldsymbol{w}_0) \right\Vert_{K_0} \ \text{s.t.} \ h(X) = \boldsymbol{y}$. Here, our RKHS norm is $\left\Vert g \right\Vert_{K_0} = \inf \{ \left\Vert \ell \right\Vert_2: \ell \in \mathbb{R}^p, g(\boldsymbol{x}) = \langle \ell, \phi_{\boldsymbol{w}(0)}(\boldsymbol{x}) \rangle, \ \forall \boldsymbol{x} \in \mathcal{X}\}$. \cite{chizat2018lazy} advises choosing an unbiased initialization $\boldsymbol{w}_0$ such that $F(\boldsymbol{w}_0) = 0$. This means that the bias term $\alpha^Df(\boldsymbol{w}(0), \boldsymbol{x})$ depending on the initialization scale vanishes. 
 
 \subsection{Example: Linear Regression}
-The major 
+The primary contribution of the paper is the explicit characterization of the implicit bias when training with gradient descent as a function of $\alpha$, the scale of initialization, in the following least-squares problem:
+For $\mathcal{X} = \mathbb{R}^d$, define the model
+\begin{align*}
+    f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^d (\boldsymbol{w}_{+, i}^2 - \boldsymbol{w}_{-, i}^2)\boldsymbol{x}_i = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle, \quad \boldsymbol{w} = \begin{bmatrix}
+                        \boldsymbol{w}_+ \\
+                        \boldsymbol{w}_-
+                        \end{bmatrix} \in \mathbb{R}^{2d},
+    \quad \boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{w}_+^2 - \boldsymbol{w}_-^2
+\end{align*}
+where $\boldsymbol{z}^2$ for $\boldsymbol{z} \in \mathbb{R}^d$ denotes element-wise squaring. This model represents a \enquote{diagonal} neural network where each input component $\boldsymbol{x}_i$ is connected to a positive input unit with weight $\boldsymbol{w}_{+, i}^2$ and a negative input unit with weight $\boldsymbol{w}_{-, i}^2$. This differs from the least-squares problem discussed in \cite{gunasekar2018implicit} where there is a single set of positive weights representing the squared least-squares coefficients (i.e. we have model $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^d \boldsymbol{w}_i^2\boldsymbol{x}_i$). The authors prefer the former formulation of the least-squares problem for two reasons: (1) by choosing $\boldsymbol{w}_0$ such that $\boldsymbol{w}_+ = \boldsymbol{w}_-$, then the model vanishes at initialization $F(\alpha \boldsymbol{w}) = 0$ without this being a saddle point of the objective and (2) the image of $F(\boldsymbol{w})$ is all linear functionals i.e. $\text{img}( F(\boldsymbol{w})) = \mathcal{X}^*$.
+
+The authors study the underdetermined case $N \ll d$ when there are many solution vectors $\boldsymbol{\beta} \in \mathbb{R}^d$ that satisfy $X 
+\boldsymbol{\beta} = \boldsymbol{y}$. Let $\boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{\infty}$ be the solution reached by gradient flow when initialized at $\boldsymbol{w}_+(0) = \boldsymbol{w}_-(0) = \alpha \boldsymbol{w}_0$. Woodworth and colleagues first consider the case of $\boldsymbol{w}_0 = \vec{1}$ and then generalize their results.
+
+For $\boldsymbol{w}_0 = \vec{1}$, it is easy to verify that the tangent kernel at initialization is $K_{\boldsymbol{w}(0)}(\boldsymbol{x}, \boldsymbol{x}') = 8 \alpha^2 \langle \boldsymbol{x}, \boldsymbol{x}' \rangle$, which is simply a scaling of the standard inner product kernel (just write out $\nabla_{\boldsymbol{w}} f(\boldsymbol{w}, \boldsymbol{x}) |_{\boldsymbol{w} = \boldsymbol{w}(0)}$).
+That is, we have $\left\Vert \boldsymbol{\beta} \right\Vert_{K_0} \propto \left\Vert \boldsymbol{\beta} \right\Vert_2$. And so in the kernel regime, $\boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}$ is equal to the minimum $\ell_2$ solution $\boldsymbol{\beta}_{\ell_2}^* := \text{argmin}_{X \boldsymbol{\beta} = y} \left\Vert \boldsymbol{\beta} \right\Vert_2$. Conversely, as $\alpha \rightarrow 0$, we approach what Woodworth and colleagues classify as the \enquote{rich limit.} Under the rich limit, the tangent kernel changes significantly during optimization, and the model $f(\boldsymbol{w}, \boldsymbol{x})$ is not linear in $\boldsymbol{w}$. For the linear regression problem under consideration with $\boldsymbol{w}_0 = \vec{1}$, \cite{gunasekar2018implicit} proves in Corollary \ref{gunasekharcor2} that $\lim_{\alpha \rightarrow 0} \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty} = \boldsymbol{\beta}_{\ell_1}^* = \text{argmin}_{X \boldsymbol{\beta} = y} \left\Vert \boldsymbol{\beta}\right\Vert_1$.
+
+And so we understand that for the current model of interest with initialization $\boldsymbol{w}_0 = \vec{1}$, the gradient flow solution in the kernel regime $\alpha \rightarrow \infty$ is the minimum $\ell_2$ solution and the solution in the rich regime $\alpha \rightarrow 0$ is the minimum $\ell_1$ solution. 
+
+\subsection{Interpolation Between the Rich and Kernel Regimes}
+What the authors seek to understand, however, is how the gradient flow solution interpolates between the rich and kernel limits. That is, what can we say about the implicit bias when training the linear regression model for $\alpha$ small, for example? This is the subject of the following theorem:
+\begin{manualtheorem}{1}\label{woodworththm1}
+For any $0 < \alpha < \infty$, if the gradient flow solution $\boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}$ for the squared parameterization model satisfies $X\boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty} = \boldsymbol{y}$, then 
+\begin{align*}
+    \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty} = \underset{\boldsymbol{\beta}}{argmin} \ Q_{\alpha}(\boldsymbol{\beta}) \ \text{s.t.} \ X\boldsymbol{\beta} = \boldsymbol{y}
+\end{align*}
+where $Q_{\alpha}(\boldsymbol{\beta}) = \alpha^2 \sum_{i=1}^d q\left(\frac{\boldsymbol{\beta}_i}{\alpha^2}\right)$ and $q(z) = \int_0^z \text{arcsinh}\left(\frac{u}{2} \right) du = 2 - \sqrt{4+z^2} + z \text{arcsinh}\left(\frac{z}{2} \right).$
+\end{manualtheorem}
+See \cite{woodworth2020kernel} for further analysis of how $Q_{\alpha}(\boldsymbol{\beta})$ reproduces the $\ell_2$ and $\ell_1$ minimization problems as $\alpha \rightarrow \infty$ and $\alpha \rightarrow 0$, respectively. In Theorem \ref{woodworththm2}, Woodworth and colleagues quantify the scale of $\alpha$ necessary to guarantee approximation of the minimum $\ell_1$ and $\ell_2$ solutions:
+\begin{manualtheorem}{2}\label{woodworththm2}
+For any $0 < \epsilon < d$, under the setting of Theorem \ref{woodworththm1} with $\boldsymbol{w}_0 = \vec{1}$, 
+\begin{align*}
+    \alpha \leq \min \left\{ (2(1 + \epsilon)\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1)^{-\frac{2+ \epsilon}{2\epsilon}}, \exp \left(-d/(\epsilon \left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1) \right) \right\} \implies \left\Vert \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}\right\Vert_1 \leq (1+\epsilon)\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1
+\end{align*}
+\begin{align*}
+    \alpha \geq \sqrt{2(1+ \epsilon)(1 + 2/\epsilon)\left\Vert \boldsymbol{\beta}_{\ell_2}^* \right\Vert_2} \implies \left\Vert \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}\right\Vert_2^2 \leq (1+\epsilon)\left\Vert \boldsymbol{\beta}_{\ell_2}^* \right\Vert_2^2.
+\end{align*}
+\end{manualtheorem}
+Theorem \ref{woodworththm2} illustrates a challenge with approximating the rich limit: while only polynomially large $\alpha$ suffices to approximate $\boldsymbol{\beta}_{\ell_2}^*$, one must have \textit{exponentially small} $\alpha$ to approximate $\boldsymbol{\beta}_{\ell_1}^*$. As a result, experiments close to the rich limit may require very small initializations and, as a result, may be computationally intractable. The work from \cite{arora2019implicit} suggests a remedy to this problem: increasing the depth (i.e. degree of homogeneity) of the model. 
+
+\subsection{The Relation of Kernel and Rich Limits to Model Generalization}
+Interestingly, the kernel and rich limits are related to the generalizability of the model. Woodworth et al. illustrate this phenomenon by generating a training set $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_N \sim \mathcal{N}(0, I)$ and $y_n \sim \mathcal{N}(\langle \boldsymbol{\beta}^*, \boldsymbol{x}_n \rangle, 0.01)$, where $\boldsymbol{\beta}^*$ is an $r^*$ sparse vector whose nonzero entries are equal to $1/\sqrt{r^*}$. The authors note that for $N \leq d$, gradient flow generally reaches a zero training error solution, but not all solutions generalize the same. In particular, they show that in the rich limit, $N = \Omega(r^*\log d)$ training points suffices for $\boldsymbol{\beta}_{\ell_1}^*$ to \enquote{generalize well}; in the kernel limit, though, good generalization requires $N = \Omega(d)$. This tells us that, in general, \textit{good generalization of our model requires us to train close to the rich regime}. As previously noted, though, one cannot take $\alpha$ to be arbitrary small: as $w(0) \rightarrow \vec{0}$, we reach a saddle point of the objective function. Thus, \cite{woodworth2020kernel} suggests working at the edge of the rich limit, ensuring generalizability of the solution while also making sure that the optimization problem is feasible. One can see this in section 7 of \cite{woodworth2020kernel}, where the authors perform experiements with neural networks on the MNIST and CIFAR10 datasets.
+
+\subsection{Reconsidering $\boldsymbol{w}_0$}
+So far, we have only considered the problem of $\boldsymbol{w}_0 = \vec{1}$. The authors give a more general statement of Theorem \ref{woodworththm1} as follows:
+\begin{manualtheorem}{1}\label{woodworththm1_1}
+For any $0 < \alpha < \infty$ and $\boldsymbol{w}_0$ with no zero entries, if the gradient flow solution $\boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{\infty}$ for the squared parameterization model satisfies $X\boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{\infty} = \boldsymbol{y}$, then 
+\begin{align*}
+    \boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{\infty} = \underset{\boldsymbol{\beta}}{argmin} \ Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) \ \text{s.t.} \ X\boldsymbol{\beta} = \boldsymbol{y}
+\end{align*}
+where $Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) = \sum_{i=1}^d \alpha^2 \boldsymbol{w}_{0,i}^2 q\left(\frac{\boldsymbol{\beta}_i}{\alpha^2\boldsymbol{w}_{0,i}^2}\right)$ and $q(z) = \int_0^z \text{arcsinh}\left(\frac{u}{2} \right) du = 2 - \sqrt{4+z^2} + z \text{arcsinh}\left(\frac{z}{2} \right).$
+\end{manualtheorem}
+The authors then note that for small $z$, $q(z) = \frac{z^2}{4} + \mathcal{O}(z^4)$ and so for $\alpha \rightarrow \infty$
+\begin{align*}
+    Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) = \sum_{i=1}^d \frac{\boldsymbol{\beta}_i^2}{4\alpha^2\boldsymbol{w}_{0, i}^2} + \mathcal{O}(\alpha^{-6}).
+\end{align*}
+That is, $Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta})$ is proportional to the $\ell_2$ norm weighted by $\text{diag}(1/\boldsymbol{w}_0^2)$. Conversely, for large $\left| z \right|$, $q(z) = \left|z \right| \log \left|z \right| + \mathcal{O}(1/ \left| z \right|)$, and so as $\alpha \rightarrow 0$, 
+\begin{align*}
+    \frac{1}{\log(1/\alpha^2)}Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) = \sum_{i=1}^d \left| \boldsymbol{\beta}_i \right| + \mathcal{O}(1/\log(1/\alpha^2)).
+\end{align*}
+This tells us that in the rich limit, $Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta})$ is proportional to $\left\Vert \boldsymbol{\beta} \right\Vert_1 $ regardless of the shape of the initialization $\boldsymbol{w}_0$. In summary, the specific initialization $\boldsymbol{w}_0$ \textit{does} affect the implicit bias in optimization under the kernel regime, but \textit{not} in the rich limit. For neural networks with i.i.d. initialized units, the particular value of $\boldsymbol{w}_0$ is analogous to the distribution used to initialize each unit. That is, changing the initialization distribution changes the tangent kernel at initialization and thus the kernel regime behavior; it does not, however, affect the rich limit.
+
+\subsection{Implicit Bias and Weights}
+The authors consider the possibility that the implicit bias is minimizing the $\ell_2$ norm from initialization:
+\begin{align*}
+    \boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^R := F \left( \underset{\boldsymbol{w}}{\text{argmin}} \left\Vert \boldsymbol{w} - \alpha \boldsymbol{w}_0 \right\Vert_2^2 \ \text{s.t.} \ L(\boldsymbol{w}) = 0 \right) = \underset{\boldsymbol{\beta}}{\text{argmin}} \ R_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) \ \text{s.t.} \ X \boldymbol{\beta} = y
+\end{align*}
+\begin{align*}
+    \text{where} \quad R_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) = \underset{\boldsymbol{w}}{\min} \left\Vert \boldsymbol{w} - \alpha \boldsymbol{w}_0 \right\Vert_2^2 \ \text{s.t.} \ F(\boldsymbol{w}) = \boldsymbol{\beta}.
+\end{align*}
+
+They remark that for the least-squares model $f(\boldsymbol{w}, \boldsymbol{x}) = \langle \boldsymbol{w}, \boldsymbol{x} \rangle$, we indeed have $\boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{\infty} = \boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{R}$. That is, the implicit bias is captured by $R_{\alpha, \boldsymbol{w}_0}$. For the two-homogeneous model under consideration, however, this is not the case. Indeed for the case of $\boldsymbol{w}_0 = \vec{1}$, we have $Q_{\alpha, \vec{1}}(\boldsymbol{\beta}) = R_{\alpha, \vec{1}}(\boldsymbol{\beta})$ for $\alpha \rightarrow 0$ and $\alpha \rightarrow \infty$. From Figure 2 of \cite{woodworth2020kernel}, we observe that, in general, $Q_{\alpha, \vec{1}}(\boldsymbol{\beta}) \neq R_{\alpha, \vec{1}}(\boldsymbol{\beta})$, and they are not rescalings of each other. In particular, $R_{\alpha, \vec{1}}(\boldsymbol{\beta})$ approaches the rich limit $\left\Vert \boldsymbol{\beta} \right\Vert_1$ polynomially in $\alpha$, while we know from previously that this is not the case for $Q_{\alpha, \vec{1}}(\boldsymbol{\beta})$.
+
+\subsection{Higher Order Models}
+As the authors note, deeper models correspond to higher order homogeneity (ex. a depth-$D$ ReLU neural network is $D$-homogeneous). Accordingly, they generalize their model to a depth-D diagonal neural network
+\begin{align*}
+    F_D(\boldsymbol{w}) = \boldsymbol{\beta}_{\boldsymbol{w}, D} = \boldsymbol{w}_+^D - \boldsymbol{w}_-^D \quad \text{and} \quad f_D(\boldsymbol{w}, \boldsymbol{x})  = \langle \boldsymbol{w}_+^D - \boldsymbol{w}_-^D, \boldsymbol{x} \rangle.
+\end{align*}
+As Woodworth et al. remark, this is simply a linear model with an unconventional parameterization, or a depth-$D$ matrix factorization problem with commutative (diagonal) measurement matrices and diagonal factor matrices as studied by \cite{arora2019implicit}. This formulation leads us to the following theorem:
+\begin{manualtheorem}{3}
+For any $0 < \alpha < \infty$ and $D \geq 3$, if $X \boldsymbol{\beta}_{\alpha, D}^{\infty} = y$, then
+\begin{align*}
+    \boldsymbol{\beta}_{\alpha, D}^{\infty} = \text{argmin}_{\boldsymbol{\beta}} Q_{\alpha}^D(\boldsymbol{\beta}) \ \text{s.t.} \ X \boldsymbol{\beta} = \boldsymbol{y}
+\end{align*}
+where $Q_{\alpha}^D(\boldymbol{\beta}) = \alpha^D \sum_{i=1}^d q_D(\boldsymbol{\beta}_i/\alpha^D)$ and $q_D = \int h_D^{-1}$ is the antiderivative of the unique inverse of $h_D(z) = (1-z)^{-\frac{D}{D-2}} - (1+z)^{-\frac{D}{D-2}}$ on $[-1, 1]$. Furthermore, $\lim_{\alpha \rightarrow 0} \boldsymbol{\beta}_{\alpha, D}^{\infty} = \boldsymbol{\beta}_{\ell_1}^*$ and $\lim_{\alpha \rightarrow \infty} \boldsymbol{\beta}_{\alpha, D}^{\infty} = \boldsymbol{\beta}_{\ell_2}^*$.
+\end{manualtheorem}
+The minimum $\ell_1$ solution in the rich limit for depth-$D$ diagonal neural networks has already been observed by Arora et al. While the rich and kernel limits do not change as the depth of the diagonal network increases, the transition between the rich and kernel regimes \textit{does} change. In particular, \textit{for higher orders of homogeneity, the transition into the extreme regimes is sharper}. Even at $D=3$, the scale of $\alpha$ needed to approximate $\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1$ is polynomial rather than exponential in the case of $D=2$ (see Figure 3(b) in \cite{woodworth2020kernel}). 
+
 \section{On Lazy Training in Differential Programming, Chizat, Oyallon, and Bach 2018}
 \section{Neural Tangent Kernel: Convergence and Generalization in Neural Networks, Jacot, Gabriel, and Hongler 2018}
 
@@ -139,7 +226,7 @@ One should notice that linear regression falls under this case: when the initial
 where $W \in \mathbb{R}^{m \times n}$ is the matrix whose rows are the observations, $\beta \in \mathbb{R}^n$ is the least-squares coefficient vector, and $y\in \mathbb{R}^m$ is the response vector.
 
 As a result, we have the following Corollary to Theorem \ref{gunasekharthm1}:
-\begin{manualcorollary}{2}
+\begin{manualcorollary}{2}\label{gunasekharcor2}
 Let $x_{\infty}(x_{\text{init}})$ be the limit point of gradient flow on $\min_{u \in \mathbb{R}^n} \left\Vert A x(u) - y\right\Vert_2^2$ with initialization $x_{\text{init}}$, where $x(u)_i = u_i^2$, $A \in \mathbb{R}^{m \times n}$, and $y \in \mathbb{R}^n$. If $\lim_{\alpha \rightarrow 0}x_{\infty}(\alpha \vec{1})$ exists and $A\widehat{x}=y$, then
 $\widehat{x} \in \text{argmin}_{x \in \mathbb{R}_+^m} \left\Vert x\right\Vert_1 \ \text{s.t.} \ Ax = y.$
 \end{manualcorollary}
@@ -167,7 +254,7 @@ Suppose $N \geq 3$ and the matrices $A_1, \ldots, A_m$ commute. Then if $\bar{W}
 \begin{align*}
     \min_{W \in \mathcal{S}_+^d} l(W) := \frac{1}{2} \sum_{i=1}^m (y_i - \langle A_i, W \rangle)^2,
 \end{align*}
-where $A_1 \ldots, A_m \in \mathbb{R}^{d \times d}$ are symmetric and linearly independent (and $\mathcal{S}_+^d$ is the set of symmetric, positive semidefinite matrices) with $l(\bar{W}_{\text{deep}}) = 0$, then it holds that $\bar{W}_{\text{deep}} \in \argmin_{W \in \mathcal{S}_+^d, l(W) = 0} \left\Vert W \right\Vert_*.$ Here, $\left\Vert \cdot \right\Vert_*$ denotes the nuclear norm.
+where $A_1 \ldots, A_m \in \mathbb{R}^{d \times d}$ are symmetric and linearly independent (and $\mathcal{S}_+^d$ is the set of symmetric, positive semidefinite matrices) with $l(\bar{W}_{\text{deep}}) = 0$, then it holds that $\bar{W}_{\text{deep}} \in \text{argmin}_{W \in \mathcal{S}_+^d, l(W) = 0} \ \left\Vert W \right\Vert_*.$ Here, $\left\Vert \cdot \right\Vert_*$ denotes the nuclear norm.
 \end{manualtheorem}
 
 The authors then consider whether the gradient descent solution to the matrix factorization problem always tends to the minimum nuclear norm solution. They show that when the number of observed entries is sufficiently large relative to the rank of the matrix, factorizations of all depth admit solutions that tend to the minimum nuclear norm. However, when fewer entries are observed, neither shallow nor deep factorizations minimize the nuclear norm. This contradicts the previously mentioned conjecture made by \cite{gunasekar2018implicit}.
