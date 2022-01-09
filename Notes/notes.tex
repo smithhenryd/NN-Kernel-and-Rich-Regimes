@@ -435,6 +435,27 @@ That is, in the infinite particle limit and as $t$ in the gradient flow tends to
 
 \section{Universal Approximation Bounds for Superpositions of a Sigmoidal Function, Barron 1993}
 
+\subsection{Main Results}
+\begin{manualtheorem}{1}
+For every function in $\Gamma_{B, C}$, every sigmoidal function $\phi$, every probability measure $\mu$, and every $n \geq 1$, there exists a linear combination of sigmoidal functions $f_n(x)$ of the form
+\begin{align*}
+    f_n(x) = \sum_{k=1}^n c_k \phi(a_k \cdot x + b_k) + c_0
+\end{align*}
+such that
+\begin{align*}
+    \int_{B} (f(x) - f_n(x))^2 \mu(dx) \leq \frac{(2C)^2}{n}.
+\end{align*}
+The coefficients of the linear combination in $f_n$ may be restricted to satisfy $\sum_{k=1}^n \left|c_k \right| \leq 2C$ and $c_0 = f(0)$.
+\end{manualtheorem}
+
+\begin{manualtheorem}{4}
+Let $f(x), x \in H$ be a function on a Hilbert space $H$ with $C_f = \int_H \left \omega \right| F(d\omega) < \infty$; then for every $r > 0$, every sigmoidal function $\phi$ on $\mathbb{R}$, every probability measure $\mu$ on $H$, and every $n \geq 1$, there is a linear combination of sigmoidal functions $f_n(x) = \sum_{k=1}^n c_k \phi(a_k \cdot x + b_k) + c_0$ such that 
+\begin{align*}
+\int_{B_r} (f(x) - f_n(x))^2 \mu(dx) \leq (2rC_f)^2/n,
+\end{align*}
+where $B_r = \{ x \in H: \left| x \right| \leq r \}$ is the Hilbert space ball of radius $r$.
+\end{manualtheorem}
+
 \section{Approximation and Estimation Bounds for Artificial Neural Networks, Barron 1993}
 
 \bibliographystyle{siam}
