@@ -175,7 +175,126 @@ where $Q_{\alpha}^D(\boldymbol{\beta}) = \alpha^D \sum_{i=1}^d q_D(\boldsymbol{\
 The minimum $\ell_1$ solution in the rich limit for depth-$D$ diagonal neural networks has already been observed by Arora et al. While the rich and kernel limits do not change as the depth of the diagonal network increases, the transition between the rich and kernel regimes \textit{does} change. In particular, \textit{for higher orders of homogeneity, the transition into the extreme regimes is sharper}. Even at $D=3$, the scale of $\alpha$ needed to approximate $\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1$ is polynomial rather than exponential in the case of $D=2$ (see Figure 3(b) in \cite{woodworth2020kernel}). 
 
 \section{On Lazy Training in Differential Programming, Chizat, Oyallon, and Bach 2018}
+
+Chizat's paper is particularly important as it provides much of the theoretical grounding upon which \cite{woodworth2020kernel} is built. 
+
+\subsection{Lazy Training}
+Let us consider parameter space $\mathbb{R}^p$, Hilbert space $\mathcal{F}$, a smooth model $h: \mathbb{R}^p \rightarrow \mathcal{F}$, and a smooth loss $R: \mathcal{F} \rightarrow \mathbb{R}_+$. Using gradient-based methods (i.e. gradient flow), the paper seeks to minimize the objective function $F: \mathbb{R}^p \mapsto \mathbb{R}_+$ defined
+\begin{align*}
+    F(w) := R(h(w)).
+\end{align*}
+With the initialization $w_0$, the authors also define the \textit{linearized model} $\overline{h}(w) = h(w_0) + Dh(w_0)(w - w_0)$ around $w_0$. The corresponding objective function is 
+\begin{align*}
+    \overline{F}(w) := R(\overline{h}(w)).
+\end{align*}
+At the beginning of training, it is known that the optimization paths of $F$ and $\overline{F}$ are close to each other. The \textit{lazy training} regime (what \cite{woodworth2020kernel} refers to as the \enquote{kernel regime}) occurs when the gradient flow dynamics of $F$ and $\overline{F}$ are close for \textit{all} $t \geq 0$, not just near $t = 0$.
+
+A natural question to arise from this discussion is when the lazy training regime occurs. The authors provide a general criterion for the lazy regime, which relates the relative change of the objective $\Delta(F)$ to the relative change of the differential $\Delta(Dh)$.
+
+In particular, assume that the initial set of parameters $w_0$ is not a minimizer so that $F(w_0) > 0$ and is not a critical point of the objective $F$ so that $\nabla F(w_0) \neq 0$. Consider the gradient descent step $w_1 = w_0 - \eta \nabla F(w_0)$ with small stepsize $\eta > 0$. The relative change of the objective for the step is $\Delta(F) := \frac{\left| F(w_1) - F(w_0) \right|}{F(w_0)} \approx \eta \frac{\left\Vert \nabla F(w_0) \right\Vert^2}{F(w_0)}$, and the relative change in the differential of $h$ measured in the operator norm is $\Delta(Dh) := \frac{\left\Vert Dh(w_1) - Dh(w_0) \right\Vert}{\left\Vert Dh(w_0) \right\Vert} \leq \eta \frac{\left\Vert \nabla F(w_0) \right\Vert \cdot \left\Vert D^2h(w_0) \right\Vert}{\left\Vert Dh(w_0)\right\Vert }$. Lazy training occurs when the \textit{differential of $h$ does not change significantly whereas the loss does} i.e. $\Delta(F) \gg \Delta(Dh)$. Using the above estimates for $\Delta(F), \Delta(Dh)$, this is guaranteed whenever
+\begin{align*}
+    \frac{\left\Vert \nabla F(w_0) \right\Vert}{F(w_0)} \gg \frac{\left\Vert D^2h(w_0)\right\Vert}{\left\Vert Dh(w_0)\right\Vert}.
+\end{align*}
+In the particular case where $R(y) = \frac{1}{2} \left\Vert y - y^{\star} \right\Vert^2$ for some $y^{\star} \in \mathcal{F}$ (i.e. the loss under consideration is the square loss), then we have the simpler criterion
+\begin{align*}
+    \kappa_h(w_0) := \left\Vert h(w_0) - y^{\star} \right\Vert \frac{\left\Vert D^2 h(w_0)\right\Vert}{\left\Vert D h(w_0)\right\Vert^2} \ll 1.
+\end{align*}
+This comes from the approximation $\left\Vert \nabla F(w_0) \right\Vert = \left\Vert Dh(w_0)^T(h(w_0) - y^{\star}) \right\Vert \approx \left\Vert Dh(w_0) \right\Vert \cdot \left\Vert h(w_0) - y^{\star} \right\Vert$.
+
+\subsection{Scaling the Output}
+Of particular importance to this work is how scaling the output $h(w)$ affects lazy training. Chizat and colleagues note that for the square loss, scaling the model $h$ by factor of $\alpha > 0$ results in 
+\begin{align*}
+    \kappa_{\alpha h}(w_0) = \frac{1}{\alpha} \left\Vert \alpha h(w_0) - y^{\star} \right\Vert \frac{\left\Vert D^2 h(w_0) \right\Vert}{\left\Vert Dh(w_0) \right\Vert^2}.
+\end{align*}
+And so as long as $\left\Vert \alpha h(w_0) - y^{\star} \right\Vert$ is bounded, taking $\alpha \rightarrow \infty$ leads to the lazy training regime. The authors discuss numerous strategies by which to ensure $h(w_0) = 0$, and so $\left\Vert \alpha h(w_0) - y^{\star} \right\Vert$ is indeed bounded.
+
+For $D$-homogeneous models, multiplying the initialization $w_0$ by a factor of $\lambda$ is equivalent to scaling the output by $\lambda^D$. That is, 
+\begin{align*}
+    \kappa_{h}(\lambda w_0) = \frac{1}{\lambda^D} \left\Vert \lambda^D h(w_0) - y^{\star} \right\Vert \frac{\left\Vert D^2 h(w_0) \right\Vert}{\left\Vert Dh(w_0) \right\Vert^2}.
+\end{align*}
+Importantly, neural networks with homogeneous activation functions and linear, \textit{but not affine}, operators are important examples of homogeneous models.
+
+\subsection{Lazy Training and the Scaled Model}
+In the remainder of their work, Chizat et al. prove that for $\alpha > 0$ large, the training dynamics for the scaled objective
+\begin{align*}
+    F_{\alpha}(w) := \frac{1}{\alpha^2} R(\alpha h(w))
+\end{align*}
+are close to those for the linearized model
+\begin{align*}
+    \overline{F}_{\alpha}(w) := \frac{1}{\alpha^2} R(\alpha \overline{h}(w)),
+\end{align*}
+where $\overline{h}(w) := h(w_0) + Dh(w_0)(w - w_0)$ and $w_0 \in \mathbb{R}^p$ is a fixed initialization. That is, we prove the prior assertion that for scaling parameter $\alpha$ large, we indeed achieve lazy training as defined at the beginning of the paper. 
+
+The necessary assumptions on the model $h: \mathbb{R}^p \rightarrow \mathcal{F}$ and loss $R: \mathcal{F} \rightarrow \mathbb{R}_+$ are as follows: the parametric model $h$ is differentiable with a locally Lipschitz differential $Dh$. Moreover, $R$ is differentiable with a Lipschitz gradient.
+
+For the primary results of the paper, the authors consider the gradient flow of the objective function $F_{\alpha}$. For initialization $w_0$, the gradient flow is the path $(w_{\alpha}(t))_{t \geq 0}$ in the space of parameters $\mathbb{R}^p$ that satisfies $w_{\alpha}(0) = w_0$ and solves the ordinary differential equation
+\begin{align*}
+    w_{\alpha}'(t) = - \nabla F_{\alpha}(w_{\alpha}(t)) = - \frac{1}{\alpha} Dh(w_{\alpha}(t))^T \nabla R(\alpha h(w_{\alpha}(t))),
+\end{align*}
+where $Dh^T$ is the adjoint of the differential $Dh$. The authors compare this dynamic to the gradient flow $(\overline{w}_{\alpha}(t))_{t \geq 0}$ of $\overline{F}_{\alpha}$ that satisfies $(\overline{w}_{\alpha}(0) = w_0$ and solves 
+\begin{align*}
+    \overline{w}_{\alpha}'(t) = - \nabla \overline{F}_{\alpha}(\overline{w}_{\alpha}(t)) = - \frac{1}{\alpha} Dh(w_0)^T \nabla R(\alpha \overline{h}(\overline{w}_{\alpha}(t))).
+\end{align*}
+
+The first major result confirms that when $h(w_0) = 0$, then large $\alpha$ leads to lazy training. It is important to point out that here, we do not assume anything about the convexity of the loss $R$.
+\begin{manualtheorem}{2.2}\label{Chizatthm2.2}
+Assume that $h(w_0) = 0$. Given a fixed time horizon $T > 0$, it holds that $\sup_{t \in [0, T]} \left\Vert w_{\alpha}(t) - w_0 \right\Vert = \mathcal{O}(1/\alpha)$,
+\begin{align*}
+    \sup_{t \in [0, T]} \left\Vert w_{\alpha}(t) - \overline{w}_{\alpha}(t) \right\Vert = \mathcal{O}(1/\alpha^2) \quad \text{and} \quad  \sup_{t \in [0, T]} \left\Vert \alpha h(w_{\alpha}(t)) - \alpha \overline{h}(\overline{w}_{\alpha}(t)) \right\Vert = \mathcal{O}(1/\alpha^2).
+\end{align*}
+\end{manualtheorem}
+Each of these three statements is of key importance. The first tells us that as $\alpha$ increases, $w_{\alpha}(t)$ is closer to initialization $w_{\alpha}(0)$ [in the $\ell_2$ norm]. The second tells us that the gradient flow of $F_{\alpha}$ approaches the gradient flow of $\overline{F}_{\alpha}$ as $\alpha$ grows. The last tells us that the scaled model $\alpha h$ approaches the scaled linearized model $\alpha \overline{h}$ for $\alpha$ large. The constants in Theorem \ref{Chizatthm2.2} depend \textit{exponentially on the time horizon $T$}.
+
+In the next portion of their paper, the author gives \textit{uniform} bounds in time and convergence results under the assumption that the loss $R$ is strongly convex. By this assumption, $\overline{F}_{\alpha}$ is strictly convex on the affine hyperspace $w_0 + \text{ker} \ Dh(w_0)^{\perp}$ which contains the linearized gradient flow $(\overline{w}_{\alpha}(t))_{t \geq 0}$. Therefore, $(\overline{w}_{\alpha}(t))_{t \geq 0}$ converges linearly to the unique global minimizer of $\overline{F}_{\alpha}$ (since we assumed strong convexity of $R$). The authors first treat the overparameterized case, when $Dh(w_0)$ is surjective. As they discuss, $\text{rank} \ Dh(w_0)$ gives the degrees of freedom of the model around initialization $w_0$. 
+
+\begin{manualtheorem}{2.4}
+Consider the $M$-smooth and $m$-strongly convex loss $R$ with minimizer $y^{\star}$ and condition number $\kappa := M/m$. Assume that $\sigma_{\text{min}}$, the smallest singular value of $Dh(w_0)^T$, is positive and that the initialization satisfies $\left\Vert h(w_0) \right\Vert \leq C_0:= \sigma_{\text{min}}^3/(32\kappa^{3/2} \left\Vert Dh(w_0) \right\Vert \text{Lip}(Dh))$, where $\text{Lip}(Dh)$ is the Lipschitz constant of $Dh$. If $\alpha > \left\Vert y^{\star} \right\Vert / C_0$, then for $t \geq 0$, it holds
+\begin{align*}
+    \left\Vert \alpha h(w_{\alpha}(t)) - y^{\star} \right\Vert \leq \sqrt{\kappa} \left\Vert \alpha h(w_0) - y^{\star} \right\Vert \exp( -m \sigma_{\text{min}}^2 t/4).
+\end{align*}
+If moreover $h(w_0) = 0$, it holds as $\alpha \rightarrow \infty$, $\sup_{t \geq 0} \left\Vert w_{\alpha}(t) - w_0 \right\Vert = \mathcal{O}(1/\alpha)$,
+\begin{align*}
+    \sup_{t \geq 0} \left\Vert \alpha h(w_{\alpha}(t)) - \alpha \overline{h}(\overline{w}_{\alpha}(t)) \right\Vert = \mathcal{O}(1/\alpha) \quad \text{and} \quad  \sup_{t \geq 0} \left\Vert w_{\alpha}(t) - \overline{w}_{\alpha}(t) \right\Vert = \mathcal{O}(\log \alpha/\alpha^2).
+\end{align*}
+\end{manualtheorem}
+Notice that there is no dependence here on the time horizon $T$, as there was in Theorem \ref{Chizatthm2.2}. Instead, we get a bound that is uniform in $t \geq 0$.
+
+Removing the overparameterized assumption, the authors prove linear convergence of the gradient flow for large values of $\alpha$:
+\begin{manualtheorem}{2.5}
+Assume that $\mathcal{F}$ is separable, R is strongly convex, $h(w_0) = 0$, and $\text{rank} \ Dh(w)$ is constant on a neighborhood of $w_0$. Then there exists ${\alpha_0} > 0$ such that for all $\alpha > \alpha_0$, the gradient flow converges at a geometric rate (asymptotically independent of $\alpha$) to a local minimum of $F_{\alpha}$.
+\end{manualtheorem}
+And so we have that, for sufficiently large $\alpha$, $\lim_{t \rightarrow \infty} w_{\alpha}(t)$ is a strict local minimizer. It is not in general, though, a global minimizer of $F_{\alpha}$ \textit{because the image of $Dh(w_0)$ need not contain the global minimizer of $R$}.
+
+\subsection{Applications to Neural Networks}
+Of importance to our present research, Chizat and colleagues discuss how these theoretical results may be applied to deep leaning problems. In these problems, we typically have a function $f$ that maps from $\mathbb{R}^p \times \mathbb{R}^d$ to $\mathbb{R}^k$, where $\mathbb{R}^d$ is the input space and $\mathbb{R}^k$ is the output space. To relate this $f$ to the problem under consideration, let $\mathcal{F}$ be a Hilbert space of functions from $\mathbb{R}^d$ to $\mathbb{R}^k$. For example, we can have $\mathcal{F} = L^2(\rho_x, \mathbb{R}^k)$ where $\rho_x$ is the distribution of input samples. So then $h: \mathbb{R}^p \rightarrow L^2(\rho_x, \mathbb{R}^k)$ maps a vector of parameters to a predictor. That is, $h: w \mapsto f(w, \cdot)$.
+
+One particular application is the two-layer neural network
+\begin{align*}
+    f_m(w, x) = \alpha(m) \sum_{j=1}^m b_j \cdot \sigma(a_j \cdot x),
+\end{align*}
+where $m$ is the size of the hidden layer, $\sigma: \mathbb{R} \rightarrow \mathbb{R}$ is an activation function, and $(\theta_j)_{j=1}^m$, $\theta_j = (a_j, b_j) \in \mathbb{R}^{d+1}$ are the parameters. Here $\alpha(m)$ is the scaling factor as previously discussed. Note that in order for $h$ to be differentiable, we must have that $\sigma$ is smooth.
+
 \section{Neural Tangent Kernel: Convergence and Generalization in Neural Networks, Jacot, Gabriel, and Hongler 2018}
+
+The paper by Jacot and colleagues studies the training of artificial neural networks in the infinite width limit. They consider fully-connected ANNs with layers numbered from $0$ (input) to $L$ (output), each containing $n_0, \ldots, n_L$ neurons, and with a Lipschitz, twice-differentiable nonlinearity function $\sigma: \mathbb{R} \rightarrow \mathbb{R}$. The authors remark that the smoothness assumption on $\sigma$, while useful for proving the desired results, do not seem to be necessary. Popular activation functions like the ReLU are clearly not twice-differentiable, and so it is reassuring that the result holds true outside of the differentiability assumptions. The paper focuses on what the authors call the ANN realization function $F^{(L)}: \mathbb{R}^p \rightarrow \mathcal{F}$, which maps parameters $\theta$ to functions $f_{\theta}$ in the space $\mathcal{F}$. As is true in a general fully-connected neural network, the parameters consist of the connection matrices $W^{(\ell)} \in \mathbb{R}^{n_{\ell} \times n_{\ell +1}}$ and bias vectors $b^{(\ell)} \in \mathbb{R}^{n_{\ell + 1}}$ for $\ell = 0, \ldots, L-1$. 
+
+\subsection{The Kernel Gradient}
+The training of an ANN involves optimizing $f_{\theta}$ in the function space $\mathcal{F}$ with respect to a functional cost $C: \mathcal{F} \rightarrow \mathbb{R}$. And even for a convex functional cost $C$, the composite cost $C \circ F^{(L)}: \mathbb{R}^p \rightarrow \mathbb{R}$ is in general highly non-convex. 
+
+The authors show that during training, the network function $f_{\theta}$ follows descent along the kernel gradient with respect to the Neural Tangent Kernel (NTK). That is, during training the network function $f_{\theta}$ evolves along the negative kernel gradient
+\begin{align*}
+    \partial_t f_{\theta(t)} = - \nabla_{\Theta^{(L)}} C|_{f_{\theta(t)}}
+\end{align*}
+with respect to the \textit{neural tangent kernel} (NTK)
+\begin{align*}
+    \Theta^{(L)}(\theta) = \sum_{p=1}^P \partial_{\theta_p} F^{(L)}(\theta) \otimes \partial_{\theta_p} F^{(L)}(\theta).
+\end{align*}
+The realization function $F^{(L)}$ is not linear (in $\theta \in \mathbb{R}^p$). As a consequence, $\partial_{\theta_p} F^{(L)}(\theta)$, and thus the neural tangent kernel, depend on the parameters $\theta$. The NTK is random at initialization (since the authors initialize the parameters as i.i.d. $\mathcal{N}(0,1)$) and varies during training. 
+
+For a more rigorous treatment of the kernel gradient, see section 3 of \cite{woodworth2020kernel}.
+
+\subsection{Key Results}
+Below, we summarize the principal results of the paper without 
 
 \section{Implicit Regularization in Matrix Factorization, Gunasekar et al. 2017}
 \subsection{Matrix Factorization Problem}
