@@ -408,6 +408,35 @@ If the matrix factorization is non-degenerate i.e. has depth $N \geq 2$, the sin
 \end{manualtheorem}
 Theorem \ref{arorathm3} establishes a tendency of gradient descent for matrix factorization problems to low rank solutions, which intensifies with the depth $N$ of the network. This is because the dynamics promote solutions that have a few large singular values and many small ones; the gap grows more extreme the deeper the matrix factorization (see Figure 3 on p. 9).
 
+\section{On the Global Convergence of Gradient Descent for Over-parameterized Models Using Optimal Transport, Chizat and Bach 2018}
+
+\subsection{Problem Statement}
+Chizat and Bach discuss the problem of finding an element in the Hilbert space $\mathcal{F}$ that minimizes a smooth, convex loss function $R: \mathcal{F} \rightarrow \mathbb{R}_+$ and that is a linear combination of a few elements from a large given parameterized set $\{ \phi(\theta) \}_{\theta \in \Theta} \subset \mathcal{F}$. They state that a general formulation of the problem is to describe the linear combination through an \textit{unknown signed measure $\mu$} on the parameter space and solve for
+\begin{align*}
+    J^* = \underset{\mu \in \mathcal{M}(\Theta)}{\min} \ J(\mu), \qquad J(\mu) := R \left( \int \phi d\mu \right) + G(\mu)
+\end{align*}
+where $\mathcal{M}(\Theta)$ is the set of signed measures on the parameter space $\Theta$ and $G: \mathcal{M}(\Theta) \rightarrow \mathbb{R}$ is an optional convex regularizer. In the present paper, the authors focus on the infinite-dimensional case where the parameter space is a domain of $\mathbb{R}^d$ and $\theta \rightarrow \phi(\theta)$ is differentiable.
+
+While this framework may appear highly theoretical, it includes training neural works with a single hidden layer. Particularly, suppose we wish to select a function belonging to a certain class that maps features in $\mathbb{R}^{d-1}$ to labels in $\mathbb{R}$. In this case, we would have Hilbert space $\mathcal{F} = L^2(\mathbb{R}^{d-1}, \rho_x)$, quadratic or logistic loss function $R$, and $\phi(\theta): x \mapsto \sigma(\sum_{i=1}^{d-1} \theta_i x_i + \theta_d)$ with activation function $\theta: \mathbb{R} \rightarrow \mathbb{R}$
+
+\subsection{Particle Gradient Descent}
+The authors discuss particle gradient descent, a technique for finding approximate minimizers of the above problem. Particle gradient descent exploits the differentiability of $\phi$ and consists of discretizing the unknown measure $\mu$ as a mixture of $m$ particles parameterized by their positions and weights. This finite-dimensional problem is
+\begin{align*}
+    \underset{\boldsymbol{w} \in \mathbb{R}^m, \boldsymbol{\theta} \in \Theta^m}{\min} J_m(\boldsymbol{w}, \boldymbol{\theta}) \quad \text{where} \quad J_m(\boldsymbol{w}, \boldsymbol{\theta}) := J \left( \frac{1}{m} \sum_{i=1}^m w_i \delta_{\theta_i} \right)
+\end{align*}
+and can be solved with classical gradient-based algorithms.
+
+The contributions of the paper are as follows: Chizat and Bach first introduce a more general class of problems and study the particle gradient flow for $m$ large (i.e. when there are many particles). They characterize the many particle limit as a \textit{Wasserstein gradient flow}. Then, under certain assumptions on $\phi$ and the initialization, they prove that if the Wasserstein gradient flow converges, then the limit is a global minimizer of $J$. Under these same assumptions, if
+$(\boldsymbol{w}^{(m)}(t), \boldymbol{\theta}^{(m)}(t))_{t \geq 0}$ are gradient flows for $J_m$ suitably initialized, then 
+\begin{align*}
+    \lim_{m , t \rightarrow \infty} J(\mu_{m, t}) = J^* \quad \text{where} \quad \mu_{m,t} = \frac{1}{m} \sum_{i=1}^m w_i^{(m)}(t) \delta_{\theta_i^{(m)}(t)}.
+\end{align*}
+That is, in the infinite particle limit and as $t$ in the gradient flow tends to infinity, then the solution to the particle problem is also a solution (i.e. global minimizer) to the infinite-dimensional problem we originally stated.
+
+\section{Universal Approximation Bounds for Superpositions of a Sigmoidal Function, Barron 1993}
+
+\section{Approximation and Estimation Bounds for Artificial Neural Networks, Barron 1993}
+
 \bibliographystyle{siam}
 \bibliography{References/biblio}
 
