@@ -294,7 +294,27 @@ The realization function $F^{(L)}$ is not linear (in $\theta \in \mathbb{R}^p$).
 For a more rigorous treatment of the kernel gradient, see section 3 of \cite{woodworth2020kernel}.
 
 \subsection{Key Results}
-Below, we summarize the principal results of the paper without 
+Below, we summarize the principal results of the paper without focusing too much on the particular math. 
+
+The first key result tells us that as the width of the ANN tends to infinity, the NTK converges in probability to an explicit deterministic limit.
+\begin{manualtheorem}{1}
+For a network of depth $L$ at initialization, with a Lipschitz nonlinearity $\sigma$, and in the limit as the layers width $n_1, \ldots, n_{L-1} \rightarrow \infty$, the NTK $\Tmega^{(L)}$ converges in probability to a deterministic limiting kernel
+\begin{align*}
+    \Theta^{(L)} \rightarrow \Theta_{\infty}^{(L)} \otimes Id_{n_L}.
+\end{align*}
+\end{manualtheorem}
+A specific definition for this limiting kernel is given in the paper and is in terms of the Gaussian processes to which the output functions $f_{\theta, k}$ tend in the infinite width limit $n_1, \ldots, n_{L-1} \rightarrow \infty$.
+
+The second main theorem discusses the behavior of the NTK during training. Particularly, in the infinite-width limit, the NTK remains asymptotically constant during training. Recall that this is exactly the \enquote{kernel regime} discussed in both \cite{woodworth2020kernel} and \cite{chizat2018lazy} where the model's gradient flow dynamic approaches that of a linearized model.
+\begin{manualtheorem}
+Assume that $\sigma$ is a Lipschitz, twice differentiable nonlinearity function, with bounded second derivative. For any $T$ such that the integral $\int_0^T \left\Vert d_t \right\Vert_{p^{in}} \ dt$ stays stochastically bounded, as $n_1, \ldots, n_{L-1} \rightarrow \infty$ we have, uniformly for $t \in [0, T]$
+\begin{align*}{2}
+    \Theta^{(L)}(t) \rightarrow \Theta_{\infty}^{(L)} \otimes Id_{n_L}.
+\end{align*}
+\end{manualtheorem}
+As is discussed in section 3 of the paper, the convergence of the neural tangent kernel to a critical point of the cost function $C$ \textit{is guaranteed for positive definite kernels}. The authors note that the limiting NTK $\Theta_{\infty}$ is positive definite if the span of the derivatives $\partial_{\theta_p}F^{(L)}, \ p = 1, \ldots, P$ becomes dense in $\mathcal{F}$ with respect to the $p^{in}$ norm as the width grows to infinity
+
+\hl{TODO: ask Professor Zhou about convergence along the principal components of the input data with respect to the NTK}
 
 \section{Implicit Regularization in Matrix Factorization, Gunasekar et al. 2017}
 \subsection{Matrix Factorization Problem}
