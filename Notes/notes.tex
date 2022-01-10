@@ -306,15 +306,15 @@ For a network of depth $L$ at initialization, with a Lipschitz nonlinearity $\si
 A specific definition for this limiting kernel is given in the paper and is in terms of the Gaussian processes to which the output functions $f_{\theta, k}$ tend in the infinite width limit $n_1, \ldots, n_{L-1} \rightarrow \infty$.
 
 The second main theorem discusses the behavior of the NTK during training. Particularly, in the infinite-width limit, the NTK remains asymptotically constant during training. Recall that this is exactly the \enquote{kernel regime} discussed in both \cite{woodworth2020kernel} and \cite{chizat2018lazy} where the model's gradient flow dynamic approaches that of a linearized model.
-\begin{manualtheorem}
+\begin{manualtheorem}{2}
 Assume that $\sigma$ is a Lipschitz, twice differentiable nonlinearity function, with bounded second derivative. For any $T$ such that the integral $\int_0^T \left\Vert d_t \right\Vert_{p^{in}} \ dt$ stays stochastically bounded, as $n_1, \ldots, n_{L-1} \rightarrow \infty$ we have, uniformly for $t \in [0, T]$
-\begin{align*}{2}
+\begin{align*}
     \Theta^{(L)}(t) \rightarrow \Theta_{\infty}^{(L)} \otimes Id_{n_L}.
 \end{align*}
 \end{manualtheorem}
-As is discussed in section 3 of the paper, the convergence of the neural tangent kernel to a critical point of the cost function $C$ \textit{is guaranteed for positive definite kernels}. The authors note that the limiting NTK $\Theta_{\infty}$ is positive definite if the span of the derivatives $\partial_{\theta_p}F^{(L)}, \ p = 1, \ldots, P$ becomes dense in $\mathcal{F}$ with respect to the $p^{in}$ norm as the width grows to infinity
+As is discussed in section 3 of the paper, the convergence of the neural tangent kernel to a critical point of the cost function $C$ \textit{is guaranteed for positive definite kernels}. The authors note that the limiting NTK $\Theta_{\infty}$ is positive definite if the span of the derivatives $\partial_{\theta_p}F^{(L)}, \ p = 1, \ldots, P$ becomes dense in $\mathcal{F}$ with respect to the $p^{in}$ norm as the width grows to infinity.
 
-\hl{TODO: ask Professor Zhou about convergence along the principal components of the input data with respect to the NTK}
+9\hl{TODO: ask Professor Zhou about convergence along the principal components of the input data with respect to the NTK (see section 5 of the paper)}
 
 \section{Implicit Regularization in Matrix Factorization, Gunasekar et al. 2017}
 \subsection{Matrix Factorization Problem}
@@ -436,7 +436,7 @@ That is, in the infinite particle limit and as $t$ in the gradient flow tends to
 \section{Universal Approximation Bounds for Superpositions of a Sigmoidal Function, Barron 1993}
 
 \subsection{Main Results}
-\begin{manualtheorem}{1}
+\begin{manualtheorem}{1}\label{barron1993thm1}
 For every function in $\Gamma_{B, C}$, every sigmoidal function $\phi$, every probability measure $\mu$, and every $n \geq 1$, there exists a linear combination of sigmoidal functions $f_n(x)$ of the form
 \begin{align*}
     f_n(x) = \sum_{k=1}^n c_k \phi(a_k \cdot x + b_k) + c_0
@@ -457,6 +457,37 @@ where $B_r = \{ x \in H: \left| x \right| \leq r \}$ is the Hilbert space ball o
 \end{manualtheorem}
 
 \section{Approximation and Estimation Bounds for Artificial Neural Networks, Barron 1993}
+
+\subsection{Main Results}
+The paper begins with a summary of the problem presented in \cite{barron1993universal}, but also makes an insightful remark: \enquote{In the case that $\hat{f}_n$ is a neural network function estimated from data, the norm $\Vert f - \hat{f}_n \Vert_{L_2(\mu, B)}$ measures the ability of the neural network to generalize to new data drawn with distribution $\mu$. In contrast, the empirical risk $(1/N) \sum_{i=1}^N (f(X_i) - f_n(X_i))^2$ only measures the accuracy of the observed data points $X_i, \ i = 1, 2, \ldots, N$.} 
+Barron then remarks that the first step to obtain a bound on the statistical risk $\Vert f - \hat{f}_n \Vert$ is to bound the approximation error $\Vert f - f_n \Vert$ of the best neural network of size $n$. To do so, he uses a special case of Theorem \ref{barron1993thm1} from \cite{barron1993universal}:
+\begin{manualtheorem}{1}
+Given an arbitrary sigmoidal function $\phi$, an arbitrary target function $f$ with $C_f$ finite, and a probability measure $\mu$ on a domain $[-1, 1]^d$, then for every $n \geq 1$, there exists an artificial neural network of the form
+\begin{align*}
+    f_n(x) = f_n(x, \theta) = \sum_{k=1}^n c_k \phi(a_k \cdot x + b_k) + c_0
+\end{align*}
+such that 
+\begin{align*}
+    \Vert f - f_n \Vert \leq \frac{C_f}{\sqrt{n}}.
+\end{align*}
+For functions $f$ with $C_f \leq C$, the parameters may be restricted to satisfy $\sum_{k=1}^n \left| c_k \right| \leq C$, $\left|c_0 - f(0) \right| \leq C$, and $\left| b_k \right| \leq \left| a_k \right|_1$. 
+\end{manualtheorem}
+
+\begin{manualtheorem}{2}
+Let a neural network be estimated by least squares with a complexity penalty (see pp. 121-122), where the range of $Y$ and each candidate function is restricted to a known interval of length $b$, then for any $\lambda > 5b^2/3$, for all $n \geq 1$, and all $N \geq 1$,
+\begin{align*}
+    \mathbb{E} \Vert f - \hat{f}_{n, N} \Vert \leq \gamma R_{n, N}(f) + \frac{2 \gamma \lambda}{N}
+\end{align*}
+and 
+\begin{align*}
+    \mathbb{E} \Vert f - \hat{f}_{N} \Vert \leq \gamma R_{N}(f) + \frac{2 \gamma \lambda}{N}
+\end{align*}
+where $\gamma = (3\lambda + b^2)/(3\lambda - 5b^2)$. Thus,
+\begin{align*}
+    \mathbb{E} \Vert f - \hat{f}_N \Vert \leq \mathcal{O}(R_N(f)).
+\end{align*}
+\end{manualtheorem}
+Here, $\hat{f}_{n, N}$ is the least-squares estimator with a complexity penalty, and $\hat{f}_N = \hat{f}_{\hat{n}, N}$ is the minimum complexity estimator (we estimate both $n$ and $\theta$).
 
 \bibliographystyle{siam}
 \bibliography{References/biblio}
