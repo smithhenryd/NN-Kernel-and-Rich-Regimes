@@ -60,9 +60,9 @@ The first portion of the project will focus on reproducing and extending the res
 
 Without digging too deep into the weeds, suppose that model $f$ maps from the parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$ that represents  the space of possible functions our neural network can represent.\footnote{A common example is $\mathcal{F} = L^2(\rho_x, \mathbb{R}^k)$, where $\rho_x$ is the distribution of training observations.} Assuming that our model $f$ satisfies some technical conditions detailed in \cite{chizat2018lazy}, then as $\alpha \rightarrow \infty$ in the initialization $\alpha \boldsymbol{w}_0$, we have that $f$ approaches the affine model 
 \begin{align}\label{linearizedmodel}
-    \overline{f}(\boldsymbol{w}) := f(\alpha \boldsymbol{w}_0) + \langle \nabla f(\alpha\boldsymbol{w_0}), \boldsymbol{w} - \boldsymbol{w}_0 \rangle
+    \bar{f}(\boldsymbol{w}) := f(\alpha \boldsymbol{w}_0) + \langle \nabla f(\alpha\boldsymbol{w_0}), \boldsymbol{w} - \boldsymbol{w}_0 \rangle
 \end{align}
-in the Hilbert space norm for all times $t \geq 0$ in the gradient flow dynamics \cite{chizat2018lazy}. That is, in the kernel regime, training our model $f$ is exactly equivalent to training an affine model $\overline{f}$. Notice that for this affine model $\overline{f}$, the gradient $\nabla \overline{f}(\boldsymbol{w}(t)) = \nabla f(\alpha \boldsymbol{w}_0)$ for all times $t \geq 0$, assuming that $\boldsymbol{w}(t)$ evolves according to the gradient flow dynamics with $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$.
+in the Hilbert space norm for all times $t \geq 0$ in the gradient flow dynamics \cite{chizat2018lazy}. That is, in the kernel regime, training our model $f$ is exactly equivalent to training an affine model $\bar{f}$. Notice that for this affine model $\bar{f}$, the gradient $\nabla \bar{f}(\boldsymbol{w}(t)) = \nabla f(\alpha \boldsymbol{w}_0)$ for all times $t \geq 0$, assuming that $\boldsymbol{w}(t)$ evolves according to the gradient flow dynamics with $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$.
 
 Therefore, we can look at the \textit{neural tangent kernel} (NTK)
 \begin{align*}
@@ -80,7 +80,7 @@ This bring me to my first goal for the project: to visualize how the NTK evolves
 \end{align*}
 I plan to use TensorFlow, a deep learning library for Python, to construct and optimize the model with weight initialization $\alpha \boldsymbol{w}_0$. Training will be performed using gradient descent, which can be thought of as a discretization of the gradient flow dynamic with some stepsize $\eta > 0$. During each $n$th iteration of the training procedure, I will evaluate the NTK at the training points $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_N$. This will allow us to visualize the changing of the NTK as we interpolate between the kernel and rich regimes.
 
-In addition to the neural tangent kernel, we will also study how the network weights $\boldsymbol{w}$ evolve throughout training. From our previous discussion of the kernel regime, we know that as $\alpha \rightarrow \infty$, the gradient flow of $L(f(\boldsymbol{w}))$ approaches that of $L(\overline{f}(\boldsymbol{w}))$. Accordingly, we can observe the $\ell_2$ distance between the weights of the model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\overline{\boldsymbol{w}}(t)$, for various values of $\alpha$ during training. We will do so using a deep learning model implemented in Python as described in the previous paragraph.
+In addition to the neural tangent kernel, we will also study how the network weights $\boldsymbol{w}$ evolve throughout training. From our previous discussion of the kernel regime, we know that as $\alpha \rightarrow \infty$, the gradient flow of $L(f(\boldsymbol{w}))$ approaches that of $L(\bar{f}(\boldsymbol{w}))$. Accordingly, we can observe the $\ell_2$ distance between the weights of the model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\bar{\boldsymbol{w}}(t)$, for various values of $\alpha$ during training. We will do so using a deep learning model implemented in Python as described in the previous paragraph.
 
 Moving away from the mathematics motivating the kernel regime, we will look at the generalizability of neural networks under the kernel and rich regimes. From the prior section, we know that for a fixed number of training observations $N$, overparameterized networks trained in the rich regime generally achieve smaller test errors than those trained in the kernel regime. We will demonstrate that this observation holds even for more complex models, such as fully-connected ReLU networks with multiple hidden layers or CNNs. Once again, we will build and train each model in Python with TensorFlow, and we will subsequently evaluate the test error once the model has been trained to approximately zero training loss. More important than exhibiting the transition between the rich and kernel regimes, we will find the specific initialization scale necessary to train in the rich regime. In doing so, we will consider both $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$ and $\boldsymbol{w}(0)_i \overset{i.i.d.}{\sim} \mathcal{W}$.
 
@@ -90,23 +90,22 @@ Should time permit, I would also like to examine the role of network depth on th
 \section{Deliverables}
 \begin{enumerate}
     \item \textit{At least} one deep learning model implemented in Python using TensorFlow
-    \item Python visualization of the neural tangent kernel while training in the rich and kernel regimes
-    \item Plot of the $\ell_2$ distance between the weights of the original model, $\boldsymbol{w}(t)$, and those of the linearized model (\ref{linearizedmodel}), $\overline{\boldsymbol{w}}(t)$, throughout training with gradient descent for various $\alpha$
+    \item Python visualization of the neural tangent kernel $K_{\boldsymbol{w}(t)}$ while training in the rich and kernel regimes
+    \item Plot of the $\ell_2$ distance between the weights of the original model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\bar{\boldsymbol{w}}(t)$, throughout training with gradient descent for various $\alpha$
     \item Graph of test error versus initialization scale for a ReLU network with $k$ hidden layers
     \item Analysis of the initialization scale necessary to train in the rich regime for a ReLU network with $k$ hidden layers
 \end{enumerate}
 
 \section{Tentative Timeline}
-\noindent\begin{tabular*}{\textwidth}{@{\hspace{\labelwidth}\llap{\labelitemi}\hspace{\labelsep}}p{3in}@{\extracolsep{\fill}}r}
+\noindent\begin{tabular*}{\textwidth}{@{\hspace{\labelwidth}\llap{}\hspace{\labelsep}}p{3in}@{\extracolsep{\fill}}r}
     Literature review, discussion with Professor Zhou & January 25 -- February 6\\[\itemsep]
     Code first model in Python with Tensorflow & January 30 -- February 20\\[\itemsep]
-    Visualize the NTK throughout training & February 20 -- March 6\\[\itemsep]
-    Implement and train linearized model & March 6 -- March 18\\[\itemsep]
+    Visualize the NTK during training for various $\alpha$  & February 20 -- March 6\\[\itemsep]
+    Implement and train affine model (\ref{linearizedmodel}) & March 6 -- March 18\\[\itemsep]
     Write code for, train ReLU neural network & March 28 -- April 10\\[\itemsep]
     Visualize test loss versus initialization scale & April 10 -- April 24\\[\itemsep]
     Prepare final report, poster & April 17 -- May 5\\[\itemsep]
 \end{tabular*}
-
 
 \bibliographystyle{siam}
 \bibliography{References/biblio}
