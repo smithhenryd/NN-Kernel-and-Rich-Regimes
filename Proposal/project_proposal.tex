@@ -33,12 +33,72 @@
 
 % Title content
 \title{\textbf{S\&DS Senior Project Proposal: \\Kernel and Rich Regimes in Deep Learning}}
-\author[]{Henry Smith}
+\author[]{Henry Smith \\
+Advised by Professor Harrison Zhou}
 \affil[]{\normalsize Yale University}
 \date{\today}
 
 \begin{document}
 
 \maketitle
+
+\section{Problem Overview}
+Much of the popularity and success of contemporary deep learning models can be attributed to their ability to generalize well when presented with unseen data. Indeed, researchers have constructed convolutional neural networks (CNNs) that achieve $< 1$\% test error on the MNIST dataset, outpacing other popular machine learning classifiers (k-nearest neighbors, support vector machines, etc.). Despite the widespread application of neural networks, practitioners remain largely unsure about the mathematical justification for why they generalize so well. 
+
+Broadly speaking, neural networks are highly overparameterized; that is, the dimension of the parameter space $\boldsymbol{w} \in \mathbb{R}^p$ is much larger than the number of observations $N$ with which the network is trained. As a result, the loss function $L$—which measures the misfit of the model for the training data $(\boldsymbol{x}_1, y_1), \ldots, (\boldsymbol{x}_N, y_N)$\\—often has many global minima where zero training error is achieved. As keenly noted in \cite{woodworth2020kernel}, though, not all of these minima result in a model $f$ which generalizes equally well.
+
+The goal of the present project is to understand the conditions under which training an overparameterized neural network will lead to a solution that generalizes well. Both \cite{chizat2018lazy} and \cite{woodworth2020kernel} investigate this problem and establish a connection between a network's initialization and the solution reached by the gradient flow dynamics. In particular, consider a network $f$ initialized with weight vector $\alpha \boldsymbol{w}_0$ and trained with a fixed $N$-many observations. Here, $\alpha > 0$ serves as a scaling parameter. Under certain conditions on the model $f$ and loss function $L$, it is observed that as $\alpha \rightarrow \infty$, the gradient flow solution generalizes poorly on test data. \cite{chizat2018lazy} and \cite{woodworth2020kernel} refer to this limit as the \enquote{lazy} or \enquote{kernel} regime. Conversely, as $\alpha \rightarrow 0$ we observe the \enquote{rich limit} in which the gradient flow solution generalizes well. In the common setting of a neural network with weights initialized $\boldsymbol{w}_i \overset{i.i.d.}{\sim} \mathcal{W}$, one would analogously look at $\text{Var}(\mathcal{W})$, with the kernel regime induced as $\text{Var}(\mathcal{W}) \rightarrow \infty$ and the rich limit as $\text{Var}(\mathcal{W}) \rightarrow 0$.
+
+Naturally, one might ask why one cannot take the initialization scale $\alpha$ to be arbitrarily small so as to achieve a model with the desired test error. It is important to note, though, that for many problems, $\boldsymbol{w} = \vec{0}$ is a saddle point for the objective $L(f(\boldsymbol{w}))$, and so taking $\alpha$ too small makes the optimization problem computationally intractable. Consequently, \cite{woodworth2020kernel} discusses the ideal scenario in which one should choose an initialization scale that acts \enquote{at the edge of the rich limit.} That is, one should choose $\alpha$ small enough so that the solution realized by gradient flow generalizes well (i.e. is in the \enquote{rich} training regime), but is also not so small that optimization is infeasible. 
+
+Woodworth and colleagues in \cite{woodworth2020kernel} posit that the contemporary successes in deep learning are a result of models that operate in the rich regime. The implications of this statement are self-evident, and they warrant further computational and theoretical study of the kernel and rich limits.
+
+\section{Problem Statement \& Methodology}
+\subsection{Computational Experiments}
+The first portion of the project will focus on reproducing and extending the results from \cite{chizat2018lazy} and \cite{woodworth2020kernel}. Underlying the previously mentioned kernel and rich regimes, there is rich literature discussing what happens mathematically as these limits are reached. 
+
+Without digging too deep into the weeds, suppose that model $f$ maps from the parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$ that represents  the space of possible functions our neural network can represent.\footnote{A common example is $\mathcal{F} = L^2(\rho_x, \mathbb{R}^k)$, where $\rho_x$ is the distribution of training observations.} Assuming our model $f$ satisfies some technical conditions detailed in \cite{chizat2018lazy}, then as $\alpha \rightarrow \infty$ in the initialization $\alpha \boldsymbol{w}_0$, we have that $f$ approaches the affine model 
+\begin{align}\label{linearizedmodel}
+    \overline{f}(\boldsymbol{w}) := f(\alpha \boldsymbol{w}_0) + \langle \nabla f(\alpha\boldsymbol{w_0}), \boldsymbol{w} - \boldsymbol{w}_0 \rangle
+\end{align}
+in the Hilbert space norm for all times $t \geq 0$ in the gradient flow dynamics \cite{chizat2018lazy}. That is, in the kernel regime, training our model $f$ is exactly equivalent to training an affine model $\overline{f}$. Notice that for this affine model $\overline{f}$, the gradient $\nabla \overline{f}(\boldsymbol{w}(t)) = \nabla f(\alpha \boldsymbol{w}_0)$ for all times $t \geq 0$, assuming that $\boldsymbol{w}(t)$ evolves according to the gradient flow dynamics satisfying $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$.
+
+Therefore, we can look at the \textit{neural tangent kernel} (NTK)
+\begin{align*}
+    K_{\boldsymbol{w}(t)}(\boldsymbol{x}, \boldsymbol{x}') = \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}(t))(\boldsymbol{x}), \nabla_{\boldsymbol{w}} f(\boldsymbol{w}(t))(\boldsymbol{x}') \rangle
+\end{align*}
+as a proxy for the kernel regime \cite{jacot2018neural}. Specifically, as a model approaches the kernel limit, we should observe that the NTK remains almost constant throughout training. 
+
+This bring me to my first goal for the project: visualizing how the NTK evolves thoughout training for the rich versus kernel regimes. To do so, I will generate a training dataset in Python which corresponds to an appropriate model. Of particular interest is the least-squares model considered in \cite{woodworth2020kernel}:
+\begin{align*}
+    f(\boldsymbol{w})(\boldsymbol{x}) = \sum_{i=1}^d (\boldsymbol{w}_{+, i}^2 - \boldsymbol{w}_{-, i}^2)\boldsymbol{x}_i = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle, \quad \boldsymbol{w} = \begin{bmatrix}
+                        \boldsymbol{w}_+ \\
+                        \boldsymbol{w}_-
+                        \end{bmatrix} \in \mathbb{R}^{2d},
+    \quad \boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{w}_+^2 - \boldsymbol{w}_-^2.
+\end{align*}
+Thereafter, I plan to use TensorFlow, a deep learning library for Python, to construct and optimize the model with weight initialization $\alpha \boldsymbol{w}_0$. Training will be performed using gradient descent, which can be thought of as a discretization of the gradient flow dynamic with some stepsize $\eta > 0$. During each $n$th iteration of the training procedure, I will evaluate the NTK at the training points $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_N$. This will allow us to visualize how the NTK varies during training as the we interpolate between the kernel and rich regimes.
+
+In addition to the neural tangent kernel, we will also study how the weights $\boldsymbol{w}$ evolve throughout training. From our previous discussion of the kernel regime, we know that as $\alpha \rightarrow \infty$, the gradient flow of $L(f(\boldsymbol{w}))$ approaches that of $L(\overline{f}(\boldsymbol{w}))$. Accordingly, we can observe the $\ell_2$ distance between the weights of the model, $\boldsymbol{w}$, and those of the affine model (\ref{linearizedmodel}), $\overline{\boldsymbol{w}}$, for various values of $\alpha$ during training. We will do so using a deep learning model implemented in Python as described in the previous paragraph.
+
+Moving away from the mathematics behind the kernel regime, we will look at the generalizability of neural networks under the kernel and rich regimes. From the prior section, we know that for a fixed number of training observations $N$, overparametrized networks trained in the rich regime generally acheieve smaller test errors than those trained in the kernel regime. We will demonstrate that this observation holds even for more complex models, such as fully-connected ReLU networks with multiple hidden layers or CNNs. Once again, we will build and train each model in Python with Tensorflow, and we will subsequently evaluate the test error once the model has been trained to approximately zero training loss. A primary goal of the project is to determine the initialization scale necessary to achieve 
+
+Should time permit, I would also like to consider the role of network depth on the transition between the kernel and rich regimes. As proven in \cite{arora2019implicit} and discussed in \cite{woodworth2020kernel}, for increasing degree of homogeneity of the model $f$, the transition between the kernel and rich regimes becomes much sharper. That is, for appropriate network $f$ and loss $L$, then as the depth of the network increases, the $\alpha$ necessary to train in the rich regime also increases. As mentioned by \cite{woodworth2020kernel}, this result suggests the benefit of depth in deep learning. To empirically this result, we would train models of varying depth $D$ each for a range of initialization scales $\alpha$; upon training each network, we would then measure the test error. 
+\subsection{}
+
+\section{Deliverables}
+\begin{enumerate}
+    \item 
+    \item
+    \item
+    \item
+    \item
+\end{enumerate}
+
+\section{Timeline}
+
+
+\bibliographystyle{siam}
+\bibliography{References/biblio}
 
 \end{document}
