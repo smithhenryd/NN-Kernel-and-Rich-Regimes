@@ -58,11 +58,11 @@ Woodworth and colleagues in \cite{woodworth2020kernel} posit that the contempora
 \subsection{Computational Experiments}
 The first portion of the project will focus on reproducing and extending the results from \cite{chizat2018lazy} and \cite{woodworth2020kernel}. Underlying the previously mentioned kernel and rich regimes, there is rich literature discussing what happens mathematically as these limits are reached. 
 
-Without digging too deep into the weeds, suppose that model $f$ maps from the parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$ that represents  the space of possible functions our neural network can represent.\footnote{A common example is $\mathcal{F} = L^2(\rho_x, \mathbb{R}^k)$, where $\rho_x$ is the distribution of training observations.} Assuming that our model $f$ satisfies some technical conditions detailed in \cite{chizat2018lazy}, then as $\alpha \rightarrow \infty$ in the initialization $\alpha \boldsymbol{w}_0$, we have that $f$ approaches the affine model 
+Without digging too deep into the weeds, suppose that model $f$ maps from the parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$ that represents  the space of possible functions our neural network can represent.\footnote{A common example is $\mathcal{F} = L^2(\rho_x, \mathbb{R}^k)$, where $\rho_x$ is the distribution of training observations.} Assuming that our model $f$ and loss $L$ satisfy some technical conditions detailed in \cite{chizat2018lazy}, then as $\alpha \rightarrow \infty$ in the initialization $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$, we have that $f$ approaches the affine model 
 \begin{align}\label{linearizedmodel}
-    \bar{f}(\boldsymbol{w}) := f(\alpha \boldsymbol{w}_0) + \langle \nabla f(\alpha\boldsymbol{w_0}), \boldsymbol{w} - \boldsymbol{w}_0 \rangle
+    \bar{f}(\boldsymbol{w}) := f(\boldsymbol{w}(0)) + \left\langle \nabla f(\boldsymbol{w}(0)), \boldsymbol{w} - \boldsymbol{w}(0) \right\rangle
 \end{align}
-in the Hilbert space norm for all times $t \geq 0$ in the gradient flow dynamics \cite{chizat2018lazy}. That is, in the kernel regime, training our model $f$ is exactly equivalent to training an affine model $\bar{f}$. Notice that for this affine model $\bar{f}$, the gradient $\nabla \bar{f}(\boldsymbol{w}(t)) = \nabla f(\alpha \boldsymbol{w}_0)$ for all times $t \geq 0$, assuming that $\boldsymbol{w}(t)$ evolves according to the gradient flow dynamics with $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$.
+in the Hilbert space norm for all times $t \geq 0$ in the gradient flow dynamics \cite{chizat2018lazy}. That is, in the kernel regime, training our model $f$ is exactly equivalent to training an affine model $\bar{f}$. Notice that for this affine model $\bar{f}$, the gradient $\nabla \bar{f}(\bar{\boldsymbol{w}}(t)) = \nabla f(\bar{\boldsymbol{w}}(0))$ for all times $t \geq 0$, assuming that $\bar{\boldsymbol{w}}(t)$ evolves according to the gradient flow dynamics with $\bar{\boldsymbol{w}}(0) = \alpha \boldsymbol{w}_0$.
 
 Therefore, we can look at the \textit{neural tangent kernel} (NTK)
 \begin{align*}
@@ -85,11 +85,12 @@ In addition to the neural tangent kernel, we will also study how the network wei
 Moving away from the mathematics motivating the kernel regime, we will look at the generalizability of neural networks under the kernel and rich regimes. From the prior section, we know that for a fixed number of training observations $N$, overparameterized networks trained in the rich regime generally achieve smaller test errors than those trained in the kernel regime. We will demonstrate that this observation holds even for more complex models, such as fully-connected ReLU networks with multiple hidden layers or CNNs. Once again, we will build and train each model in Python with TensorFlow, and we will subsequently evaluate the test error once the model has been trained to approximately zero training loss. More important than exhibiting the transition between the rich and kernel regimes, we will find the specific initialization scale necessary to train in the rich regime. In doing so, we will consider both $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$ and $\boldsymbol{w}(0)_i \overset{i.i.d.}{\sim} \mathcal{W}$.
 
 Should time permit, I would also like to examine the role of network depth on the transition between the kernel and rich regimes. As proven in \cite{arora2019implicit} and discussed in \cite{woodworth2020kernel}, for increasing degree of homogeneity of the model $f$, the transition between the kernel and rich regimes becomes much sharper. That is, for appropriate network $f$ and loss $L$, then as the depth of the network increases, the $\alpha$ necessary to train in the rich regime also increases. To empirically verify this result, we would train models of varying depth $D$, each for a range of initialization scales $\alpha$; upon training each network, we would then measure the test error. By plotting the test error versus initialization scale $\alpha$ for each network depth $D$, we could then understand the effect of depth on the transition between the kernel and rich regimes. 
-\subsection{}
+
+\subsection{Theoretical Study of Convergence}
 
 \section{Deliverables}
 \begin{enumerate}
-    \item \textit{At least} one deep learning model implemented in Python using TensorFlow
+    \item \textit{At least} one deep learning model implemented in Python with TensorFlow
     \item Python visualization of the neural tangent kernel $K_{\boldsymbol{w}(t)}$ while training in the rich and kernel regimes
     \item Plot of the $\ell_2$ distance between the weights of the original model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\bar{\boldsymbol{w}}(t)$, throughout training with gradient descent for various $\alpha$
     \item Graph of test error versus initialization scale for a ReLU network with $k$ hidden layers
@@ -106,6 +107,8 @@ Should time permit, I would also like to examine the role of network depth on th
     Visualize test loss versus initialization scale & April 10 -- April 24\\[\itemsep]
     Prepare final report, poster & April 17 -- May 5\\[\itemsep]
 \end{tabular*}
+
+\newpage
 
 \bibliographystyle{siam}
 \bibliography{References/biblio}
