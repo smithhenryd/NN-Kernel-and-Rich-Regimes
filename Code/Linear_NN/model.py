@@ -20,7 +20,7 @@ class Linear_Regression(tf.keras.Model):
         # The network contains a single linear layer
         self.linear_layer_1 = Linear(alpha*w0, **kwargs)
 
-    def call(self, inputs):
+    def call(self, inputs) -> tf.Tensor:
         """
         Evaluates the linear regression model at the specified inputs
 
@@ -45,7 +45,7 @@ class Linear(tf.keras.layers.Layer):
         # Initialize the weight vector
         self.w = tf.Variable(initial_value=w0, trainable=True)
             
-    def call(self, inputs):
+    def call(self, inputs) -> tf.Tensor:
         """
         Evaluates the linear layer at the specified inputs
         """
@@ -55,7 +55,6 @@ class Linear(tf.keras.layers.Layer):
             d = int(tf.shape(self.w)[0]/2)
             W = tf.reshape(weights_sq[0:d,0] - weights_sq[d:,0], (-1, 1))
             return tf.matmul(inputs, W)
-
         except:
             raise ValueError(f"Size of network weights must be twice the size of inputs: network weights {tf.shape(self.w)[0]}, inputs {tf.shape(inputs)[0]}")
 
