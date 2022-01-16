@@ -54,15 +54,25 @@ class Linear(tf.keras.layers.Layer):
         """
 
         weights_sq = tf.math.square(self.w)
-        
         try:
-            d = (tf.shape(self.w)[1])/2
-            W = weights_sq[0:d] - weights_sq[d:]
-
+            d = int(tf.shape(self.w)[1]/2)
+            W = tf.reshape(weights_sq[0,0:d] - weights_sq[0,d:], (1, -1))
             return tf.matmul(W, inputs)
 
         except:
             raise ValueError(f"Size of network weights must be twice the size of inputs: network weights {tf.shape(self.w)[1]}, inputs {tf.shape(inputs)[0]}")
 
 if __name__ == '__main__':
-    pass
+    
+    # Create the linear regression model
+    d = 3
+    w0 = tf.ones([1, 2*d])
+    model = Linear_Regression(w0)
+
+    # And evaluate it at N test points
+    N = 5
+    inputs = tf.random.normal([d, N])
+    outputs = model.call(inputs)
+
+    # Verify f(w0) = 0
+    assert tf.norm(tf.zeros([N, 1]) - outputs) < 1e-10
