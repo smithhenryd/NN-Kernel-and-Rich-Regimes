@@ -1,7 +1,36 @@
 import tensorflow as tf 
 
-class Linear_Regression():
-    pass
+class Linear_Regression(tf.keras.Model):
+    """
+    The diagonal neural network considered in Woodworth et al. 2020
+    Note that this is just simple linear regression problem with an alternate
+    parameterization of the weights
+    """
+
+    def __init__(self, w0, alpha=1, **kwargs):
+        """
+        Initializes the linear regression model
+
+        w0: a 1 x 2d dimensional tensor, representing the "shape" of the initialization
+        alpha: a nonnegative float, representing the multiplicative factor by which w0 is scaled
+        """
+
+        super(Linear_Regression, self).__init__(**kwargs)
+
+        # The network contains a single linear layer
+        self.linear_layer_1 = Linear(alpha*w0, **kwargs)
+
+    def call(self, inputs):
+        """
+        Evaluates the linear regression model at the specified inputs
+
+        inputs: a d x N dimensional tensor whose columns contain the vectors at which the model is to be evaluated
+        
+        return: a 1 x N dimensional tensor containing the corresponding outputs of the model
+        """
+        return self.linear_layer_1(inputs)
+
+
 
 class Linear(tf.keras.layers.Layer):
     """
@@ -11,8 +40,6 @@ class Linear(tf.keras.layers.Layer):
     def __init__(self, w0, **kwargs):
         """
         Initializes the linear layer 
-
-        w0: a 1 x 2d dimensional tensor, representing the initial weights for the linear layer
         """
 
         super(Linear, self).__init__(**kwargs)
@@ -20,16 +47,10 @@ class Linear(tf.keras.layers.Layer):
         # Initialize the weight vector
         self.w = tf.Variable(initial_value=w0, trainable=True)
         self.w = tf.reshape(self.w, (1,-1))
-        
-        return
-    
+            
     def call(self, inputs):
         """
         Evaluates the linear layer at the specified inputs
-
-        inputs: a d x N dimensional tensor whose columns contain the vectors at which the layer is to be evaluated
-        
-        return: a 1 x N dimensional tensor containing the corresponding outputs of the linear layer
         """
 
         weights_sq = tf.math.square(self.w)
@@ -42,3 +63,6 @@ class Linear(tf.keras.layers.Layer):
 
         except:
             raise ValueError(f"Size of network weights must be twice the size of inputs: network weights {tf.shape(self.w)[1]}, inputs {tf.shape(inputs)[0]}")
+
+if __name__ == '__main__':
+    pass
