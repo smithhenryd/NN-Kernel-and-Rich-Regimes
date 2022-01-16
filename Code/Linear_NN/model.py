@@ -11,7 +11,7 @@ class Linear_Regression(tf.keras.Model):
         """
         Initializes the linear regression model
 
-        w0: a 1 x 2d dimensional tensor, representing the "shape" of the initialization
+        w0: a 2d x 1 dimensional tensor, representing the "shape" of the initialization
         alpha: a nonnegative float, representing the multiplicative factor by which w0 is scaled
         """
 
@@ -24,29 +24,26 @@ class Linear_Regression(tf.keras.Model):
         """
         Evaluates the linear regression model at the specified inputs
 
-        inputs: a d x N dimensional tensor whose columns contain the vectors at which the model is to be evaluated
+        inputs: a N x d dimensional tensor whose *rows* contain the vectors at which the model is to be evaluated
         
-        return: a 1 x N dimensional tensor containing the corresponding outputs of the model
+        return: a N x 1 dimensional tensor containing the corresponding outputs of the model
         """
         return self.linear_layer_1(inputs)
-
-
 
 class Linear(tf.keras.layers.Layer):
     """
     The single layer of the diagonal neural network
     """
 
-    def __init__(self, w0, **kwargs):
+    def __init__(self, w0):
         """
         Initializes the linear layer 
         """
 
-        super(Linear, self).__init__(**kwargs)
+        super(Linear, self).__init__()
         
         # Initialize the weight vector
         self.w = tf.Variable(initial_value=w0, trainable=True)
-        self.w = tf.reshape(self.w, (1,-1))
             
     def call(self, inputs):
         """
@@ -55,24 +52,26 @@ class Linear(tf.keras.layers.Layer):
 
         weights_sq = tf.math.square(self.w)
         try:
-            d = int(tf.shape(self.w)[1]/2)
-            W = tf.reshape(weights_sq[0,0:d] - weights_sq[0,d:], (1, -1))
-            return tf.matmul(W, inputs)
+            d = int(tf.shape(self.w)[0]/2)
+            W = tf.reshape(weights_sq[0:d,0] - weights_sq[d:,0], (-1, 1))
+            return tf.matmul(inputs, W)
 
         except:
-            raise ValueError(f"Size of network weights must be twice the size of inputs: network weights {tf.shape(self.w)[1]}, inputs {tf.shape(inputs)[0]}")
+            raise ValueError(f"Size of network weights must be twice the size of inputs: network weights {tf.shape(self.w)[0]}, inputs {tf.shape(inputs)[0]}")
+
 
 if __name__ == '__main__':
-    
+
     # Create the linear regression model
     d = 3
-    w0 = tf.ones([1, 2*d])
+    w0 = tf.ones([2*d, 1])
     model = Linear_Regression(w0)
 
     # And evaluate it at N test points
     N = 5
-    inputs = tf.random.normal([d, N])
+    inputs = tf.random.normal([N, d])
     outputs = model.call(inputs)
 
+    tf.print(model.trainable_weights)
     # Verify f(w0) = 0
     assert tf.norm(tf.zeros([N, 1]) - outputs) < 1e-10
