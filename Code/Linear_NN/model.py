@@ -30,6 +30,12 @@ class Linear_Regression(tf.keras.Model):
         """
         return self.linear_layer_1(inputs)
 
+    def __call__(self, inputs) -> tf.Tensor:
+        """
+        Overrides Python magic method
+        """
+        self.call(inputs)
+
 class Linear(tf.keras.layers.Layer):
     """
     The single layer of the diagonal neural network
