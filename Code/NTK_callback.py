@@ -75,7 +75,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
                     NTK_matrix[i,j] = tf.tensordot(grad_x, grad_y, 2)
             
             # Append the neural tangent kernel matrix to the list of evaluations
-            self.model.NTK_evals(NTK_matrix)
+            self.model.NTK_evals.append(NTK_matrix)
         return
     
     def _get_gradient(self, x) -> tf.Tensor:
