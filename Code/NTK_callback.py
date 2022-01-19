@@ -64,9 +64,11 @@ class NTKCallback(tf.keras.callbacks.Callback):
             for i in range(self.num_training):
                 for j in range(self.num_training):
                     
-                    # Training points at which to evaluate the gradient of the model wrt weights
+                    # Get the training points
                     index = i*self.num_training + j
                     x, y = self.training_grid[0][index,:], self.training_grid[1][index,:]
+                    
+                    # Compute the gradient of the model wrt the weights at these points
                     grad_x, grad_y = self._get_gradient(x), self._get_gradient(y)
                     
                     # Compute the \ell_2 inner product of grad_x and grad_y
