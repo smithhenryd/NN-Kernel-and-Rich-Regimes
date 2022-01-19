@@ -26,7 +26,7 @@ class Linear_Regression(tf.keras.Model):
 
         inputs: a N x d dimensional tensor whose *rows* contain the vectors at which the model is to be evaluated
         
-        return: a N x 1 dimensional tensor containing the corresponding outputs of the model
+        return: a N x 1 dimensional Tensor containing the corresponding outputs of the model
         """
         return self.linear_layer_1(inputs)
 

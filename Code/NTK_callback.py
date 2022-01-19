@@ -5,14 +5,16 @@ class NTKCallback(tf.keras.callbacks.Callback):
     A custom callback function for evaluating the neural tangent kernel (NTK)
     on the training data during neural network optimization; for additional information
     on the neural tangent kernel, see Jacot et al. 2018
+
+    NOTE: The TensorFlow model to which the callback function binds must implement the __call__ method
     """
     
     def __init__(self, training_data, step=1, **kwargs):
         """
         Initializes the callback object
 
-        training_data: a two-dimensional tensor representing the data with which the network is trained;
-        note: training observerations are assumed to be stored in the *rows* of the tensor
+        training_data: a two-dimensional Tensor representing the data with which the network is trained;
+        note: training observerations are assumed to be stored in the *rows* of the Tensor
         step: an integer; every 'step' epochs of training, we evaluate the NTK at the training data
         """
         
@@ -31,7 +33,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
         """
         Builds the grid on which to evaluate the gradient of the model
 
-        training_data: a two-dimensional tensor representing the data with which the network is trained
+        training_data: a two-dimensional Tensor representing the data with which the network is trained
         return: a tuple of Tensors, the first of stores is the x-coordinates of the grid, the second of which
         stores the y-coordinates
         """
