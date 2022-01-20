@@ -5,8 +5,6 @@ class NTKCallback(tf.keras.callbacks.Callback):
     A custom callback function for evaluating the neural tangent kernel (NTK)
     on the training data during neural network optimization; for additional information
     on the neural tangent kernel, see Jacot et al. 2018
-
-    NOTE: The TensorFlow model to which the callback function binds must implement the __call__ method
     """
     
     def __init__(self, training_data, step=1, **kwargs):
