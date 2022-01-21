@@ -1,5 +1,5 @@
 import tensorflow as tf
-from Linear_NN.model import Linear_Regression
+from ..Linear_NN.model import Linear_Regression
 
 class Linearized_Model(tf.keras.Model):
     """
