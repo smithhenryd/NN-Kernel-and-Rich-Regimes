@@ -31,8 +31,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
         # Initialize the grid of NTK evaluations (a list of Tensors)
         # TODO: can we store this on the model object?
         self.model.NTK_evals = []
-
-
+    
     def _create_training_grid(self, training_data) -> tuple[tf.Tensor]:
         """
         Builds the grid on which to evaluate the gradient of the model
@@ -72,7 +71,6 @@ class NTKCallback(tf.keras.callbacks.Callback):
             self.model.NTK_evals.append(tf.reshape(result, [self.num_training, self.num_training]))
         return
 
-            
     def _get_gradient(self, input) -> tf.Tensor:
         """
         Computes the gradient of the model with respect to the weight vector w evaluated at each input x
