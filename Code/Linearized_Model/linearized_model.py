@@ -68,21 +68,20 @@ class Linearized_Layer(tf.keras.layers.Layer):
         Computes the gradient of the nonlinear model with respect to the weight vector w at w = w0 evaluated at each input x
         """
 
+        # Number of inputs
+        N = int(tf.shape(inputs)[0])
+        # Dimension of parameter space
+        p = int(tf.shape(self.w)[0])
+
         with tf.GradientTape() as g:
             
-            # Number of inputs
-            N = int(tf.shape(inputs)[0])
-            # Dimension of parameter space
-            p = int(tf.shape(self.w)[0])
-
             # Forward pass
             model_eval = model(inputs)
 
             # Calculate gradient at each input x
             grad = g.jacobian(model_eval, model.trainable_weights)
-            grad = tf.reshape(grad, [N, p])
+            return tf.reshape(grad, [N, p])
 
-            return grad
 
     def call(self, inputs) -> tf.Tensor:
         """

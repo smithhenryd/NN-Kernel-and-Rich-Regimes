@@ -12,16 +12,22 @@ class NTKCallback(tf.keras.callbacks.Callback):
         Initializes the callback object
 
         training_data: a two-dimensional Tensor representing the data with which the network is trained;
-        note: training observerations are assumed to be stored in the *rows* of the Tensor
+        NOTE: training observerations are assumed to be stored in the *rows* of the Tensor
+
         step: an integer; every 'step' epochs of training, we evaluate the NTK at the training data
         """
         
         super(NTKCallback, self).__init__(**kwargs)
 
         self.step = step
+
+        # Compute number of training observations, dimension of parameter space
         self.num_training = int(tf.shape(training_data)[0])
+        self.p = int(tf.shape(tf.reshape(self.model.trainable_weights, [-1, 1]))[0])
+        
         # Initialize the grid of training points
         self.training_grid = self._create_training_grid(training_data)
+        
         # Initialize the grid of NTK evaluations (a list of Tensors)
         # TODO: can we store this on the model object?
         self.model.NTK_evals = []
@@ -32,7 +38,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
         Builds the grid on which to evaluate the gradient of the model
 
         training_data: a two-dimensional Tensor representing the data with which the network is trained
-        return: a tuple of Tensors, the first of stores is the x-coordinates of the grid, the second of which
+        return: a tuple of Tensors, the first of which stores is the x-coordinates of the grid, the second of which
         stores the y-coordinates
         """
 
@@ -55,42 +61,32 @@ class NTKCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
 
         if not epoch % self.step:
-            
-            # Matrix containing the evaluations of the NTK
-            NTK_matrix = tf.zeros([self.num_training, self.num_training], dtype=tf.float32)
-            
-            for i in range(self.num_training):
-                for j in range(self.num_training):
-                    
-                    # Get the training points
-                    index = i*self.num_training + j
-                    x, y = self.training_grid[0][index,:], self.training_grid[1][index,:]
-                    
-                    # Compute the gradient of the model wrt the weights at these points
-                    grad_x, grad_y = self._get_gradient(x), self._get_gradient(y)
-                    
-                    # Compute the \ell_2 inner product of grad_x and grad_y
-                    NTK_matrix[i,j] = tf.tensordot(grad_x, grad_y, 2)
-            
-            # Append the neural tangent kernel matrix to the list of evaluations
-            self.model.NTK_evals.append(NTK_matrix)
-        return
-    
-    def _get_gradient(self, x) -> tf.Tensor:
-        """
-        Evaluates the gradient of the model with respect to the trainable weights at the point x
 
-        x: a 1 x d dimensional Tensor, where d is the dimension of the input to the model
-        return: a 1 x p dimensional Tensor, where p is the dimension of the parameter space
+            # Get the gradients of the model with respect to w evaluated on the grid of sample points
+            grad_x, grad_y = self._get_gradient(self.training_grid[0]), self._get_gradient(self.training_grid[1])
+            
+            # Compute the \ell_2 inner product of grad_x and grad_y
+            result = tf.math.reduce_sum(tf.math.multiply(grad_x, grad_y), axis=1, keepdims=True) 
+            
+            # Reshape the result to an N x N matrix
+            self.model.NTK_evals.append(tf.reshape(result, [self.num_training, self.num_training]))
+        return
+
+            
+    def _get_gradient(self, input) -> tf.Tensor:
         """
+        Computes the gradient of the model with respect to the weight vector w evaluated at each input x
+        """
+    
+        N = int(tf.shape(input)[0])
 
         with tf.GradientTape() as g:
+
+            # Evaluate the model at the input tensor 
+            model_eval = self.model(input)
+
+            # Then compute the gradient of the model f with respect to the weights w, evaluated at each input x
+            grad = g.jacobian(model_eval, self.model.trainable_weights)
             
-            # TODO: Not sure if this line is needed (we are not computing the gradient wrt x)
-            g.watch(x)
-
-            # Evaluate the model at x 
-            model_eval = self.model(x)
-
-            # Then compute the gradient of the model f with respect to the weights w, evaluated at the point x
-            return g.gradient(model_eval, self.model.trainable_weights)      
+            # Reshape the output Tensor
+            return tf.reshape(grad, [N, self.p])
