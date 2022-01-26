@@ -77,7 +77,7 @@ Woodworth and colleagues are particularly interested in the case of  $N \ll p$, 
 \subsection{Kernel Regime}
 Locally, the gradient descent depends only on the first-order approximation in $\boldsymbol{w}$:
 \begin{align*}
-    f(\boldsymbol{w}, \boldsymbol{x}) = f(\boldsymbol{w} - \boldsymbol{w}(t), \boldsymbol{x}) + \langle \boldsymbol{w} - \boldsymbol{w}(t), \phi_{\boldsymbol{w}(t)}(\boldsymbol{x}) \rangle + \mathcal{O}( \left\Vert \boldsymbol{w} - \boldsymbol{w}(t) \right\Vert^2),
+    f(\boldsymbol{w}, \boldsymbol{x}) = f(\boldsymbol{w}(t), \boldsymbol{x}) + \langle \boldsymbol{w} - \boldsymbol{w}(t), \phi_{\boldsymbol{w}(t)}(\boldsymbol{x}) \rangle + \mathcal{O}( \left\Vert \boldsymbol{w} - \boldsymbol{w}(t) \right\Vert^2),
 \end{align*}
 where $\phi_{\boldsymbol{w}(t)}(\boldsymbol{x}) = \nabla_{\boldsymbol{w}} f(\boldsymbol{w}(t), \boldsymbol{x})$ is the \textit{feature map} corresponding to the \textit{tangent kernel} $K_{\boldsymbol{w}(t)}(\boldsymbol{x}, \boldsymbol{x}') = \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}(t), \boldsymbol{x}), \nabla_{\boldsymbol{w}} f(\boldsymbol{w}(t), \boldsymbol{x}')\rangle$. Clearly this approximation is linear in $\boldsymbol{w}$ but need not be linear in $\boldsymbol{x}$ if the underlying model $F(\boldsymbol{w})$ is not linear in $\boldsymbol{x}$.
 
@@ -231,7 +231,7 @@ For the primary results of the paper, the authors consider the gradient flow of 
 \begin{align*}
     w_{\alpha}'(t) = - \nabla F_{\alpha}(w_{\alpha}(t)) = - \frac{1}{\alpha} Dh(w_{\alpha}(t))^T \nabla R(\alpha h(w_{\alpha}(t))),
 \end{align*}
-where $Dh^T$ is the adjoint of the differential $Dh$. The authors compare this dynamic to the gradient flow $(\overline{w}_{\alpha}(t))_{t \geq 0}$ of $\overline{F}_{\alpha}$ that satisfies $(\overline{w}_{\alpha}(0) = w_0$ and solves 
+where $Dh^T$ is the adjoint of the differential $Dh$. The authors compare this dynamic to the gradient flow $(\overline{w}_{\alpha}(t))_{t \geq 0}$ of $\overline{F}_{\alpha}$ that satisfies $\overline{w}_{\alpha}(0) = w_0$ and solves 
 \begin{align*}
     \overline{w}_{\alpha}'(t) = - \nabla \overline{F}_{\alpha}(\overline{w}_{\alpha}(t)) = - \frac{1}{\alpha} Dh(w_0)^T \nabla R(\alpha \overline{h}(\overline{w}_{\alpha}(t))).
 \end{align*}
@@ -257,7 +257,7 @@ If moreover $h(w_0) = 0$, it holds as $\alpha \rightarrow \infty$, $\sup_{t \geq
     \sup_{t \geq 0} \left\Vert \alpha h(w_{\alpha}(t)) - \alpha \overline{h}(\overline{w}_{\alpha}(t)) \right\Vert = \mathcal{O}(1/\alpha) \quad \text{and} \quad  \sup_{t \geq 0} \left\Vert w_{\alpha}(t) - \overline{w}_{\alpha}(t) \right\Vert = \mathcal{O}(\log \alpha/\alpha^2).
 \end{align*}
 \end{manualtheorem}
-Notice that there is no dependence here on the time horizon $T$, as there was in Theorem \ref{Chizatthm2.2}. Instead, we get a bound that is uniform in $t \geq 0$.
+Notice that there is no dependence here on the time horizon $T$, as there was in Theorem \ref{Chizatthm2.2}. Instead, we get a bound that is uniform in $t \geq 0$. Also, we observe from the first statement that, for sufficiently large $\alpha$, the convergence of $(w_{\alpha}(t))_{t \geq 0}$ to the global minimum of $F_{\alpha}$, denoted $y^{\star}$, is exponential in $t$.
 
 Removing the overparameterized assumption, the authors prove linear convergence of the gradient flow for large values of $\alpha$:
 \begin{manualtheorem}{2.5}
@@ -290,6 +290,12 @@ with respect to the \textit{neural tangent kernel} (NTK)
     \Theta^{(L)}(\theta) = \sum_{p=1}^P \partial_{\theta_p} F^{(L)}(\theta) \otimes \partial_{\theta_p} F^{(L)}(\theta).
 \end{align*}
 The realization function $F^{(L)}$ is not linear (in $\theta \in \mathbb{R}^p$). As a consequence, $\partial_{\theta_p} F^{(L)}(\theta)$, and thus the neural tangent kernel, depend on the parameters $\theta$. The NTK is random at initialization (since the authors initialize the parameters as i.i.d. $\mathcal{N}(0,1)$) and varies during training. 
+
+In kernelized gradient descent with respect to the neural tangent kernel, the parameters are updated according to a training direction $d_t \in \mathcal{F}$:
+\begin{align*}
+    \partial_t \theta_p(t) =  \left \langle \partial_{\theta_p} F^{(L)}(\theta(t)), d_t \right\rangle_{p^{in}}
+\end{align*}
+where $\langle f, g \rangle_p^{in} = \mathbb{E}_{x \sim p^{in}} [f(x)^T g(x) ]$ and $p^{in}$ is a fixed distribution on the input space $\mathbb{R}^{n_0}$. For gradient descent, the training direction is taken to be $d_t = -d|_{f_{\theta(t)}}$. Here, $d|_{f_{\theta(t)}}$ is the dual element such that $\partial_f^{in} C|_{f_0} = \langle d|_{f_0}, \cdot \rangle_{p^{in}}$. The most important takeaway here is that \textit{we are performing gradient descent in a function space $\mathcal{F}$} rather than in Euclidean space.
 
 For a more rigorous treatment of the kernel gradient, see section 3 of \cite{woodworth2020kernel}.
 
@@ -402,7 +408,7 @@ Arora and colleagues then prove the following result:
 \begin{manualtheorem}{3}\label{arorathm3}
 The signed singular values of the product matrix W(t) evolve by 
 \begin{align*}
-    \dot{\sigma}_r(t) = -N (\sigma_r^2(t))^{1-1/N} \cdot \langle \nabla l(W(t)), u_r(t), v_r^T(t) \rangle, \qquad r = 1, \ldots, \min\{d, d'\}.
+    \dot{\sigma}_r(t) = -N (\sigma_r^2(t))^{1-1/N} \cdot \langle \nabla l(W(t)), u_r(t)v_r^T(t) \rangle, \qquad r = 1, \ldots, \min\{d, d'\}.
 \end{align*}
 If the matrix factorization is non-degenerate i.e. has depth $N \geq 2$, the singular values need not be signed (we can assume $\sigma_r(t) \geq 0$ for all $t$).
 \end{manualtheorem}
