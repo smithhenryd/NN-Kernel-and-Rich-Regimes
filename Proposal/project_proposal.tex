@@ -70,7 +70,7 @@ Therefore, we can look at the \textit{neural tangent kernel} (NTK)
 \end{align*}
 as a proxy for the kernel regime \cite{jacot2018neural}. Specifically, as a model approaches the kernel limit, we should observe that the NTK remains almost constant throughout training. 
 
-This bring me to my first goal for the project: to visualize how the NTK evolves thoughout training for the rich versus kernel regimes. To do so, I will generate a training dataset in Python which corresponds to an appropriate model. Of particular interest is the least-squares model considered in \cite{woodworth2020kernel}:
+This bring me to my first goal for the project: to visualize how the NTK evolves thoughout training for the rich versus kernel regimes. To do so, I will generate a training dataset in Python which corresponds to an appropriate model. Of particular interest is the linear regression model considered in \cite{woodworth2020kernel}:
 \begin{align*}
     f(\boldsymbol{w})(\boldsymbol{x}) = \sum_{i=1}^d (\boldsymbol{w}_{+, i}^2 - \boldsymbol{w}_{-, i}^2)\boldsymbol{x}_i = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle, \quad \boldsymbol{w} = \begin{bmatrix}
                         \boldsymbol{w}_+ \\
