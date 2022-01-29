@@ -55,8 +55,9 @@ Naturally, one might ask why one cannot take the initialization scale $\alpha$ t
 Woodworth and colleagues in \cite{woodworth2020kernel} posit that the contemporary successes in deep learning are a result of models that operate in the rich regime. The implications of this statement are self-evident, and they warrant further computational and theoretical study of the kernel and rich limits.
 
 \section{Problem Statement \& Methodology}
-\subsection{Computational Experiments}
-The first portion of the project will focus on reproducing and extending the results from \cite{chizat2018lazy} and \cite{woodworth2020kernel}. Underlying the previously mentioned kernel and rich regimes, there is rich literature discussing what happens mathematically as these limits are reached. 
+
+\subsection{Observing the Kernel Regime}
+The first portion of the project will focus on visualizing and reproducing the results from \cite{chizat2018lazy} and \cite{woodworth2020kernel}. Underlying the previously mentioned kernel and rich regimes, there is rich literature discussing what happens mathematically as these limits are reached. 
 
 Without digging too deep into the weeds, suppose that model $f$ maps from the parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$ that represents  the space of possible functions our neural network can represent.\footnote{A common example is $\mathcal{F} = L^2(\rho_x, \mathbb{R}^k)$, where $\rho_x$ is the distribution of training observations.} Further, suppose that $f$ is a $D$-homogeneous function, meaning $f(\alpha \boldsymbol{w}) = \alpha^D f(\boldsymbol{w})$. Under certain technical conditions on model $f$ and loss $L$ detailed in \cite{chizat2018lazy}, then as $\alpha \rightarrow \infty$ in the initialization $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$, we have that $f$ approaches the affine model 
 \begin{align}\label{linearizedmodel}
@@ -71,40 +72,39 @@ Therefore, we can look at the \textit{neural tangent kernel} (NTK)
 as a proxy for the kernel regime \cite{jacot2018neural}. Specifically, as a model approaches the kernel limit, we should observe that the NTK remains almost constant throughout training. 
 
 This bring me to my first goal for the project: to visualize how the NTK evolves thoughout training for the rich versus kernel regimes. To do so, I will generate a training dataset in Python which corresponds to an appropriate model. Of particular interest is the linear regression model considered in \cite{woodworth2020kernel}:
-\begin{align*}
+\begin{align}\label{linrreg}
     f(\boldsymbol{w})(\boldsymbol{x}) = \sum_{i=1}^d (\boldsymbol{w}_{+, i}^2 - \boldsymbol{w}_{-, i}^2)\boldsymbol{x}_i = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle, \quad \boldsymbol{w} = \begin{bmatrix}
                         \boldsymbol{w}_+ \\
                         \boldsymbol{w}_-
                         \end{bmatrix} \in \mathbb{R}^{2d},
     \quad \boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{w}_+^2 - \boldsymbol{w}_-^2.
-\end{align*}
+\end{align}
 I plan to use TensorFlow, a deep learning library for Python, to construct and optimize the model with weight initialization $\alpha \boldsymbol{w}_0$. Training will be performed using gradient descent, which can be thought of as a discretization of the gradient flow dynamics with some stepsize $\eta > 0$. During each $n$th iteration of the training procedure, I will evaluate the NTK at the training points $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_N$. This will allow us to visualize the changing of the NTK as we interpolate between the kernel and rich regimes.
 
-In addition to the neural tangent kernel, we will also study how the network weights $\boldsymbol{w}$ evolve throughout training. From our previous discussion of the kernel regime, we know that as $\alpha \rightarrow \infty$, the gradient flow of $L(f(\boldsymbol{w}))$ approaches that of $L(\bar{f}(\boldsymbol{w}))$. Accordingly, we can observe the $\ell_2$ distance between the weights of the model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\bar{\boldsymbol{w}}(t)$, for various values of $\alpha$ during training. We will do so using a deep learning model implemented in Python as described in the previous paragraph.
+In addition to the neural tangent kernel, we will also study how the network weights $\boldsymbol{w}$ evolve throughout training. From our previous discussion of the kernel regime, we know that as $\alpha \rightarrow \infty$, the gradient flow of $L(f(\boldsymbol{w}))$ approaches that of $L(\bar{f}(\boldsymbol{w}))$. Accordingly, we can observe the $\ell_2$ distance between the weights of the model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\bar{\boldsymbol{w}}(t)$, for various values of $\alpha$ during training. We will do so using the linear regression model (\ref{linrreg}) implemented in Python as described in the previous paragraph.
 
-Moving away from the mathematics motivating the kernel regime, we will look at the generalizability of neural networks under the kernel and rich regimes. From the prior section, we know that for a fixed number of training observations $N$, overparameterized networks trained in the rich regime generally achieve smaller test errors than those trained in the kernel regime. We will demonstrate that this observation holds even for more complex models, such as fully-connected ReLU networks with multiple hidden layers or CNNs. Once again, we will build and train each model in Python with TensorFlow, and we will subsequently evaluate the test error once the model has been trained to approximately zero training loss. More important than exhibiting the transition between the rich and kernel regimes, we will find the specific initialization scale necessary to train in the rich regime. In doing so, we will consider both $\boldsymbol{w}(0) = \alpha \boldsymbol{w}_0$ and $\boldsymbol{w}(0)_i \overset{i.i.d.}{\sim} \mathcal{W}$.
+\subsection{The Kernel Regime \& Model Generalization}
+Moving away from the mathematics motivating the kernel regime, we will look at the generalization of neural networks trained under the kernel and rich regimes. From the prior section, we know that for a fixed number of training observations $N$, overparameterized networks trained in the rich regime generally achieve smaller test errors than those trained in the kernel regime. We will empirically demonstrate that this observation holds for the linear regression model (\ref{linrreg}), which was previously illustrated by Woodworth and colleagues in \cite{woodworth2020kernel}. Differing from Woodworth's analysis, though, we will also consider the time necessary to train a given model. That is, we will plot the number of iterations $n_{\alpha, \kappa}$ of gradient descent necessary to attain training error below some threshold $\kappa$ as a function of the initialization scale $\alpha$. We expect that as we get closer and closer to the rich limit $\alpha \rightarrow 0$, the resulting models will become more and more costly to train.
 
-Should time permit, I would also like to examine the role of network depth on the transition between the kernel and rich regimes. As proven in \cite{arora2019implicit} and discussed in \cite{woodworth2020kernel}, for increasing degree of homogeneity of the model $f$, the transition between the kernel and rich regimes becomes much sharper. That is, for appropriate network $f$ and loss $L$, then as the depth of the network increases, the $\alpha$ necessary to train in the rich regime also increases. To empirically verify this result, we would train models of varying depth $D$, each for a range of initialization scales $\alpha$; upon training each network, we would then measure the test error. By plotting the test error versus initialization scale $\alpha$ for each network depth $D$, we could then understand the effect of depth on the transition between the kernel and rich regimes. 
-
-\subsection{Theoretical Study of Convergence}
+Moving past the example of linear regression, we hope to consider other interesting models, such as the [overparameterized] logistic regression model studied in \cite{wei2019regularization}. Wei and colleagues establish the mathematical result that training the logistic model in the kernel regime leads to poor generalization, which can be mitigated with the addition of a regularization term. It would be especially appealing to investigate whether by training the unregularized logistic regression model in the rich regime instead, we could achieve comparable test error to that of the regularized model. Of further interest are sparse problems, where the underlying model $f$ from which the data $\{(\boldsymbol{x}_i, y_i)\}_{i=1}^N$ is generated exhibits sparsity in its parameters \cite{ma2018priori}. We would expect that, since the parameters $\boldsymbol{w}$ change less during training when in the kernel regime than in the rich regime (see \cite{chizat2018lazy}), we would observe much smaller test error in the rich regime. 
 
 \section{Deliverables}
 \begin{enumerate}
     \item Multiple deep learning models implemented in Python with TensorFlow
     \item Python visualization of the neural tangent kernel $K_{\boldsymbol{w}(t)}$ while training in the rich and kernel regimes
     \item Plot of the $\ell_2$ distance between the weights of the original model, $\boldsymbol{w}(t)$, and those of the affine model (\ref{linearizedmodel}), $\bar{\boldsymbol{w}}(t)$, throughout training with gradient descent for various $\alpha$
-    \item Graph of test error versus initialization scale for a ReLU network with $k$ hidden layers
-    \item Analysis of the initialization scale necessary to train in the rich regime for a ReLU network with $k$ hidden layers
+    \item Graphs of test error versus initialization scale for various overparameterized models (linear regression (\ref{linrreg}), logistic regression, sparse)
+    \item Analysis of the relationship between the initialization scale $\alpha$ and number of training iterations $n_{\alpha, \kappa}$ for the linear regression model
 \end{enumerate}
 
 \section{Tentative Timeline}
 \noindent\begin{tabular*}{\textwidth}{@{\hspace{\labelwidth}\llap{}\hspace{\labelsep}}p{3in}@{\extracolsep{\fill}}r}
     Literature review, discussion with Professor Zhou & January 25 -- February 6\\[\itemsep]
-    Code first model in Python with Tensorflow & January 30 -- February 20\\[\itemsep]
-    Visualize the NTK during training for various $\alpha$  & February 20 -- March 6\\[\itemsep]
-    Implement and train affine model (\ref{linearizedmodel}) & March 6 -- March 18\\[\itemsep]
-    Write code for, train ReLU neural network & March 28 -- April 10\\[\itemsep]
-    Visualize test loss versus initialization scale & April 10 -- April 24\\[\itemsep]
+    Code linear regression (\ref{linrreg}) and affine (\ref{linearizedmodel}) models & January 30 -- February 20\\[\itemsep]
+    Visualize the NTK, weights during training & February 20 -- March 6\\[\itemsep]
+    Examine test loss versus initialization scale for (\ref{linrreg}) & March 6 -- March 20\\[\itemsep]
+    Code logistic regression model, examine test loss & March 20 -- April 10\\[\itemsep]
+    Code sparse model, examine test loss & April 10 -- April 24\\[\itemsep]
     Prepare final report, poster & April 17 -- May 5\\[\itemsep]
 \end{tabular*}
 
