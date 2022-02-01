@@ -23,14 +23,13 @@ class NTKCallback(tf.keras.callbacks.Callback):
 
         # Compute number of training observations, dimension of parameter space
         self.num_training = int(tf.shape(training_data)[0])
-        self.p = int(tf.shape(tf.reshape(self.model.trainable_weights, [-1, 1]))[0])
-        
+
         # Initialize the grid of training points
         self.training_grid = self._create_training_grid(training_data)
         
         # Initialize the grid of NTK evaluations (a list of Tensors)
         # TODO: can we store this on the model object?
-        self.model.NTK_evals = []
+        self.NTK_evals = []
     
     def _create_training_grid(self, training_data) -> tuple[tf.Tensor]:
         """
@@ -58,8 +57,17 @@ class NTKCallback(tf.keras.callbacks.Callback):
         return (X, Y)
     
     def on_epoch_end(self, epoch, logs=None):
+        """
+        Evaluates the NTK of the model on the training data
+
+        epoch: an integer, the epoch number of the model during training
+        """
 
         if not epoch % self.step:
+
+            # Get the dimension of the model's parameter space
+            if epoch == self.step:
+                self.p = int(tf.shape(tf.reshape(self.model.trainable_weights, [-1, 1]))[0])
 
             # Get the gradients of the model with respect to w evaluated on the grid of sample points
             grad_x, grad_y = self._get_gradient(self.training_grid[0]), self._get_gradient(self.training_grid[1])
@@ -68,7 +76,8 @@ class NTKCallback(tf.keras.callbacks.Callback):
             result = tf.math.reduce_sum(tf.math.multiply(grad_x, grad_y), axis=1, keepdims=True) 
             
             # Reshape the result to an N x N matrix
-            self.model.NTK_evals.append(tf.reshape(result, [self.num_training, self.num_training]))
+            self.NTK_evals.append(tf.reshape(result, [self.num_training, self.num_training]))
+            print(f"Evaluated NTK on epoch {epoch}.")
         return
 
     def _get_gradient(self, input) -> tf.Tensor:
