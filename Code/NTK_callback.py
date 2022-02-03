@@ -66,7 +66,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
         if not epoch % self.step:
 
             # Get the dimension of the model's parameter space
-            if epoch == 0:
+            if not epoch:
                 self.p = int(tf.shape(tf.reshape(self.model.trainable_weights, [-1, 1]))[0])
 
             # Get the gradients of the model with respect to w evaluated on the grid of sample points
@@ -77,7 +77,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
             
             # Reshape the result to an N x N matrix
             self.NTK_evals.append(tf.reshape(result, [self.num_training, self.num_training]))
-            print(f"Evaluated NTK on epoch {epoch}.")
+            print(f"\nEvaluated NTK on epoch {epoch}.")
         return
 
     def _get_gradient(self, input) -> tf.Tensor:
