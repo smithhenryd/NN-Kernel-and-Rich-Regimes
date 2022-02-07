@@ -495,6 +495,141 @@ where $\gamma = (3\lambda + b^2)/(3\lambda - 5b^2)$. Thus,
 \end{manualtheorem}
 Here, $\hat{f}_{n, N}$ is the least-squares estimator with a complexity penalty, and $\hat{f}_N = \hat{f}_{\hat{n}, N}$ is the minimum complexity estimator (we estimate both $n$ and $\theta$).
 
+\section{Regularization Matters: Generalization and Optimization of
+Neural Nets v.s. their Induced Kernel, Wei et al. 2020}
+
+From \cite{jacot2018neural} we know that the prediction function found by gradient descent is in the span of the training data in a reproducing kernel Hilbert space induced by the neural tangent kernel. As the authors of the present paper note, though, the equivalence between gradient descent and the neural tangent kernel is broken once a regularization term is added. 
+
+In understanding this distinction between kernelized gradient descent and gradient descent with a regularization term, the authors look at neural network generalization. Specifically, they construct a distribution of the data $\mathcal{D}$ such that a \enquote{two-layer neural network optimizing regularized logistic loss, will achieve a large margin, and therefore, good generalization.} Conversely, any prediction function in the span of the training data in the RKHS induced by the NTK will overfit the noise in the training data. This means that the solution to kernelized gradient descent will achieve poor margin and bad generalization.
+
+\subsection{Generalization of Regularized Network versus NTK}
+
+The distribution $\mathcal{D}$ of training data $(x,y)$ is as follows. For any $k \geq 3$, $x^Te-k \sim \{-1,1\}$ is a uniform random bit (i.e. the last $k-2$ components of $x$ are noise). And for $x^Te_1$, $x^Te_2$, $y$ choose
+\begin{align*}
+    &y = +1, \quad x^Te_1 = +1, \quad x^Te_2 = 0 \quad \text{w/ prob. 1/4}\\
+    &y = +1, \quad x^Te_1 = +1, \quad x^Te_2 = 0 \quad \text{w/ prob. 1/4}\\
+    &y = -1, \quad x^Te_1 = 0, \quad x^Te_2 = +1 \quad \text{w/ prob. 1/4}\\
+    &y = -1, \quad x^Te_1 = 0, \quad x^Te_2 = -1 \quad \text{w/ prob. 1/4}
+\end{align*}
+
+The network computes $f^{\text{NN}}(x; \Theta) := \sum_{j=1}^m w_j [u_j^Tx]$, where $\Theta$ is the parameter space with $\theta_j = (u_j, w_j)$ and  $[\cdot]_+$ is the ReLU activation. The $\ell_2$ regularized logistic loss is 
+\begin{align*}
+    L_{\lambda}(\boldsymbol{\Theta}) = \frac{1}{n} \sum_{i=1}^n \log(1 + \exp(-y_i f^{\text{NN}}(x_i, \Theta))) + \lambda \Vert \Theta \Vert_{\text{F}}^2.
+\end{align*}
+Let $\Theta_{\lambda} \in \text{argmin}_{\Theta} L_{\lambda}(\Theta)$ be the global optimizer. Also we know that the neural tangent kernel associated with the architecture is
+\begin{align*}
+   K(x, x') = \mathbb{E}_{w \sim \mathcal{N}(0, r_w^2), u \sim \mathcal{N}(0, r_u^2I)}[\langle \nabla_{\theta}f^{\text{NN}}(x; \Theta), \nabla_{\theta}f^{\text{NN}}(x'; \Theta)  \rangle].
+\end{align*}
+Notice the expectation is taken over the weights of the network since they are initialized randomly. This is \textit{not} the case with \cite{woodworth2020kernel}, where the initial weights are chosen to be $\boldsymbol{w}_0 = \alpha \vec{1}$. That is, the NTK is deterministic--not random--upon initialization. For coefficients $\beta$, the prediction function $f^{\text{kernel}}(x; \beta)$ in the RKHS induced by $K$ can be written as $f^{\text{kernel}}(x; \beta) = \sum_{i=1}^n \beta_i K(x; \beta)$. 
+
+This formulation of the problem leads us to present the main of the paper:
+\begin{manualtheorem}{2.1}
+Let \mathcal{D} be the distribution defined previously. With probability $1 - d^{-5}$ over the random draw of $n \lesssim d^2$ samples $(x_1, y_1), \ldots, (x_n, y_n)$ from $\mathcal{D}$, for all choices of $\beta$, the kernel prediction function $f^{\text{kernel}}(\cdot, \beta)$ will have at least $\Omega(1)$ error:
+\begin{align*}
+    \underset{(x, y) \sim \mathcal{D}}{\mathbb{P}}[f^{\text{kernel}}(x; \beta)y \leq 0] = \Omega(1).
+\end{align*}
+Meanwhile, for $\lambda \leq \text{poly}(n)^{-1}$, the regularized neural net solution $f^{\text{NN}}(\cdot; \Omega_{\lambda})$ with at least four hidden units can have good approximation with $\mathcal{O}(d^2)$ samples because we have the following generalization error bound:
+\begin{align*}
+    \underset{(x,y) \sim \mathcal{D}}{\mathbb{P}}[f^{\text{NN}}(x;\Theta_{\lambda})y \leq 0] \lesssim \sqrt{\frac{d}{n}}.
+\end{align*}
+This implies a $\Omega(d)$ sample-complexity gap between the regularized neural net and kernel prediction function.
+\end{manualtheorem}
+
+\section{A Priori Estimates of the Population Risk for Two-layer Neural Networks, Weinan et al. 2018}
+
+The authors consider the problem of learning a function from a training set of $n$ \textit{i.i.d.} samples $\{(x_i, y_i)\}_{i=1}^n$ drawn from an underlying distribution $\rho_{x,y}$. The target function is $f^*(x) = \mathbb{E}[y|x]$. Further, the authors assume that the values $y_i$ are given by the decomposition $y = f^*(x) + \xi$, where $\xi$ denotes the noise. For simplicity of their analysis, the authors assume that the data lie in $X = [-1, 1]^d$ and $0 \leq f^* \leq 1$.
+
+The network under consideration is 
+\begin{align*}
+    f(x; \theta) = \sum_{k=1}^m a_k \sigma(w_k^Tx),
+\end{align*}
+where $w_k \in \mathbb{R}^d$, $\sigma: \mathbb{R} \rightarrow \mathbb{R}$ is a nonlinear, scale-invariant activation function (ex. ReLU). The authors consider $f$ to be overparameterized in the case of $m > n$ (that is, when the width of the network is greater than the dimension of the input).
+
+In order to estimate the population risk
+\begin{align*}
+    L(\theta) = \mathbb{E}_{x,y}[\ell(f(x; \theta), y)],
+\end{align*}
+the authors work with the empirical risk
+\begin{align*}
+    \hat{L}_n(\theta) = \frac{1}{n} \sum_{i=1}^n \ell(f(x_i; \theta), y_i).
+\end{align*}
+where $\ell(y, y') = (y - y')^2$ is the squared loss. Moreover, they consider the path norm
+\begin{align*}
+    \left\Vert \theta \right\Vert_{\mathcal{P}} = \sum_{k=1}^m |a_k| \left\Vert w_k \right\Vert_1.
+\end{align*}
+For the two-layer network $f(\cdot, \theta)$ with width $m$, they then define the regularized risk to be 
+\begin{align*}
+    J_{\lambda}(\theta) := \hat{L}_n(\theta) + \lambda(\left\Vert \theta \right\Vert_{\mathcal{P}} + 1).
+\end{align*}
+They remark that the additional $\lambda$ terms is used to simplify their proof and does not affect their results. Corresponding to this definition, we can then define the regularized risk estimator to be 
+\begin{align*}
+    \hat{\theta}_{n, \lambda} = \text{argmin} J_{\lambda}(\theta).
+\end{align*}
+Note that $\hat{\theta}_{n, \lambda}$ is not necessarily unique.
+
+\subsection{Barron Spaces}
+
+Let $\mathbb{S}^d = \{ w| \left\Vert w \right\Vert_1 = 1\}$, and let $\mathcal{F}$ be the Borel $\sigma$-algebra on $\mathbb{S}^d$. Further, let $P(\mathbb{S}^d)$ denote the collection of all probability measures on $(\mathbb{S}^d, \mathcal{F})$. 
+
+Now, we define $\mathcal{B}(X)$ to be the set of functions that admit the integral representation 
+\begin{align*}
+    f(x) = \int_{\mathbb{S}^d} a(w) \sigma(\langle w, x \rangle) d \pi(w) \qquad \forall x \in X,
+\end{align*}
+where $\pi \in P(\mathbb{S}^d)$, and $a(\cdot)$ is a measurable function with respect to $(\mathbb{S}^d, \mathcal{F})$. We can define a norm on $\mathcal{B}(X)$ for each $p \geq 1$ as follows: for any $f \in \mathcal{B}(X)$, let 
+\begin{align*}
+    \gamma_p(f) := \underset{(a, \pi) \in \Omega_f}{\inf} \left( \int_{\mathbb{S}^d} |a(w)|^p dw \right)^{1/p},
+\end{align*}
+where
+\begin{align*}
+    \Omega_f = \bigg\{(a, \pi) |f(x) = \int_{\mathbb{S}^d} a(w) \sigma(\langle w, x \rangle) d \pi(w) \bigg\}.
+\end{align*}
+
+Moreover, using this norm, we define the Barron space to be $B_p(X) := \{ f \in \mathcal{B}(X) | \gamma_p(f) < \infty\}$. Note that by Hölder's inequality, since $\pi(\cdot)$ is a probability distribution, then for any $q \geq p > 0$, we get $\gamma_p(f) \leq \gamma_q(f)$. Thus, we get the containment $\B_{\infty}(X) \subset \cdots \subset B_2(X) \subset B_1(X)$. 
+
+Why should we care about this seemingly abstract space? All finite, two-layer neural networks belong to the Barron space with $\pi(w) = \frac{1}{m}\sum_{k=1}^m \delta(w- \hat{w}_k)$, and the Universal Approximation Theorem tells us that continuous functions can be approximated arbitrarily well by two-layer neural networks. Therefore, $\mathcal{B}_p(X)$ is dense in $C(X)$. 
+
+Even more important, Barron spaces have a connection to reproducing kernel Hilbert spaces. For a fixed probability measure $\pi$, define 
+\begin{align*}
+    H_{\pi}(X) := \bigg\{  \int_{\mathbb{S}^d} a(w) \sigma(\langle w, x \rangle) d \pi(w) : \left\Vert f \right\Vert_{H_{\pi}} < \infty \bigg\}
+\end{align*}
+where
+\begin{align*}
+    \left\Vert f\right\Vert_{H_{\pi}} := \mathbb{E}[|a(w)|^2].
+\end{align*}
+Additionally, we recall that for a symmetric positive definite function $k: X \times X \mapsto \mathbb{R}$, the induces RKHS is the completion of $\{ \sum_i a_i k(x_i, x) \}$ with respect to the inner product $\langle k(x_i, \cdot), k(x_j, \cdot) \rangle_{H_k} = k(x_i, x_j)$. It has been shown that $H_{\pi} = H_{k_{\pi}}$, where the kernel $k_{\pi}$ is defined by 
+\begin{align*}
+    k_{\pi}(x, x) := \mathbb{E}_{\pi}[\sigma(\langle w, x \rangle)\sigma(\langle w, x' \rangle)].
+\end{align*}
+This means that the Barron space is equal to the union of reproducing kernel Hilbert spaces
+\begin{align*}
+    \mathcal{B}_2(X) = \underset{\pi \in P(\mathbb{S}^d)}{\bigcup} H_{\pi}(X).
+\end{align*}
+
+For a comparison of two-layer neural networks and kernel methods in terms of Barron spaces, see \cite{ma2018priori} pp. 6-8. In particular, Weinan and colleagues discuss the mathematical conditions under which the population risk for kernel methods is much larger than that for neural network models. The key distinction between neural networks and kernel methods is summarized as follows:\\ \enquote{The kernel method works with a specific RKHS with a particular choice of the kernel or the probability distribution $\pi$. In contrast, the neural network models work with the union of all these RKHS and select the kernel or the probability distribution adapted to the data} \cite{ma2018priori}.
+
+\subsection{Main Results}
+
+\begin{manualtheorem}{4.1}
+Assume that the target function $f^* \in \mathcal{B}_2(X)$ and $\lambda \geq \lambda_n.$ Then for any $\delta > 0$, with probability at least $1 - \delta$ over the choice of training set $S$, we have
+\begin{align*}
+    \mathbb{E}_x|f(x; \hat{\theta}_{n, \lambda}) - f^*(x)|^2 \lesssim \frac{\gamma_2^2(f^*)}{m} + \lambda \hat{\gamma}_2(f^*) + \frac{1}{\sqrt{n}}(\hat{\gamma}_2(f^*) + \sqrt{\ln{(n/\delta)}}).
+\end{align*}
+\end{manualtheorem}
+
+For the next result, the authors assume that the noise satisfies 
+\begin{align*}
+    \mathbb{P}[|\xi| > t] \leq c_0 e^{-\frac{t^2}{\sigma}}, \quad \forall t \geq \tau_0.
+\end{align*}
+where $c_0, \tau_0, \sigma$ are constants.
+\begin{manualtheorem}{4.2}
+Assume that the target function $f^* \in \mathcal{B}_2(X)$ and $\lambda \geq \lambda_n$. Then for any $\delta > 0$, with probability at least $1- \delta$ over the choice of the training set $S$, we have
+\begin{align*}
+    \mathbb{E}_x|f(x; \hat{\theta}_{n, \lambda}) - f^*(x)|^2 \lessim \frac{\gamma_2^2(f^*)}{m} + \lambda B_n \hat{\gamma}_2(f^*)\\
+    + \frac{B_n^2}{\sqrt{n}}\left( \hat{\gamma}_2(f^*) + \sqrt{\ln(n/\delta)} \right)\\
+    + \frac{B_n^2}{\sqrt{n}}\left( c_0 \sigma^2 + \sqrt{\frac{\mathbb{E}(\xi^2)}{n^{1/2}\lambda}} \right).
+\end{align*}
+\end{manualtheorem}
+
 \bibliographystyle{siam}
 \bibliography{References/biblio}
 
