@@ -113,7 +113,7 @@ class Linearized_Layer(tf.keras.layers.Layer):
 class LinearizedCallback(tf.keras.callbacks.Callback):
     """
     Modifies a Linearized_Model object so that when training is complete, calling
-    model(inputs) will evaluate the model on arbitrary [rather than training] inputs
+    model (inputs) will evaluate the model on arbitrary [rather than training] inputs
     (this eliminates the need for the 'evaluate' method in the original object)
     """
     def __init__(self, model, **kwargs):
@@ -127,10 +127,9 @@ class LinearizedCallback(tf.keras.callbacks.Callback):
         
         self.nonlinear_model = model
 
-    def on_train_end(logs=None):
+    def on_train_end(self,logs=None):
        
-        # TODO: check that this callback function works
-        self.model.__call__ = lambda lin_model, inputs: lin_model.model.evaluate(self.nonlinear_model, inputs)
+        self.model.__call__ = lambda inputs: self.model.evaluate(self.nonlinear_model, inputs)
         self.model.call = self.model.__call__
 
 if __name__ == "__main__":

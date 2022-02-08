@@ -14,7 +14,7 @@ class NTKCallback(tf.keras.callbacks.Callback):
         training_data: a two-dimensional Tensor representing the data with which the network is trained;
         NOTE: training observerations are assumed to be stored in the *rows* of the Tensor
 
-        step: an integer; every 'step' epochs of training, we evaluate the NTK at the training data
+        step: a positive integer; every 'step' epochs of training, we evaluate the NTK at the training data
         """
         
         super(NTKCallback, self).__init__(**kwargs)
@@ -28,7 +28,6 @@ class NTKCallback(tf.keras.callbacks.Callback):
         self.training_grid = self._create_training_grid(training_data)
         
         # Initialize the grid of NTK evaluations (a list of Tensors)
-        # TODO: can we store this on the model object?
         self.NTK_evals = []
     
     def _create_training_grid(self, training_data) -> tuple[tf.Tensor]:
