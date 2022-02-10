@@ -94,7 +94,6 @@ class Linearized_Layer(tf.keras.layers.Layer):
         """
         Evaluates model at training data
         """
-        #self.bias_scale*self.bias + tf.matmul(self.grads ,tf.reshape(self.w - self.init), [-1, 1])
         return self.bias_scale*self.bias + tf.matmul(self.grads,tf.reshape(self.w - self.init, [-1, 1]))
     
     def evaluate(self, model, inputs):
