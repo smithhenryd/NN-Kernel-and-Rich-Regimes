@@ -5,7 +5,7 @@ import pickle
 from ..Linear_NN.model import Linear_Regression
 from training_callbacks import LossThreshold, SaveLoss
 
-def generate_sparse_dataset(N, d, r, indices=None, save=True):
+def generate_sparse_dataset(N, d, r, indices=None, filename='training_data_sparse_regression.pk'):
     """
     Generates a training dataset corresponding to the overparameterized, r-sparse linear regression problem
     from Woodworth et al. 2020
@@ -16,7 +16,7 @@ def generate_sparse_dataset(N, d, r, indices=None, save=True):
     each nonzero entry in this vector has value 1/sqrt(r)
     indices: a list of integers, the coordinates of the beta vector which will be nonzero; by default, nonzero
     indices are chosen at random
-    save: a boolean, whether the data should be pickled and saved
+    filename: a file name for saving the dataset; the X, Y, and beta arrays will be pickled as np.ndarray objects
 
     return: a tuple (X, Y, beta), where 
     X and Y are tf.Tensor objects representing input (N x d) and response (N x 1) data 
@@ -54,9 +54,8 @@ def generate_sparse_dataset(N, d, r, indices=None, save=True):
     param_tuple = (X_train, Y_train, beta)
     
     # Pickle the training data (as np.ndarray objects) for posterity 
-    if save:
-        with open('training_data_sparse_regression.pickle', 'wb') as f:
-            pickle.dump(param_tuple, f)
+    with open(filename, 'wb') as f:
+        pickle.dump(param_tuple, f)
     
     return tf.convert_to_tensor(X_train, dtype=tf.float32), tf.convert_to_tensor(Y_train, dtype=tf.float32), tf.convert_to_tensor(beta, dtype=tf.float32)
 
@@ -98,6 +97,7 @@ def train_linreg_network(train_data, test_data, w0, alphas, lr, loss_threshold=1
 
         # Instantiate callback object
         model_loss = SaveLoss()
+        model_threshold = LossThreshold(loss_threshold)
 
         # Instantiate the model with initialization scale i
         model = Linear_Regression(w0, i)
@@ -107,13 +107,14 @@ def train_linreg_network(train_data, test_data, w0, alphas, lr, loss_threshold=1
         model.compile(optimizer, loss=MSE)
 
         # And finally fit it
-        model.fit(train_x, train_y, epochs=max_epochs, validation_data=[test_x, test_y],  callbacks=[model_loss, LossThreshold(loss_threshold)])
+        model.fit(train_x, train_y, epochs=max_epochs, validation_data=[test_x, test_y],  callbacks=[model_loss, model_threshold])
 
         # Once the model has been fit, store the training and test loss 
         train_losses.append(model_loss.training_loss)
         test_losses.append(model_loss.test_loss)
+        num_epochs_conv.append(model_threshold.epoch_count)
 
-    return train_losses, test_losses
+    return train_losses, test_losses, num_epochs_conv
 
 if __name__ == "__main__":
 
@@ -128,12 +129,12 @@ if __name__ == "__main__":
     training_data = generate_sparse_dataset(num_training, d, len(indices), indices=indices)
 
     # Initialization shape and scales
-    # Let's start with only three alphas (and thus three networks )
+    # Let's start with only three alphas (and thus three networks)
     w0 = tf.ones([2*d, 1])
     alphas = [0.1, 1, 3]
 
     # Now let's create our test dataset
     num_test = 100
-    test_data = generate_sparse_dataset(num_test, d, len(indices), indices=indices, save=False)
+    test_data = generate_sparse_dataset(num_test, d, len(indices), indices=indices, filename='test_data_sparse_regression.pk')
 
     train_linreg_network((training_data[0], training_data[1]), (test_data[0], test_data[1]), w0, alphas=alphas, lr=10**(-3))

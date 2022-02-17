@@ -7,16 +7,18 @@ class LossThreshold(tf.keras.callbacks.Callback):
     """
 
     def __init__(self, threshold, **kwargs):
-        
-        super(LossThreshold, self).__init__(**kwargs)
-        self.threshold = threshold
+      
+      super(LossThreshold, self).__init__(**kwargs)
+      self.threshold = threshold
 
     def on_epoch_end(self, epoch, logs=None): 
         
-        loss = logs["loss"]
-        if loss <= self.threshold:
-            self.model.stop_training = True
-
+      loss = logs["loss"]
+      
+      if loss <= self.threshold:
+        self.epoch_count = epoch
+        self.model.stop_training = True
+    
 class SaveLoss(tf.keras.callbacks.Callback):
     """
     A Callback object for storing the network's training and test loss throughout training;
