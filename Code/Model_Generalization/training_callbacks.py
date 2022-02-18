@@ -14,10 +14,11 @@ class LossThreshold(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None): 
         
       loss = logs["loss"]
+      self.epoch_count = epoch
       
       if loss <= self.threshold:
-        self.epoch_count = epoch
         self.model.stop_training = True
+      
     
 class SaveLoss(tf.keras.callbacks.Callback):
     """
