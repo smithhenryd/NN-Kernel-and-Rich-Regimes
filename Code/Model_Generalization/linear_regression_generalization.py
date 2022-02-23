@@ -1,3 +1,4 @@
+from typing import final
 import tensorflow as tf
 import numpy as np
 import pickle
@@ -88,6 +89,9 @@ def train_linreg_network(train_data, test_data, w0, alphas, lr, loss_threshold=1
     # Store the number of epochs to converge
     num_epochs_conv = []
 
+    # And store the final weights of the network
+    final_weights = []
+
     # We will use the MSER as out loss function for all models
     MSE = tf.keras.losses.MeanSquaredError()
 
@@ -112,9 +116,14 @@ def train_linreg_network(train_data, test_data, w0, alphas, lr, loss_threshold=1
         # Once the model has been fit, store the training and test loss 
         train_losses.append(model_loss.training_loss)
         test_losses.append(model_loss.test_loss)
+        
+        # As well as the number of epochs for convergence
         num_epochs_conv.append(model_threshold.epoch_count)
 
-    return train_losses, test_losses, num_epochs_conv
+        # And the final weights of the network
+        final_weights.append(model.linear_layer_1.w)
+
+    return train_losses, test_losses, num_epochs_conv, final_weights
 
 if __name__ == "__main__":
 
