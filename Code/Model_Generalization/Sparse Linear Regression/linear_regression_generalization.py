@@ -48,7 +48,7 @@ def generate_sparse_dataset(N, d, r, indices=None, filename='training_data_spars
 
     # Generate the response points y_i according to a univariate normal distribution with mean \langle x_i, \beta \rangle
     # and variance 0.01
-    Y_train = np.random.normal(loc=np.reshape(X_train@beta, (N)), scale=0.01, size=N)
+    Y_train = np.random.normal(loc=np.reshape(X_train@beta, (N)), scale=0.1, size=N)
     Y_train =np.reshape(Y_train, (N,1))
     assert Y_train.shape == (N,1)
 
