@@ -1,0 +1,77 @@
+\documentclass{article}
+
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0pt}
+
+% Formatting and images 
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[titletoc,title]{appendix}
+\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{soul}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{indentfirst}
+\usepackage{csquotes}
+
+%% Packages for mathematical typesetting
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{pgf}
+\usepackage{comment}
+\usepackage{float}
+\usepackage{blindtext}
+\usepackage{enumitem}
+\usepackage{bbm}
+\usepackage{array}
+
+% Title content
+\title{\textbf{Project Title}}
+\author[]{Henry Smith}
+\affil[]{\normalsize Yale University}
+\date{\today}
+
+\begin{document}
+
+% Title page
+\maketitle
+
+\pagebreak
+
+%Acknowledgment
+\vspace*{\fill}
+
+\begin{centering}
+\section*{Acknowledgement}
+\end{centering}
+
+\vspace*{\fill}
+
+\pagebreak
+% Table of contents
+
+\vspace*{\fill}
+
+\begin{centering}
+\tableofcontents
+\end{centering}
+
+\vspace*{\fill}
+
+\pagebreak
+% Begin content
+
+\pagebreak
+% References
+
+\bibliographystyle{siam}
+\bibliography{References/biblio}
+
+\end{document}
