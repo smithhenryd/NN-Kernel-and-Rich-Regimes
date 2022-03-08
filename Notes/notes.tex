@@ -101,9 +101,9 @@ The authors study the underdetermined case $N \ll d$ when there are many solutio
 \boldsymbol{\beta} = \boldsymbol{y}$. Let $\boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^{\infty}$ be the solution reached by gradient flow when initialized at $\boldsymbol{w}_+(0) = \boldsymbol{w}_-(0) = \alpha \boldsymbol{w}_0$. Woodworth and colleagues first consider the case of $\boldsymbol{w}_0 = \vec{1}$ and then generalize their results.
 
 For $\boldsymbol{w}_0 = \vec{1}$, it is easy to verify that the tangent kernel at initialization is $K_{\boldsymbol{w}(0)}(\boldsymbol{x}, \boldsymbol{x}') = 8 \alpha^2 \langle \boldsymbol{x}, \boldsymbol{x}' \rangle$, which is simply a scaling of the standard inner product kernel (just write out $\nabla_{\boldsymbol{w}} f(\boldsymbol{w}, \boldsymbol{x}) |_{\boldsymbol{w} = \boldsymbol{w}(0)}$).
-That is, we have $\left\Vert \boldsymbol{\beta} \right\Vert_{K_0} \propto \left\Vert \boldsymbol{\beta} \right\Vert_2$. And so in the kernel regime, $\boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}$ is equal to the minimum $\ell_2$ solution $\boldsymbol{\beta}_{\ell_2}^* := \text{argmin}_{X \boldsymbol{\beta} = y} \left\Vert \boldsymbol{\beta} \right\Vert_2$. Conversely, as $\alpha \rightarrow 0$, we approach what Woodworth and colleagues classify as the \enquote{rich limit.} Under the rich limit, the tangent kernel changes significantly during optimization, and the model $f(\boldsymbol{w}, \boldsymbol{x})$ is not linear in $\boldsymbol{w}$. For the linear regression problem under consideration with $\boldsymbol{w}_0 = \vec{1}$, \cite{gunasekar2018implicit} proves in Corollary \ref{gunasekharcor2} that $\lim_{\alpha \rightarrow 0} \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty} = \boldsymbol{\beta}_{\ell_1}^* = \text{argmin}_{X \boldsymbol{\beta} = y} \left\Vert \boldsymbol{\beta}\right\Vert_1$.
+That is, we have $\left\Vert \boldsymbol{\beta} \right\Vert_{K_0} \propto \left\Vert \boldsymbol{\beta} \right\Vert_2$. And so in the kernel regime, $\boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}$ is equal to the minimum $\ell^2$ solution $\boldsymbol{\beta}_{\ell^2}^* := \text{argmin}_{X \boldsymbol{\beta} = y} \left\Vert \boldsymbol{\beta} \right\Vert_2$. Conversely, as $\alpha \rightarrow 0$, we approach what Woodworth and colleagues classify as the \enquote{rich limit.} Under the rich limit, the tangent kernel changes significantly during optimization, and the model $f(\boldsymbol{w}, \boldsymbol{x})$ is not linear in $\boldsymbol{w}$. For the linear regression problem under consideration with $\boldsymbol{w}_0 = \vec{1}$, \cite{gunasekar2018implicit} proves in Corollary \ref{gunasekharcor2} that $\lim_{\alpha \rightarrow 0} \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty} = \boldsymbol{\beta}_{\ell^1}^* = \text{argmin}_{X \boldsymbol{\beta} = y} \left\Vert \boldsymbol{\beta}\right\Vert_1$.
 
-And so we understand that for the current model of interest with initialization $\boldsymbol{w}_0 = \vec{1}$, the gradient flow solution in the kernel regime $\alpha \rightarrow \infty$ is the minimum $\ell_2$ solution and the solution in the rich regime $\alpha \rightarrow 0$ is the minimum $\ell_1$ solution. 
+And so we understand that for the current model of interest with initialization $\boldsymbol{w}_0 = \vec{1}$, the gradient flow solution in the kernel regime $\alpha \rightarrow \infty$ is the minimum $\ell^2$ solution and the solution in the rich regime $\alpha \rightarrow 0$ is the minimum $\ell^1$ solution. 
 
 \subsection{Interpolation Between the Rich and Kernel Regimes}
 What the authors seek to understand, however, is how the gradient flow solution interpolates between the rich and kernel limits. That is, what can we say about the implicit bias when training the linear regression model for $\alpha$ small, for example? This is the subject of the following theorem:
@@ -114,20 +114,20 @@ For any $0 < \alpha < \infty$, if the gradient flow solution $\boldsymbol{\beta}
 \end{align*}
 where $Q_{\alpha}(\boldsymbol{\beta}) = \alpha^2 \sum_{i=1}^d q\left(\frac{\boldsymbol{\beta}_i}{\alpha^2}\right)$ and $q(z) = \int_0^z \text{arcsinh}\left(\frac{u}{2} \right) du = 2 - \sqrt{4+z^2} + z \text{arcsinh}\left(\frac{z}{2} \right).$
 \end{manualtheorem}
-See \cite{woodworth2020kernel} for further analysis of how $Q_{\alpha}(\boldsymbol{\beta})$ reproduces the $\ell_2$ and $\ell_1$ minimization problems as $\alpha \rightarrow \infty$ and $\alpha \rightarrow 0$, respectively. In Theorem \ref{woodworththm2}, Woodworth and colleagues quantify the scale of $\alpha$ necessary to guarantee approximation of the minimum $\ell_1$ and $\ell_2$ solutions:
+See \cite{woodworth2020kernel} for further analysis of how $Q_{\alpha}(\boldsymbol{\beta})$ reproduces the $\ell^2$ and $\ell^1$ minimization problems as $\alpha \rightarrow \infty$ and $\alpha \rightarrow 0$, respectively. In Theorem \ref{woodworththm2}, Woodworth and colleagues quantify the scale of $\alpha$ necessary to guarantee approximation of the minimum $\ell^1$ and $\ell^2$ solutions:
 \begin{manualtheorem}{2}\label{woodworththm2}
 For any $0 < \epsilon < d$, under the setting of Theorem \ref{woodworththm1} with $\boldsymbol{w}_0 = \vec{1}$, 
 \begin{align*}
-    \alpha \leq \min \left\{ (2(1 + \epsilon)\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1)^{-\frac{2+ \epsilon}{2\epsilon}}, \exp \left(-d/(\epsilon \left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1) \right) \right\} \implies \left\Vert \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}\right\Vert_1 \leq (1+\epsilon)\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1
+    \alpha \leq \min \left\{ (2(1 + \epsilon)\left\Vert \boldsymbol{\beta}_{\ell^1}^* \right\Vert_1)^{-\frac{2+ \epsilon}{2\epsilon}}, \exp \left(-d/(\epsilon \left\Vert \boldsymbol{\beta}_{\ell^1}^* \right\Vert_1) \right) \right\} \implies \left\Vert \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}\right\Vert_1 \leq (1+\epsilon)\left\Vert \boldsymbol{\beta}_{\ell^1}^* \right\Vert_1
 \end{align*}
 \begin{align*}
-    \alpha \geq \sqrt{2(1+ \epsilon)(1 + 2/\epsilon)\left\Vert \boldsymbol{\beta}_{\ell_2}^* \right\Vert_2} \implies \left\Vert \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}\right\Vert_2^2 \leq (1+\epsilon)\left\Vert \boldsymbol{\beta}_{\ell_2}^* \right\Vert_2^2.
+    \alpha \geq \sqrt{2(1+ \epsilon)(1 + 2/\epsilon)\left\Vert \boldsymbol{\beta}_{\ell^2}^* \right\Vert_2} \implies \left\Vert \boldsymbol{\beta}_{\alpha, \vec{1}}^{\infty}\right\Vert_2^2 \leq (1+\epsilon)\left\Vert \boldsymbol{\beta}_{\ell^2}^* \right\Vert_2^2.
 \end{align*}
 \end{manualtheorem}
-Theorem \ref{woodworththm2} illustrates a challenge with approximating the rich limit: while only polynomially large $\alpha$ suffices to approximate $\boldsymbol{\beta}_{\ell_2}^*$, one must have \textit{exponentially small} $\alpha$ to approximate $\boldsymbol{\beta}_{\ell_1}^*$. As a result, experiments close to the rich limit may require very small initializations and, as a result, may be computationally intractable. The work from \cite{arora2019implicit} suggests a remedy to this problem: increasing the depth (i.e. degree of homogeneity) of the model. 
+Theorem \ref{woodworththm2} illustrates a challenge with approximating the rich limit: while only polynomially large $\alpha$ suffices to approximate $\boldsymbol{\beta}_{\ell^2}^*$, one must have \textit{exponentially small} $\alpha$ to approximate $\boldsymbol{\beta}_{\ell^1}^*$. As a result, experiments close to the rich limit may require very small initializations and, as a result, may be computationally intractable. The work from \cite{arora2019implicit} suggests a remedy to this problem: increasing the depth (i.e. degree of homogeneity) of the model. 
 
 \subsection{The Relation of Kernel and Rich Limits to Model Generalization}
-Interestingly, the kernel and rich limits are related to the generalizability of the model. Woodworth et al. illustrate this phenomenon by generating a training set $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_N \sim \mathcal{N}(0, I)$ and $y_n \sim \mathcal{N}(\langle \boldsymbol{\beta}^*, \boldsymbol{x}_n \rangle, 0.01)$, where $\boldsymbol{\beta}^*$ is an $r^*$ sparse vector whose nonzero entries are equal to $1/\sqrt{r^*}$. The authors note that for $N \leq d$, gradient flow generally reaches a zero training error solution, but not all solutions generalize the same. In particular, they show that in the rich limit, $N = \Omega(r^*\log d)$ training points suffices for $\boldsymbol{\beta}_{\ell_1}^*$ to \enquote{generalize well}; in the kernel limit, though, good generalization requires $N = \Omega(d)$. This tells us that, in general, \textit{good generalization of our model requires us to train close to the rich regime}. As previously noted, though, one cannot take $\alpha$ to be arbitrary small: as $w(0) \rightarrow \vec{0}$, we reach a saddle point of the objective function. Thus, \cite{woodworth2020kernel} suggests working at the edge of the rich limit, ensuring generalizability of the solution while also making sure that the optimization problem is feasible. One can see this in section 7 of \cite{woodworth2020kernel}, where the authors perform experiements with neural networks on the MNIST and CIFAR10 datasets.
+Interestingly, the kernel and rich limits are related to the generalizability of the model. Woodworth et al. illustrate this phenomenon by generating a training set $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_N \sim \mathcal{N}(0, I)$ and $y_n \sim \mathcal{N}(\langle \boldsymbol{\beta}^*, \boldsymbol{x}_n \rangle, 0.01)$, where $\boldsymbol{\beta}^*$ is an $r^*$ sparse vector whose nonzero entries are equal to $1/\sqrt{r^*}$. The authors note that for $N \leq d$, gradient flow generally reaches a zero training error solution, but not all solutions generalize the same. In particular, they show that in the rich limit, $N = \Omega(r^*\log d)$ training points suffices for $\boldsymbol{\beta}_{\ell^1}^*$ to \enquote{generalize well}; in the kernel limit, though, good generalization requires $N = \Omega(d)$. This tells us that, in general, \textit{good generalization of our model requires us to train close to the rich regime}. As previously noted, though, one cannot take $\alpha$ to be arbitrary small: as $w(0) \rightarrow \vec{0}$, we reach a saddle point of the objective function. Thus, \cite{woodworth2020kernel} suggests working at the edge of the rich limit, ensuring generalizability of the solution while also making sure that the optimization problem is feasible. One can see this in section 7 of \cite{woodworth2020kernel}, where the authors perform experiements with neural networks on the MNIST and CIFAR10 datasets.
 
 \subsection{Reconsidering $\boldsymbol{w}_0$}
 So far, we have only considered the problem of $\boldsymbol{w}_0 = \vec{1}$. The authors give a more general statement of Theorem \ref{woodworththm1} as follows:
@@ -142,14 +142,14 @@ The authors then note that for small $z$, $q(z) = \frac{z^2}{4} + \mathcal{O}(z^
 \begin{align*}
     Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) = \sum_{i=1}^d \frac{\boldsymbol{\beta}_i^2}{4\alpha^2\boldsymbol{w}_{0, i}^2} + \mathcal{O}(\alpha^{-6}).
 \end{align*}
-That is, $Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta})$ is proportional to the $\ell_2$ norm weighted by $\text{diag}(1/\boldsymbol{w}_0^2)$. Conversely, for large $\left| z \right|$, $q(z) = \left|z \right| \log \left|z \right| + \mathcal{O}(1/ \left| z \right|)$, and so as $\alpha \rightarrow 0$, 
+That is, $Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta})$ is proportional to the $\ell^2$ norm weighted by $\text{diag}(1/\boldsymbol{w}_0^2)$. Conversely, for large $\left| z \right|$, $q(z) = \left|z \right| \log \left|z \right| + \mathcal{O}(1/ \left| z \right|)$, and so as $\alpha \rightarrow 0$, 
 \begin{align*}
     \frac{1}{\log(1/\alpha^2)}Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) = \sum_{i=1}^d \left| \boldsymbol{\beta}_i \right| + \mathcal{O}(1/\log(1/\alpha^2)).
 \end{align*}
 This tells us that in the rich limit, $Q_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta})$ is proportional to $\left\Vert \boldsymbol{\beta} \right\Vert_1 $ regardless of the shape of the initialization $\boldsymbol{w}_0$. In summary, the specific initialization $\boldsymbol{w}_0$ \textit{does} affect the implicit bias in optimization under the kernel regime, but \textit{not} in the rich limit. For neural networks with i.i.d. initialized units, the particular value of $\boldsymbol{w}_0$ is analogous to the distribution used to initialize each unit. That is, changing the initialization distribution changes the tangent kernel at initialization and thus the kernel regime behavior; it does not, however, affect the rich limit.
 
 \subsection{Implicit Bias and Weights}
-The authors consider the possibility that the implicit bias is minimizing the $\ell_2$ norm from initialization:
+The authors consider the possibility that the implicit bias is minimizing the $\ell^2$ norm from initialization:
 \begin{align*}
     \boldsymbol{\beta}_{\alpha, \boldsymbol{w}_0}^R := F \left( \underset{\boldsymbol{w}}{\text{argmin}} \left\Vert \boldsymbol{w} - \alpha \boldsymbol{w}_0 \right\Vert_2^2 \ \text{s.t.} \ L(\boldsymbol{w}) = 0 \right) = \underset{\boldsymbol{\beta}}{\text{argmin}} \ R_{\alpha, \boldsymbol{w}_0}(\boldsymbol{\beta}) \ \text{s.t.} \ X \boldymbol{\beta} = y
 \end{align*}
@@ -170,9 +170,9 @@ For any $0 < \alpha < \infty$ and $D \geq 3$, if $X \boldsymbol{\beta}_{\alpha, 
 \begin{align*}
     \boldsymbol{\beta}_{\alpha, D}^{\infty} = \text{argmin}_{\boldsymbol{\beta}} Q_{\alpha}^D(\boldsymbol{\beta}) \ \text{s.t.} \ X \boldsymbol{\beta} = \boldsymbol{y}
 \end{align*}
-where $Q_{\alpha}^D(\boldymbol{\beta}) = \alpha^D \sum_{i=1}^d q_D(\boldsymbol{\beta}_i/\alpha^D)$ and $q_D = \int h_D^{-1}$ is the antiderivative of the unique inverse of $h_D(z) = (1-z)^{-\frac{D}{D-2}} - (1+z)^{-\frac{D}{D-2}}$ on $[-1, 1]$. Furthermore, $\lim_{\alpha \rightarrow 0} \boldsymbol{\beta}_{\alpha, D}^{\infty} = \boldsymbol{\beta}_{\ell_1}^*$ and $\lim_{\alpha \rightarrow \infty} \boldsymbol{\beta}_{\alpha, D}^{\infty} = \boldsymbol{\beta}_{\ell_2}^*$.
+where $Q_{\alpha}^D(\boldymbol{\beta}) = \alpha^D \sum_{i=1}^d q_D(\boldsymbol{\beta}_i/\alpha^D)$ and $q_D = \int h_D^{-1}$ is the antiderivative of the unique inverse of $h_D(z) = (1-z)^{-\frac{D}{D-2}} - (1+z)^{-\frac{D}{D-2}}$ on $[-1, 1]$. Furthermore, $\lim_{\alpha \rightarrow 0} \boldsymbol{\beta}_{\alpha, D}^{\infty} = \boldsymbol{\beta}_{\ell^1}^*$ and $\lim_{\alpha \rightarrow \infty} \boldsymbol{\beta}_{\alpha, D}^{\infty} = \boldsymbol{\beta}_{\ell^2}^*$.
 \end{manualtheorem}
-The minimum $\ell_1$ solution in the rich limit for depth-$D$ diagonal neural networks has already been observed by Arora et al. While the rich and kernel limits do not change as the depth of the diagonal network increases, the transition between the rich and kernel regimes \textit{does} change. In particular, \textit{for higher orders of homogeneity, the transition into the extreme regimes is sharper}. Even at $D=3$, the scale of $\alpha$ needed to approximate $\left\Vert \boldsymbol{\beta}_{\ell_1}^* \right\Vert_1$ is polynomial rather than exponential in the case of $D=2$ (see Figure 3(b) in \cite{woodworth2020kernel}). 
+The minimum $\ell^1$ solution in the rich limit for depth-$D$ diagonal neural networks has already been observed by Arora et al. While the rich and kernel limits do not change as the depth of the diagonal network increases, the transition between the rich and kernel regimes \textit{does} change. In particular, \textit{for higher orders of homogeneity, the transition into the extreme regimes is sharper}. Even at $D=3$, the scale of $\alpha$ needed to approximate $\left\Vert \boldsymbol{\beta}_{\ell^1}^* \right\Vert_1$ is polynomial rather than exponential in the case of $D=2$ (see Figure 3(b) in \cite{woodworth2020kernel}). 
 
 \section{On Lazy Training in Differential Programming, Chizat, Oyallon, and Bach 2018}
 
@@ -243,7 +243,7 @@ Assume that $h(w_0) = 0$. Given a fixed time horizon $T > 0$, it holds that $\su
     \sup_{t \in [0, T]} \left\Vert w_{\alpha}(t) - \overline{w}_{\alpha}(t) \right\Vert = \mathcal{O}(1/\alpha^2) \quad \text{and} \quad  \sup_{t \in [0, T]} \left\Vert \alpha h(w_{\alpha}(t)) - \alpha \overline{h}(\overline{w}_{\alpha}(t)) \right\Vert = \mathcal{O}(1/\alpha^2).
 \end{align*}
 \end{manualtheorem}
-Each of these three statements is of key importance. The first tells us that as $\alpha$ increases, $w_{\alpha}(t)$ is closer to initialization $w_{\alpha}(0)$ [in the $\ell_2$ norm]. The second tells us that the gradient flow of $F_{\alpha}$ approaches the gradient flow of $\overline{F}_{\alpha}$ as $\alpha$ grows. The last tells us that the scaled model $\alpha h$ approaches the scaled linearized model $\alpha \overline{h}$ for $\alpha$ large. The constants in Theorem \ref{Chizatthm2.2} depend \textit{exponentially on the time horizon $T$}.
+Each of these three statements is of key importance. The first tells us that as $\alpha$ increases, $w_{\alpha}(t)$ is closer to initialization $w_{\alpha}(0)$ [in the $\ell^2$ norm]. The second tells us that the gradient flow of $F_{\alpha}$ approaches the gradient flow of $\overline{F}_{\alpha}$ as $\alpha$ grows. The last tells us that the scaled model $\alpha h$ approaches the scaled linearized model $\alpha \overline{h}$ for $\alpha$ large. The constants in Theorem \ref{Chizatthm2.2} depend \textit{exponentially on the time horizon $T$}.
 
 In the next portion of their paper, the author gives \textit{uniform} bounds in time and convergence results under the assumption that the loss $R$ is strongly convex. By this assumption, $\overline{F}_{\alpha}$ is strictly convex on the affine hyperspace $w_0 + \text{ker} \ Dh(w_0)^{\perp}$ which contains the linearized gradient flow $(\overline{w}_{\alpha}(t))_{t \geq 0}$. Therefore, $(\overline{w}_{\alpha}(t))_{t \geq 0}$ converges linearly to the unique global minimizer of $\overline{F}_{\alpha}$ (since we assumed strong convexity of $R$). The authors first treat the overparameterized case, when $Dh(w_0)$ is surjective. As they discuss, $\text{rank} \ Dh(w_0)$ gives the degrees of freedom of the model around initialization $w_0$. 
 
@@ -319,8 +319,6 @@ Assume that $\sigma$ is a Lipschitz, twice differentiable nonlinearity function,
 \end{align*}
 \end{manualtheorem}
 As is discussed in section 3 of the paper, the convergence of the neural tangent kernel to a critical point of the cost function $C$ \textit{is guaranteed for positive definite kernels}. The authors note that the limiting NTK $\Theta_{\infty}$ is positive definite if the span of the derivatives $\partial_{\theta_p}F^{(L)}, \ p = 1, \ldots, P$ becomes dense in $\mathcal{F}$ with respect to the $p^{in}$ norm as the width grows to infinity.
-
-\hl{TODO: ask Professor Zhou about convergence along the principal components of the input data with respect to the NTK (see section 5 of the paper)}
 
 \section{Implicit Regularization in Matrix Factorization, Gunasekar et al. 2017}
 \subsection{Matrix Factorization Problem}
@@ -504,7 +502,7 @@ In understanding this distinction between kernelized gradient descent and gradie
 
 \subsection{Generalization of Regularized Network versus NTK}
 
-The distribution $\mathcal{D}$ of training data $(x,y)$ is as follows. For any $k \geq 3$, $x^Te-k \sim \{-1,1\}$ is a uniform random bit (i.e. the last $k-2$ components of $x$ are noise). And for $x^Te_1$, $x^Te_2$, $y$ choose
+The distribution $\mathcal{D}$ of training data $(x,y)$ is as follows. For any $k \geq 3$, $x^Te_k \sim \{-1,1\}$ is a uniform random bit (i.e. the last $k-2$ components of $x$ are noise). And for $x^Te_1$, $x^Te_2$, $y$ choose
 \begin{align*}
     &y = +1, \quad x^Te_1 = +1, \quad x^Te_2 = 0 \quad \text{w/ prob. 1/4}\\
     &y = +1, \quad x^Te_1 = +1, \quad x^Te_2 = 0 \quad \text{w/ prob. 1/4}\\
@@ -512,15 +510,17 @@ The distribution $\mathcal{D}$ of training data $(x,y)$ is as follows. For any $
     &y = -1, \quad x^Te_1 = 0, \quad x^Te_2 = -1 \quad \text{w/ prob. 1/4}
 \end{align*}
 
-The network computes $f^{\text{NN}}(x; \Theta) := \sum_{j=1}^m w_j [u_j^Tx]$, where $\Theta$ is the parameter space with $\theta_j = (u_j, w_j)$ and  $[\cdot]_+$ is the ReLU activation. The $\ell_2$ regularized logistic loss is 
+The network computes $f^{\text{NN}}(x; \Theta) := \sum_{j=1}^m w_j [u_j^Tx]$, where $\Theta$ is the parameter space with $\theta_j = (u_j, w_j)$ and  $[\cdot]_+$ is the ReLU activation. The $\ell^2$ regularized logistic loss is 
 \begin{align*}
     L_{\lambda}(\boldsymbol{\Theta}) = \frac{1}{n} \sum_{i=1}^n \log(1 + \exp(-y_i f^{\text{NN}}(x_i, \Theta))) + \lambda \Vert \Theta \Vert_{\text{F}}^2.
 \end{align*}
+Note that the Frobenius norm $\Vert \Theta \Vert_{\text{F}}^2$ can be interpreted as the $\ell^2$ norm when the parameters are arranged into a single vector.
+
 Let $\Theta_{\lambda} \in \text{argmin}_{\Theta} L_{\lambda}(\Theta)$ be the global optimizer. Also we know that the neural tangent kernel associated with the architecture is
 \begin{align*}
    K(x, x') = \mathbb{E}_{w \sim \mathcal{N}(0, r_w^2), u \sim \mathcal{N}(0, r_u^2I)}[\langle \nabla_{\theta}f^{\text{NN}}(x; \Theta), \nabla_{\theta}f^{\text{NN}}(x'; \Theta)  \rangle].
 \end{align*}
-Notice the expectation is taken over the weights of the network since they are initialized randomly. This is \textit{not} the case with \cite{woodworth2020kernel}, where the initial weights are chosen to be $\boldsymbol{w}_0 = \alpha \vec{1}$. That is, the NTK is deterministic--not random--upon initialization. For coefficients $\beta$, the prediction function $f^{\text{kernel}}(x; \beta)$ in the RKHS induced by $K$ can be written as $f^{\text{kernel}}(x; \beta) = \sum_{i=1}^n \beta_i K(x; \beta)$. 
+Notice that the expectation is taken over the weights of the network since they are initialized randomly. This is \textit{not} the case with \cite{woodworth2020kernel}, where the initial weights are chosen to be $\boldsymbol{w}_0 = \alpha \vec{1}$. That is, the NTK is deterministic--not random--upon initialization. For coefficients $\beta$, the prediction function $f^{\text{kernel}}(x; \beta)$ in the RKHS induced by $K$ can be written as $f^{\text{kernel}}(x; \beta) = \sum_{i=1}^n \beta_i K(x_i, x)$. 
 
 This formulation of the problem leads us to present the main of the paper:
 \begin{manualtheorem}{2.1}
@@ -534,6 +534,37 @@ Meanwhile, for $\lambda \leq \text{poly}(n)^{-1}$, the regularized neural net so
 \end{align*}
 This implies a $\Omega(d)$ sample-complexity gap between the regularized neural net and kernel prediction function.
 \end{manualtheorem}
+Notice here that $f^{\text{NN}}(x;\Theta_{\lambda})y > 0$ indicates good prediction of our network, whereas $f^{\text{NN}}(x;\Theta_{\lambda})y < 0$ indicates poor prediction. The authors' intuition is for this generalization gap is that the regularization term $\lambda \Vert \Theta \Vert_{\text{F}}^2$ \enquote{allows the neural net to find informative features
+(weight vectors), that are adaptive to the data distribution and easier for the last layer’s weights to separate.} In particular, the weight vectors $[ e_1x ]_+$, $[-e_1x ]_+$, $[e_2x ]_+$, and $[-e_2x ]_+$, which determine the sign of the first two coordinates of $x$, are sufficient to fit the data distribution $\mathcal{D}$. Conversely, the kernel regime has a fixed feature space (namely, the feature map defined by $\varphi(x) = \nabla_{\theta}f^{\text{NN}}(x; \Theta)$) and is only searching for the coefficients in the RKHS.
+
+\subsection{Perturbed Wasserstein Gradient Flow}
+The principal result of the paper requires attaining the global minimum of the $\ell^2$ regularized loss. The authors show that for infinite-width two-layer networks, gradient descent finds global optimizers of the $\ell^2$ regularized loss in polynomial iterations. \cite{chizat2018global} demonstrated that as the hidden layer size approaches infinity, then gradient descent for a finite neural network approaches the \textit{Wasserstein gradient flow} over distributions of hidden units. 
+
+The modeling of an infinite-width neural network is as follows. Define the following functional over distributions $\rho$ on $\mathbb{R}^{d+1}$: $L[\rho] := R(\int \Phi d\rho) + \int V d\rho$. Here, $\Phi: \mathbb{R}^{d+1} \rightarrow \mathbb{R}^k$ can be thought of the network function mapping a set of parameters to the predictions. Note that this differs from our common conception of neural networks as mapping from an input space to an output space. Similarly, $R: \mathbb{R}^k \rightarrow \mathbb{R}$ and $V: \mathbb{R}^{d+1} \rightarrow \mathbb{R}$ can be thought of the network loss and the regularizer, respectively. 
+
+For the purposes of their problem, the authors take $\Phi$ and $V$ to be two-homogeneous. They require that $R$ is convex and nonnegative on the unit sphere and that $V$ is positive on the unit sphere. As for regularity assumptions, they specify that $\Phi$ and $V$ are differentiable as well as upper bounded and Lipschitz on the unit sphere. Moreover, they suppose that $R$ is Lipschitz and that its Hessian has bounded operator norm.
+
+Now that we have stated this mathematical definition for neural networks, we relate the definition to the logistic regression problem under consideration. As we have previously suggested, $\rho$ has the interpretation of being a distribution over the parameters of the neural network. Take $k = n$ and $\Phi_i(\theta) = w \phi(u^T x_i)$ for $\theta = (w, u)$. Then $\int \Phi d\rho$ is a distributional neural network that computes an output for each of the $n$ training samples. The distributional version of the regularized logistic loss can be formulated by setting $V(\theta) := \lambda \Vert \theta \Vert_2^2$ and $R(a_1, \ldots, a_n) := \sum_{i=1}^n \log(1 + \exp(-y_ia_i))$.
+
+From here, the authors define $L'[\rho]: \mathbb{R}^{d+1} \rightarrow \mathbb{R}$ such that $L'[\rho](\theta) := \langle R'(\int \Phi d\rho), \Phi(\theta) \rangle + V(\theta)$ and $v[\rho](\theta) := - \nabla_{\theta} L'[\rho](\theta)$. They mention that, informally, $L'[\rho]$ is the gradient of $L$ with respect to $\rho$, and $v$ is the induced velocity field. For the standard Wasserstein gradient flow dynamics, we have that $\rho_t$ evolves according to 
+\begin{align*}
+\frac{d}{dt}\rho_t = -\nabla \cdot (v[\rho_t] \rho_t).
+\end{align*}
+Notice that this gradient flow is over distributions on the parameter space (which is different than how we are accustomed to thinking about gradient flow). The authors then propose the modified dynamics 
+\begin{align*}
+    \frac{d}{dt}\rho_t = - \sigma \rho_t  + \sigma U^d  - \nabla \cdot (v[\rho_t] \rho_t)
+\end{align*}
+where $U^d$ is the uniform distribution over $\mathbb{S}^d$. The authors justify this small uniform noise by stating that it \enquote{ensures that at all time-steps, there is sufficient mass in a descent direction for the algorithm to decrease the objective.}
+
+They then prove the following result, which gives convergence to a global optimizer of the regularized loss in polynomial time:
+\begin{manualtheorem}{3.3}
+Suppose that $\Phi$ and $V$ are two homogeneous and the aforementioned regularity conditions ($\Phi$ and $V$ differentiable, upper bounded and Lipschitz on $\mathbb{S}^d$, $R$ is Lispchitz and has Hessian with bounded operator norm). Also assume that for a starting distribution $\rho_0$, a solution to the perturbed Wasserstein gradient flow dynamics exist. Define $L^{\star} = \inf{\rho} L[\rho]$. Let $\epsilon > 0$ be a desired error threshold and choose $\sigma = \exp(-d\log(1/\epsilon)\text{poly}(k, L[\rho_0] - L^{\star}))$ and $t_{\epsilon} := \frac{d^2}{\epsilon^4} \text{poly}(\log(1/\epsilon), k, L[\rho_0] - L^{\star})$, where the regularity parameters for $\Phi$, $V$, and $R$ are hidden in $\text{poly}(\cdot)$. Then the perturbed Wasserstein gradient flow converges to an $\epsilon$-approximate global minimum in $t_{\epsilon}$ time:
+\begin{align*}
+    \underset{0 \leq t \leq t_{\epsilon}}{L[\rho_t]} - L^{\star} \leq \epsilon.
+\end{align*}
+
+\end{manualtheorem}
+
 
 \section{A Priori Estimates of the Population Risk for Two-layer Neural Networks, Weinan et al. 2018}
 
