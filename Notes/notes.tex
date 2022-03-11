@@ -661,6 +661,135 @@ Assume that the target function $f^* \in \mathcal{B}_2(X)$ and $\lambda \geq \la
 \end{align*}
 \end{manualtheorem}
 
+\section{Implicit Bias of Neural Networks for Wide Two-layer Neural Networks Trained with the Logistic Loss, Chizat and Bach 2020}
+
+The authors' work focuses on infinitely-wide two-layer neural networks; recall that training an infinite width network is equivalent to the Wasserstein gradient flow over the distributions of hidden units. In this case, however, the gradient flow diverges. This particular analysis does not take place in the lazy training regime. Rather, they seek to characterize the classifier learned by gradient flow for a particular class of two-layer neural networks and for losses with an exponential tail.
+
+\subsection{Preliminaries}
+The authors consider a training set of $n$ observations $(x_i, y_i)_{i \in [n]}$ where $x_i \in \mathbb{R}^d$ and $y_i \in \{-1, +1\}$. The prediction functions of interest are of the form
+\begin{align*}
+    h_m(\boldsymbol{w}, x) = \frac{1}{m} \sum_{j=1}^m \phi(w_j, x),
+\end{align*}
+where $m \geq 1$ is the number of units and $\boldsymbol{w} = (w_j)_{j \in [m]} \in (\mathbb{R}^p)^m$ are the trainable parameters. Further, they assume that the \textit{feature function} $\phi$ is (positively) two-homogeneous in the weights
+\begin{align*}
+    \phi(rw, x) = r^2\phi(w, x) \quad \text{for all $(r, w, x) \in \mathbb{R}_+ \times \mathbb{R}^p \times \mathbb{R}^d$}
+\end{align*}
+as well as balanced, which means that there exists some map $T: \mathbb{S}^{p-1} \rightarrow \mathbb{S}^{p-1}$ such that for $\theta \in \mathbb{S}^{p-1}$,
+\begin{align*}
+    \phi(T(\theta), \cdot) = -\phi(\theta, \cdot).
+\end{align*}
+
+An example of such a network is a two-layer ReLU neural network, which has feature function
+\begin{align*}
+    \phi(w, x) = b(a^T(x, 1))_+ \quad \text{for $w = (a, b) \in \mathbb{R}^{d+2}$}.
+\end{align*}
+The neural network is not differentiable, since $[\cdot]_+$ has a corner at $t=0$.
+
+The neural network under consideration can be parameterized in terms of $\mu$, a discrete measure with $m$ atoms:
+\begin{align*}
+    h(\mu, x) = \int_{\mathbb{R}^p} \phi(w, x) d\mu(w).
+\end{align*}
+The two-homogeneous projection operator $\Pi_2: \mathcal{P}_2(\mathbb{R}^p) \rightarrow \mathcal{M}_+(\mathbb{S}^{p-1})$ maps from the set of probability measures on $\mathbb{R}^p$ to the set of nonnegative, finite, Borel measures on $\mathbb{S}^{p-1}$ and is characterized by the property that for any $\varphi \in \mathcal{C}(\mathbb{S}^{p-1})$,
+\begin{align*}
+    \int_{\mathbb{S}^{p-1}} \varphi(\theta) d[\Pi_2(\mu)](\theta) = \int_{\mathbb{R}^p} \Vert w \Vert^2 \varphi(w/\Vert w \Vert) d \mu(w).
+\end{align*}
+This operator projects the mass of $\mu$ onto the unit sphere after re-weighting it by the squared distance to the origin.
+
+\subsection{Max Margins and Functional Norms}
+Given the training set $(x_i, y_i)_{i \in [n]}$, the \textit{margin} of a predictor function $f:\mathbb{R}^d \rightarrow \mathbb{R}$ is  $\min_{i \in [n]} y_i f(x_i)$. When the margin is strictly positive, then the predictor makes no error on the training set. \textit{Max-margin} predictors are those which maximize the margin over a certain set of functions. For example, when this set of functions define a unit ball in some norm $\Vert \cdot \Vert$, they solve
+\begin{align*}
+    \underset{\Vert f \Vert \leq 1}{\max}\underset{i \in [n]}{\min} \ y_if(x_i)
+\end{align*}
+
+\subsubsection{The Variation Norm}
+Given a feature function $\phi$ which satisfies the homogeneity and balanced assumption, we consider the space $\mathcal{F}_1$ of functions that can be expressed as 
+\begin{align*}
+    f(x) = \int_{\mathbb{S}^{p-1}}\phi(\theta, x) d\nu(\theta),
+\end{align*}
+where $\nu \in \mathcal{M}_+(\mathbb{S}^{p-1})$ has finite mass. The infimum over $\nu(\mathbb{S}^{p-1})$ defines a norm $\Vert f \Vert_{\mathcal{F}_1}$, sometimes called the \textit{variation norm} on $\mathcal{F}_1$. Therefore, the $\mathcal{F}_1$-max-margin of the training set is denoted $\gamma_1$ and given by
+\begin{align*}
+    \gamma_1 :=  \underset{\Vert f \Vert_{\mathcal{F}_1} \leq 1}{\max} \ \underset{i \in [n]}{\min} y_i f(x_i) = \underset{\substack{\nu \in \mathcal{M}_+(\mathbb{S}^{p-1})\\ \nu(\mathbb{S}^{p-1}) \leq 1}}{\max} \ \underset{i \in [n]}{\min} \ y_i \int_{\mathbb{S}^{p-1}}\phi(\theta, x) d\nu(\theta).
+\end{align*}
+
+\subsubsection{RKHS Norm}
+Consider a two-layer neural network withnthe activation function $\sigma: \mathbb{R} \rightarrow \mathbb{R}$. Then we can let $\tau \in \mathcal{P}(\mathbb{S}^{p-1})$ be the uniform measure on the sphere $\mathbb{S}^{p-1}$, where $p=d+1$, and define $\mathcal{F}_2$ as functions of the form $f(x) = \int_{\mathbb{S}^{p-1}} \sigma(b + c^Tx)g(b, c) d\tau(b, c)$ for some square integrable function $g \in L^2(\tau)$. The infimum of $\Vert g \Vert_{L^2(\tau)}$ over such decompositions defines a norm $\Vert f \Vert_{\mathcal{F}_2}$. Moreover, $\mathcal{F}_2$ is a reproducing kernel Hilbert space (RKHS). The $\mathcal{F}_2$ max margin of the training set is
+\begin{align*}
+    \gamma_2 :=  \underset{\Vert f \Vert_{\mathcal{F}_2} \leq 1}{\max} \ \underset{i \in [n]}{\min} y_i f(x_i)  = \underset{\Vert g \Vert_{L^2(\tau)} \leq 1}{\max} \ \underset{i \in [n]}{\min} \ y_i \int_{\mathbb{S}^{p-1}} \sigma(b + c^Tx)g(b, c) d\tau(b, c).
+\end{align*}
+
+\subsection{Training in the Infinite-width Limit}
+Given a loss function $\ell: \mathbb{R} \rightarrow \mathbb{R}_+$, we define the empirical risk associated to a predictor $h_m(\boldsymbol{w}, \cdot)$ as $\frac{1}{n}\sum_{i=1}^n \ell(-y_i h_m(\boldsymbol{w}, x_i))$.
+
+The authors making the following assumptions on the loss $\ell$: The loss $\ell$ is differentiable with a locally Lipschitz-continuous gradient. It has a \textit{exponential tail} in the sense that $\ell(u) \sim \ell'(u) \ell \exp(u)$ as $u \rightarrow -\infty$, it is strictly increasing, and there exists $c > 0$ such that $ell'(u) \geq c$ for $u \geq 0$. The main examples are the logistic loss $\ell(u) = \log(1+ \exp(u))$ and the exponential loss $\ell(u) = \exp(u)$.
+
+We also assume that the family $(\phi(\cdot, x_i))_{i \in [n]}$ is linearly independent and for $i \in [n]$, the function $\phi(\cdot, x_i)$ is differentiable with a Lipschitz-continuous gradient and subanalytic.
+
+For the sake of their proof, the authors consider the problem of maximizing the negative logarithm of the empirical risk, rather than the empirical risk itself. Thus, they define 
+\begin{align*}
+    S(u) = - \log \left( \frac{1}{n} \sum_{i=1}^n \ell(-u_i) \right).
+\end{align*}
+When $\ell$ is the exponential, then this is known as the \textit{soft min}.
+
+From here, we can define the objective function $F_m: (\mathbb{R}^p)^m \rightarrow \mathbb{R}$ on the vector of parameters $\boldsymbol{w} = (w_j)_{j \in [m]}$ defined as $F_m(\boldsymbol{w}) = S(\hat{h}_m(\boldsymbol{w}))$, where $\hat{h}_m(\boldsymbol{w}) = (y_ih_m(\boldymbol{w}, x_i))_{i \in [n]}$. For initialization $\boldsymbol{w}(0) \in (\mathbb{R}^p)^m$, the gradient flow $(\boldsymbol{w}(t))_{t \geq 0}$ is
+\begin{align*}
+    \frac{d}{dt}\boldsymbol{w}(t) = m \nabla F_m(\boldsymbol{w}(t)).
+\end{align*}
+
+\begin{manualtheorem}{2}
+Under the aforementioned assumptions on feature map $\phi$, loss $\ell$, and $(\phi(\cdot, x_i))_{i \in [n]}$, if the sequence $(w_j(0))_{j \in \mathbb{N}_*}$ is such that $\mu_{0, m}$ converges in $\mathcal{P}_2(\mathbb{R}^p)$ to $\mu_0$, then $\mu_{t,m}$ converges in $\mathcal{P}_2(\mathbb{R}^p)$ to the unique Wasserstein gradient flow of $F$ starting from $\mu_0$. The convergence is uniform on bounded time intervals.
+\end{manualtheorem}
+
+\subsection{Main Result}
+\begin{manualtheorem}{3}\label{nondiffconv}
+Once again, assume that the previously stated assumptions on feature map $\phi$, loss $\ell$, and $(\phi(\cdot, x_i))_{i \in [n]}$ hold. Moreover, assume that $\Pi_2(\mu_0)$ has full support on $\mathbb{S}^{p-1}$. If $\nabla S(\hat{h}(\mu_t))$ converges and $\bar{\nu}_t = \Pi_2(\mu_t)/[\Pi_2(\mu_t)](\mathbb{S}^{p-1})$ converges weakly to some $\bar{\nu}_{\infty}$, then this limit $\bar{\nu}_{\infty}$ is a maximizer for the $\mathcal{F}_1$-max-margin problem.
+\end{manualtheorem}
+Note that the unnormalized measure $\nu_t$ does not converge, and so the global convergence result from \cite{chizat2018global} does not apply. Combining this result with the previous theorem regarding the convergence of gradient descent (for a finite neural network) to the Wasserstein gradient flow, we have the following result for finite networks:
+\begin{manualcorollary}{4}
+Under the assumptions of Theorem \ref{nondiffconv}, assume that the sequence $(w_j(0))_{j \in \mathbb{N}_*}$ is such that $\mu_{0, m}$ converges in $\mathcal{P}_2(\mathbb{R}^p)$ to $\mu_0$. Then, denoting, $\bar{\nu}_{m,t} = \Pi_2(\mu_{m ,t})/ [\Pi_2(\mu_{m, t})](\mathbb{S}^{p-1})$, it holds
+\begin{align*}
+    \lim_{m, t \rightarrow \infty} \left( \underset{i \in [n]}{\min} \ y_i \int \phi(\theta, x_i) d \bar{\nu}_{m,t} \right) = \gamma_1.
+\end{align*}
+\end{manualcorollary}
+
+To account for the nondifferentiability of the ReLU function, which is of particular interest, let us consider another result. In particular, for an input distribution $\rho  \in \mathcal{P}(\mathbb{R}^d)$ with a bounded density and bounded support $\mathcal{X}$, and $y: \mathcal{X} \rightarrow \{ -1, 1\}$ continuous, we consider the population objective
+\begin{align*}
+    F(\mu) = -\log\left( \int_{\mathcal{X}} \exp\left(-y(x) h(\mu, x) \right) d \rho(x)\right).
+\end{align*}
+
+\begin{manualtheorem}{5}
+There exists $(\mu_t)_{t \geq 0}$ a Wasserstein gradient flow of the objective $F$ with $\mu_0 = \mathcal{U}(\mathbb{S}^d)\otimes \mathcal{U}(\{-1,1\})$. If $\nabla S[\hat{h}(\mu_t)]$ converges weakly in $\mathcal{P}(\mathcal{X})$, if $\bar{\nu}_t = \Pi_2(\mu_t)/([\Pi_2(\mu_t)](\mathbb{S}^{p-1}))$ converges weakly in $\mathcal{P}(\mathbb{S}^{p-1})$ and if $F_{\mu t}'$ converges in $\mathcal{C}_{loc}^1$ to some $F'$ that satisfies the Morse-Sard property, then $h(\overbar{\nu}, \cdot)$ is a maximizer for $\max_{\Vert f \Vert_{\mathcal{F}_1} \leq 1} \min_{x \in \mathcal{X}} y(x)f(x)$.
+\end{manualtheorem}
+
+\subsection{Training Only the Output Layer}
+
+The authors also consider the scenario in which the input is initialized randomly and fixed. The objective function corresponding to this model is
+\begin{align*}
+    F(r) = -\log\left( \frac{1}{n} \sum_{i=1}^n \exp\left( -\frac{1}{m} \sum_{j=1}^m z_{i,j} r_j\right) \right)
+\end{align*}
+where $z_{i,j} = y_i \sigma(b_j + x_i^Tc_j)$ is the signed output of neuron $j$ for the training point $i$ and $\sigma: \mathbb{R} \rightarrow \mathbb{R}$ is the nonlinearity.
+
+The gradient descent corresponding to the initialization $r(0) \in 
+\mathbb{R}^m$ and sequence of step-sizes $(\eta(t))_{t \in \mathbb{N}}$ is 
+\begin{align*}
+    r(t + 1) = r(t) + \eta(t)m \nabla F(r(t)).
+\end{align*}
+For step-size on the order of $1/\sqrt{t}$, the dynamics converges in $\mathcal{O}(\log(t)/\sqrt{t})$ iterations to a max $\ell^2$-margin classifier. 
+
+\subsection{Generalization Bounds}
+The authors propose measuring the complexity of the dataset $S_n = (x_i, y_i)_{i=1}^n$ with the \textit{projected interclass distance} defined, for $r \in [d]$, as 
+\begin{align*}
+    \Delta_r(S_n) := \underset{P}{\sup}\left\{ \underset{y_i \neq y_i}{\inf} \Vert P(x_i) - P(x_i') \Vert_2; \ \text{$P$ is a rank-$r$ orthogonal projection} \right\}.
+\end{align*}
+For each dimension $r$, it looks for the $r$-dimensional subspace which maximizes the distance between the two classes. Then if $\Delta_r \approx \Delta_d$ for $r \ll d$, there is underlying structure in the data that can be exploited for statistical efficiency.
+
+\begin{manualtheorem}{8}[Generalization Bound]
+For any $\epsilon \in (0,1)$ and $r \in [d]$, there exists $C(r), C_{\epsilon}(r) > 0$ such that the following holds. If $(x, y) \sim \mathbb{P}$ is such that for some $R > 0$ and $\Delta_r(\mathbb{P}) \leq C(r)$, it holds $\Delta_r(S_n) \leq \Delta_r(\mathb{P})$ and $\Vert x \Vert_2 \leq R$ almost surely, then it holds with probability at least $1- \delta$ over the choice of \textit{i.i.d.} samples $S_n = (x_i, y_i)_{i=1}^n$, for $f$ the $\mathcal{F}_1$-max-margin classifier on $S_n$,
+\begin{align*}
+    \mathbb{P}[yf(x) < 0] \leq \frac{C_{\epsilon}(r)}{\sqrt{n}} \left( \frac{R}{\Delta_r(\mathbb{P})} \right)^{\frac{r+3}{2-\epsilon}} + \sqrt{\frac{\log(B)}{n}} + \sqrt{\frac{\log(1/\delta)}{2n}}
+\end{align*}
+where $B = \log_2(4(R+1)C_2(r)) + (r+2)\log_2(R/\Delta_r(\mathbb{P}))$. The same bound applies to the $\mathcal{F}_2$-max-margin classifier for $r=d$.
+\end{manualtheorem}
+
 \bibliographystyle{siam}
 \bibliography{References/biblio}
 
