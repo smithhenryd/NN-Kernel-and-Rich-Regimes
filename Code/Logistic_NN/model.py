@@ -37,7 +37,7 @@ def get_ReLU_NN(d, units, rw =1, ru=1, lambd=0)->tf.keras.Model:
     model.add(tf.keras.layers.Dense(units=1, activation=None, use_bias=False, kernel_initializer=init_w, kernel_regularizer=tf.keras.regularizers.L2(lambd)))
     return model
 
-def get_logistic_dataset(num_samples, d):
+def get_logistic_dataset(num_samples, d)->[tf.Tensor, tf.Tensor]:
     """
     Constructs the dataset corresponding to the logstic regression problem from Wei et al. 2020
     """
@@ -56,12 +56,25 @@ def get_logistic_dataset(num_samples, d):
 
     return X, Y
 
+class LogisticLoss(tf.keras.losses.Loss):
+
+    def __init__(self, **kwargs):
+        
+        super(LogisticLoss, self).__init__(**kwargs)
+        
+    def call(self, y_true, y_pred):
+
+        y_true = tf.cast(y_true, y_pred.dtype)
+        loss = tf.math.log(1 + tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
+        return tf.reduce_mean(tf.reshape(loss, [-1]))
+
+
 if __name__ == "__main__":
 
     # Suppose we have two-dimensional inputs and want to create a NN with 5 neurons in the hidden layer
-    d = 5
-    units = 5
-    NN = get_ReLU_NN(d, units)
+    d = 20
+    units = 10
+    NN = get_ReLU_NN(d, units, rw=0.1, ru=0.1, lambd=0)
 
     # Print the model summary
     print(NN.summary())
@@ -72,4 +85,11 @@ if __name__ == "__main__":
     # Finally, let's try evaluating the network at a sample point
     print(NN(tf.ones(shape=[1,d])))
 
-    get_logistic_dataset(5, d)
+    X_train, Y_train = get_logistic_dataset(200, d)
+    X_test, Y_test = get_logistic_dataset(200,d)
+
+    optimizer = tf.keras.optimizers.SGD(learning_rate=3*10e-4)
+    logerror = LogisticLoss()
+    
+    NN.compile(optimizer, loss=logerror)
+    NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=2*10**4)
