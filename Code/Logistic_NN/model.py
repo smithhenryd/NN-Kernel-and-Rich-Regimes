@@ -68,6 +68,26 @@ class LogisticLoss(tf.keras.losses.Loss):
         loss = tf.math.log(1 + tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
         return tf.reduce_mean(tf.reshape(loss, [-1]))
 
+class ClassificationError(tf.keras.metrics.Metric):
+
+    def __init__(self, **kwargs):
+
+        super(ClassificationError, self).__init__(**kwargs)
+
+        # Add a weight to store the classification (0-1) error throughout training
+        self.binary_err = self.add_weight(initializer='zeros')
+    
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        """
+        Updates the classification error after each epoch of training
+        
+        An observation is misclassified if y_i*f(x_i) <= 0 and correctly classified if y_i*f(x_i) > 0 
+        """
+
+        raise NotImplementedError
+    
+    def result(self):
+        raise NotImplementedError
 
 if __name__ == "__main__":
 
@@ -88,8 +108,8 @@ if __name__ == "__main__":
     X_train, Y_train = get_logistic_dataset(200, d)
     X_test, Y_test = get_logistic_dataset(200,d)
 
-    optimizer = tf.keras.optimizers.SGD(learning_rate=3*10e-4)
-    logerror = LogisticLoss()
-    
-    NN.compile(optimizer, loss=logerror)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=10e-1)
+    logloss= LogisticLoss()
+
+    NN.compile(optimizer, loss=logloss)
     NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=2*10**4)
