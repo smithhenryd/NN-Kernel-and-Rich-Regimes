@@ -32,9 +32,12 @@
 \usepackage{bbm}
 \usepackage{array}
 
+\DeclareMathOperator*{\argmin}{arg\,min}
+
 % Title content
-\title{\textbf{Project Title}}
-\author[]{Henry Smith}
+\title{\textbf{Title}}
+\author[]{Henry Smith\\
+Advised by Professor Harrison Zhou}
 \affil[]{\normalsize Yale University}
 \date{\today}
 
@@ -72,6 +75,76 @@
 
 \pagebreak
 % Begin content
+
+\section{Introduction}
+
+\section{Preliminaries}\label{preliminaries}
+
+The notation we present mirrors that of \cite{chizat2018lazy} and \cite{woodworth2020kernel}, since these two papers provide the main motivation for our research.
+
+In particular, let $h: \mathbb{R}^P \rightarrow \mathcal{F}$ be a model mapping from parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$. In the context of neural networks, we take $\mathcal{F}$ to be the space containing all possible network functions. Then for each weight vector $\boldsymbol{w} \in \mathbb{R}^p$, our model $h$ specifies an associated network function $f \in \mathcal{F}$. More explicitly, we have the map $\boldsymbol{w} \mapsto f(\boldsymbol{w}, \cdot)$, where $f(\boldsymbol{w}, \cdot): \mathcal{X} \rightarrow \mathbb{R}$ is the neural network parameterized by weight vector $\boldsymbol{w}$. Here, $\mathcal{X}$ denotes the input space of the network $f$; for the purposes of our studies, we consider a Euclidean input space $\mathcal{X} \subseteq \mathbb{R}^n$. Of key importance in this notation is the distinction between $h$, which maps an individual weight vector to a network function, and $f(\boldsymbol{w}, \cdot)$, which maps an input point to a response value.
+
+Since this notation is admittedly quite difficult to parse, we provide two illustrative examples which are of interest to our research. First, we consider the case in which our function space $\mathcal{F}$  is equal to $\mathcal{X}^*$, the dual space of $\mathcal{X}$. Then for each weight vector $\boldsymbol{w} \in \mathbb{R}^p$, we get the corresponding network function $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^n \boldsymbol{w}_i\boldsymbol{x}_i$. That is, we associate with each weight vector a linear function in the input space $\mathcal{X}$. Let $(\boldsymbol{x}_1, y_1), \ldots, (\boldsymbol{x}_N, y_N)$ be the training points for our neural network, where each $\boldsymbol{x}_i \in \mathcal{X}$ and $y_i \in \mathbb{R}$. Moreover, let $\mathcal{D}$ be the empirical distribution determined by the training data $\{(\boldsymbol{x}_i, y_i) \}_{i=1}^N$. The keen reader will recognize that for $\mathcal{F} = \mathcal{X}^*$, minimizing $\boldsymbol{w} \in \mathbb{R}^p$ with respect to the empirical risk, $\argmin_{\boldsymbol{w} \in \mathbb{R}^p} \  \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}}\left[\left(y - f(\boldsymbol{w}, \boldsymbol{x}) \right)^2 \right]$, is equivalent to simple linear regression. This linear regression example is that which is studied in \cite{woodworth2020kernel}. 
+
+More generally, though, the network functions $f(\boldsymbol{w}, \cdot) \in \mathcal{F}$ need not be linear in the input space $\mathcal{X}$. And so to broaden our function class, we consider $\mathcal{F} = L^2(\mathcal{D}_{\boldsymbol{x}}, \mathbb{R}^n)$, where $\mathcal{D}_{\boldsymbol{x}}$ is the empirical distribution of the input points $\{ \boldsymbol{x}_i \}_{i=1}^N$ included in our training dataset \cite{chizat2018lazy}. That is, we specify that for each vector $\boldsymbol{w} \in \mathbb{R}^p$, the corresponding network function $f(\boldsymbol{w}, \cdot)$ must be square integrable with respect to the distribution of input samples. If, in some hypothetical scenario, we were to know the population distribution of the input data $\mathcal{\rho_{\boldsymbol{x}}}$, we could instead take $\mathcal{F} = L^2(\rho_{\boldsymbol{x}}, \mathbb{R}^n)$. Clearly, this is a broad function class $\mathcal{F}$ which encompasses many popular examples in contemporary deep learning.
+
+Now that we have cleared up the meaning of $h$ and $f(\boldsymbol{w}, \cdot)$, we consider a certain property on $h$ which will be essential for our paper. In particular, we are interested in models $h$ which are \textit{$D$-positively homogeneous}. This means that for any $\boldsymbol{w} \in \mathbb{R}^p$ and any $\alpha \in \mathbb{R}_+$, then $h(\alpha \boldsymbol{w}) = \alpha^D h(\boldsymbol{w})$. Intuitively, $h$ $D$-positively homogeneous tells us that scaling the output of $h$ by a factor of $\alpha \in \mathbb{R}_+$ is equivalent to scaling the input by a factor of $\alpha^{1/D}$. The first example given above $h: \boldsymbol{w} \mapsto \sum_{i=1}^n \boldsymbol{w}_i \boldsymbol{x}_i$ provides an example of a 1-homogeneous model.
+
+To conclude the setup of our paper, we consider how one would find an optimal weight vector $\boldsymbol{w}$ which minimizes some loss objective on $\mathcal{F}$. In particular, let $L: \mathcal{F} \rightarrow \mathbb{R}_+$ be the loss function mapping each element $f$ in our Hilbert space $\mathcal{F}$ to a nonnegative real number. An example of such a function $L$ is the mean-squared error or empirical risk 
+\begin{align}
+   L(f) = \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}} \left[ \left(y - f(\boldsymbol{x}) \right)^2 \right] = \frac{1}{N}\sum_{i=1}^N (y_i - f(\boldsymbol{x_i}))^2\label{mse}
+\end{align}
+that we mentioned above. Given a model $h: \mathbb{R}^p \rightarrow \mathcal{F}$ and corresponding loss function $L: \mathcal{F} \rightarrow \mathbb{R}$, we can minimize the objective $L(h(\boldsymbol{w}))$ over the parameter space $\mathbb{R}^p$ using the \textit{gradient flow} dynamics with respect to $\boldsymbol{w} \in \mathbb{R}^p$. That is, we suppose that the network weights $\boldsymbol{w}(t)$ evolve in time $t \in \mathbb{R}_+$ according to the differential equation
+\begin{align*}
+    \boldsymbol{w}(t) = -\nabla L(\boldsymbol{w}(t)), \qquad \boldsymbol{w}(0) = \boldsymbol{w}_0
+\end{align*}
+where $\boldsymbol{w}_0 \in \mathbb{R}^p$ is some starting vector. Practitioners of deep learning should understand the gradient flow as a continuous time analogue to gradient descent \cite{wibisono2016}. Rather than choosing some positive stepsize with which we update our weights at $t \in \{0, 1, 2, \ldots \}$, gradient flow specifies the instantaneous direction in which we should update our weights at every time $t \in \mathbb{R}_+$.
+
+\section{The Rich and Kernel Regimes, An Introduction}
+
+\subsection{The Linearized Model}
+
+As we detailed in the previous section, suppose we have some model $h: \mathbb{R}^p \rightarrow \mathcal{F}$ mapping a weight vector to a predictor function. And let $L: \mathcal{F} \rightarrow \mathbb{R}_+$ be a loss function which computes the misfit for each predictor function.  Moreover, suppose that our model $h$ is $D$-positively homogeneous. Using the gradient flow on the objective function $L(h(\boldsymbol{w}))$, we would like to find the $\boldsymbol{w}^{\star}$ such that $h(\boldsymbol{w}^{\star})$ minimizes $L$. Let us denote the gradient flow on $L(h(\boldsymbol{w}))$ by $(\boldsymbol{w}(t))_{t \geq 0}$ with starting point $\boldsymbol{w}(0) = \boldsymbol{w}_0$.
+
+Corresponding to this model $h$, we have a \textit{linearized model} $\bar{h}$ defined
+\begin{align}
+    \bar{h}(\boldsymbol{w}) := h(\boldsymbol{w}_0) + Dh(\boldsymbol{w}_0)(\boldsymbol{w}-\boldsymbol{w}_0).\label{linearizedmodel}
+\end{align}
+In our particular case of $h(\boldsymbol{w}) = f(\boldsymbol{w}, \cdot)$ a neural network with $f(\boldsymbol{w}, \cdot): \mathcal{X} \rightarrow \mathbb{R}$, then we have
+\begin{align}
+    \bar{h}(\boldsymbol{w}) = \bar{f}(\boldsymbol{w}, \boldsymbol{x}) &=  f(\boldsymbol{w}_0, \boldsymbol{x}) + D_{\boldsymbol{w}}f(\boldsymbol{w}_0, \boldsymbol{x})(\boldsymbol{w}-\boldsymbol{w}_0) \nonumber\\ 
+    &= f(\boldsymbol{w}_0, \boldsymbol{x}) + \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}), \boldsymbol{w}-\boldsymbol{w}_0\rangle, \quad \boldsymbol{x} \in \mathcal{X}.\label{linearizedmodelnetwork}
+\end{align}
+
+One will notice that the linearized model $\bar{h} = \bar{f}(\boldsymbol{w}, \cdot)$ is simply equal to the linearization of $h$ around its initialization $\boldsymbol{w}_0$ \cite{chizat2018lazy}. That is, $\bar{h}$ is an affine model in the weights $\boldsymbol{w}$ with $\bar{h}(\boldsymbol{w}_0) = h(\boldsymbol{w}_0) = f(\boldsymbol{w}_0, \boldsymbol{x})$ and $\nabla_{\boldsymbol{w}} \bar{f}(\boldsymbol{w}, \boldsymbol{x})|_{\boldsymbol{w} = \boldsymbol{\tilde{w}}} = \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x})$ for every $\boldsymbol{\tilde{w}} \in \mathbb{R}^p$. 
+
+\subsection{Gradient Flow as a Kernel Method}
+
+Now that we have presented the definition of the linearized model, let us analyze the special case of $h$ identically zero at its initialization $\boldsymbol{w}_0$ and loss $L$ the square loss, which is simply (\ref{mse}) scaled by a factor of $N$. Under these assumptions, the corresponding linearized model $\bar{h}$ is
+\begin{align*}
+    \bar{h}(\boldsymbol{w}) = \bar{f}(\boldsymbol{w}, \boldsymbol{x}) = \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}), \boldsymbol{w}-\boldsymbol{w}_0\rangle, \quad \boldsymbol{x} \in \mathcal{X}. 
+\end{align*}
+Let $(\boldsymbol{\bar{w}}(t))_{t \geq 0}$ be the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ with $\boldsymbol{\bar{w}}(0) = \boldsymbol{w}_0$. We observe that for all times $t\in \mathbb{R}_+$, the predictor function $\bar{h}(\boldsymbol{\bar{w}}(t))$ can be expressed as $\langle \varphi(\boldsymbol{x}), \boldsymbol{\bar{w}}(t) - \boldsymbol{w}_0 \rangle$ for every $\boldsymbol{x} \in \mathcal{X}$, where $\varphi(\boldsymbol{x}) = \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x})$ and $\boldsymbol{w}(t) - \boldsymbol{w}_0 \in \mathbb{R}^p$. 
+
+That is, for all times $t \in \mathbb{R}_+$, $\bar{h}(\boldsymbol{\bar{w}}(t))$ lies in the Reproducing Kernel Hilbert Space (RKHS) defined by the feature map $\varphi: \mathcal{X} \rightarrow \mathbb{R}^p$. The positive-definite kernel function $K: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ corresponding to this feature map $\varphi(\boldsymbol{x})$ is defined by
+\begin{align}
+    K(\boldsymbol{x}_1, \boldsymbol{x}_2) :&= \langle \varphi(\boldsymbol{x}_1), \varphi(\boldsymbol{x}_2) \rangle \nonumber \\
+    &= \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}_1), \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}_2) \rangle, \quad \forall \boldsymbol{x}_1, \boldsymbol{x}_2 \in \mathcal{X}\label{NTK}.
+\end{align}
+
+Therefore, finding the $\boldsymbol{w}^{\star} \in \mathbb{R}^p$ which minimizes $L(f(\boldsymbol{w}))$ is equivalent to finding the function $f^{\star}$ in the RKHS defined by feature $\varphi$ which minimizes the square loss. More precisely stated, when $h(\boldsymbol{w}_0) = 0$ and $L$ is the square loss, then the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ is equivalent to a kernel method with the \textit{neural tangent kernel} $K$ given by (\ref{NTK}) \cite{chizat2018lazy} \cite{jacot2018neural}.
+
+\subsection{Relating the Nonlinear and Linearized Models}
+
+So far, we have characterized the linearized model $\bar{h}$ corresponding to model $h$ and have justified that, under appropriate circumstances, gradient flow on the linearized objective $L(\bar{h}(\boldsymbol{w}))$ is equivalent to a kernel method. However, we have provided no indication that the 
+
+\section{Visualizing the Kernel Regime}
+
+
+
+
+
+
 
 \pagebreak
 % References
