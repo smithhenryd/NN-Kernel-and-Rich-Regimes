@@ -188,7 +188,7 @@ One will notice that Theorem \ref{Chizatthm2.4} expands the results in Theorem \
 Recall our assumption that $h$ is $D$-positively homogeneous, and so $\alpha h(\boldsymbol{w}) = h(\alpha^{1/D}\boldsymbol{w})$ as well as $\alpha \bar{h}(\boldsymbol{w}) = \bar{h}(\alpha^{1/D}\boldsymbol{w})$.
 Therefore, the gradient flow on the scaled objective $\frac{1}{\alpha^2}L(\alpha h(\boldsymbol{w}))$ with initialization $\boldsymbol{w}_{\alpha}(0) = \boldsymbol{w}_0$ is exactly the same as the gradient flow on the unscaled objective $\frac{1}{\alpha^2}L(h(\boldsymbol{w}))$ with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha^{1/D}\boldsymbol{w}_0$. Throughout the remainder of the paper, we will consider the second scenario in which the initialization $\boldsymbol{w}_0$ is scaled by $\alpha$ as opposed to the model output $h(\boldsymbol{w}_{\alpha}(t))$. 
 
-\subsection{Defining the Kernel and Rich Regimes}
+\subsection{Defining the Kernel and Rich Regimes}\label{defkernelrich}
 
 Altogether, Theorems \ref{Chizatthm2.2} and \ref{Chizatthm2.4} from \cite{chizat2018lazy} formulate the \textit{kernel limit} that will be of primary interest in Sections \ref{summarizekernel} and \ref{summarizekernel}. To conclude this portion of our paper, we make clear our definition of the kernel limit and contrast it with the \textit{rich limit}. 
 
@@ -286,12 +286,16 @@ And so we have written down explicit formulas both for the kernel and rich limit
     \centering
     \includegraphics[width=.5\textwidth]{Imgs/Linearized_Model/visualize_linearized_0.1.png}\hfill
     \includegraphics[width=.5\textwidth]{Imgs/Linearized_Model/visualize_linearized_10.png}
-    \caption{A neural network with two weights $w_1$, $w_2$ evaluated at the input $1 \in \mathbb{R}$. On the left, notice that the network is highly nonlinear (and nonconvex) in its weights. Conversely, on the right, we see that the function is close to the linearization around its initialization, and so we are approaching the lazy regime.}
+    \caption{The linear regression model}
 \end{figure}
+
+Now that we have given exact descriptions of the kernel and rich limits for the linear regression problem, we wish to empirically demonstrate the transition between the two limits. Our first demonstration aims to represent the relationship between the original model $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^n (\boldsymbol{w}_{i,+}^2 - \boldsymbol{w}_{i,-}^2)\boldsymbol{x}_i$ and the linearized model $\bar{f}(\boldsymbol{w}, \boldsymbol{x}) = \langle \varphi(\boldsymbol{x}), \boldsymbol{w} - \boldsymbol{w}(0) \rangle = 2\alpha \langle \boldsymbol{x} , \boldsymbol{w}_+^2 -  \boldsymbol{w}_-^2\rangle$ with initialization $\boldsymbol{w}(0) = \alpha \mathbbm{1}$. In particular, we know from Section \ref{defkernelrich} that as $\alpha \rightarrow 0$, we should observe that for fixed $\boldsymbol{x} \in \mathcal{X}$, $f(\boldsymbol{w}, \boldsymbol{x})$ and $\bar{f}(\boldsymbol{w}, \boldsymbol{x})$ are very different from one another as a function of the model's weights $\boldsymbol{w} \in \mathbb{R}^{2n}$. Conversely, as $\alpha \rightarrow \infty$ we should observe that for fixed $\boldsymbol{x}$, $f(\boldsymbol{w}, \boldsymbol{x})$ is approximately equal to  $\bar{f}(\boldsymbol{w}, \boldsymbol{x})$, the linearization around its initialization.
+
+Since $\boldsymbol{w}$ increases quickly in dimension as $n$ grows, we consider the case of $n =1$. That is, we have a simple linear regression model with a single slope coefficient $\beta_{\boldsymbol{w}} = \boldsymbol{w}_{+, 1}^2 - \boldsymbol{w}_{-, 1}^2$. For simplicity, let us define $w_1 := \boldsymbol{w}_{+, 1}$, $w_2 := \boldsymbol{w}_{-, 1}$, and so we can think of $f$ as a neural network with a one-dimensional input $x$ and two weights $w_1, w_2$. 
 
 \begin{figure}[H]
 \animategraphics[loop, controls, width=\textwidth]{10}{Imgs/Linearized_Model/GIF_imgs/visualize_linearized_}{0}{99}
-\caption{Hi foo baz}
+\caption{}
 \end{figure}
 
 
