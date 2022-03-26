@@ -11,6 +11,8 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{soul}
+\usepackage{animate}
+
 
 %% Language and font encodings
 \usepackage[english]{babel}
@@ -232,8 +234,7 @@ Let $N \leq n$, meaning the dimension of the input space is at least as large as
 \end{assumption}
 We make this assumption because, as previously discussed, we are interested in the different solutions to the gradient flow dynamics when trained in the kernel and rich regimes. Taking $N \leq n$ ensures that the system $\boldsymbol{X}\boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{y}$ is underdetermined, and so there are usually (but not always), many solutions for $\boldsymbol{\beta}_{\boldsymbol{w}}$. Equivalently stated, we choose our network $f(\boldsymbol{w}, \boldsymbol{x})$ to be overparameterized so that there are many potential weight vectors $\boldsymbol{w}$ which minimize the objective $L(h(\boldsymbol{w}))$.
 
-\subsubsection{Explicit Characterization of the Kernel and Rich Limits}
-
+\subsubsection{Explicit Solutions for the Kernel and Rich Limits}
 Albeit quite straightforward and lacking in complexity, the linear regression problem is well-suited for studying the implicit biases resulting from training in the kernel and rich regimes. Woodworth and colleagues provide a thorough characterization of these implicit biases, which we summarize in the remainder of this section. In particular, let us consider the gradient flow on $L(h(\boldsymbol{w}))$, $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}$, with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$. That is, we are looking at the gradient flow on the objective with initialization scaled by a factor of $\alpha \in \mathbb{R}_+$, $\alpha \neq 0$. Also, we are explicitly choosing $\boldsymbol{w}_0 = \mathbbm{1}$ so that $h(\boldsymbol{w}_0) = 0$, as we pointed out above.
 
 First, let us determine the kernel limit. Writing down the feature map $\varphi(\boldsymbol{x}) = \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_{\alpha}(0), \boldsymbol{x})$ explicitly, 
@@ -278,6 +279,21 @@ In the case of our linear regression problem, the matrix $\boldsymbol{Z}$ is dia
 That is, the solution $\boldsymbol{w}^{\star}$ to the gradient flow $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}$, $\boldsymbol{w}(0) = \alpha \mathbbm{1}$ on $L(h(\boldsymbol{w}))$ in the rich limit $\alpha \rightarrow 0$ satisfies $h(\boldsymbol{w}^{\star}) = \langle \boldsymbol{\beta}_{\ell^1}, \boldsymbol{x} \rangle, \ \forall \boldsymbol{x} \in \mathcal{X}$, where $\boldsymbol{\beta}_{\ell^1}$ is the minimum $\ell^1$ solution to $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$, $\boldsymbol{\beta} \in \mathbb{R}_+^n$. If the minimum $\ell^1$ solution to $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$ is contained in $\mathbb{R}_+^n$, then $\boldsymbol{\beta}_{\ell^1} = \argmin_{\beta \in \mathbb{R}^n} \| \boldsymbol{\beta} \|, \ \boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$ (i.e. $\boldsymbol{\beta}_{\ell^1}$ is the true $\ell^1$ solution to the system $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$).
 
 And so we have written down explicit formulas both for the kernel and rich limits corresponding to the simple linear regression problem $h(\boldsymbol{w}) = f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^n(\boldsymbol{w}_{+, i}^2 - \boldsymbol{w}_{-, i}^2)\boldsymbol{x}_i = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle $ with loss $L$ the mean-squared error. The result we have presented is particularly salient as it gives a clear characterization of the implicit biases that result from training in the kernel and rich regimes. In particular, under appropriate conditions on the system $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$, the solution to the gradient flow dynamics in the kernel limit is the minimum $\ell^2$ solution $\boldsymbol{\beta}_{\ell^2}$, whereas the the solution in the rich limit is the minimum $\ell^2$ solution $\boldsymbol{\beta}_{\ell^1}$. Woodworth and colleagues go even a step further and indicate how the gradient flow solution interpolates between the minimum $\ell^1$ and $\ell^2 $ solutions as the initialization scale $\alpha$ interpolates between $0$ and $\infty$ (see Theorem 1 in \cite{woodworth2020kernel}). The consequences of this result are self-evident: in the linear regression setting, one can choose their initialization scale $\alpha$ carefully in order to achieve either $\ell^1$ or $\ell^2$ shrinkage.
+
+\subsection{The Linearized Model}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.5\textwidth]{Imgs/Linearized_Model/visualize_linearized_0.1.png}\hfill
+    \includegraphics[width=.5\textwidth]{Imgs/Linearized_Model/visualize_linearized_10.png}
+    \caption{A neural network with two weights $w_1$, $w_2$ evaluated at the input $1 \in \mathbb{R}$. On the left, notice that the network is highly nonlinear (and nonconvex) in its weights. Conversely, on the right, we see that the function is close to the linearization around its initialization, and so we are approaching the lazy regime.}
+\end{figure}
+
+\begin{figure}[H]
+\animategraphics[loop, controls, width=\textwidth]{10}{Imgs/Linearized_Model/GIF_imgs/visualize_linearized_}{0}{99}
+\caption{Hi foo baz}
+\end{figure}
+
 
 \pagebreak
 % References
