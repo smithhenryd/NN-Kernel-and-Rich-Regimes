@@ -12,7 +12,7 @@
 \usepackage{hyperref}
 \usepackage{soul}
 \usepackage{animate}
-
+\usepackage{subfig}
 
 %% Language and font encodings
 \usepackage[english]{babel}
@@ -118,7 +118,7 @@ As a consequence, we are able to define the \textit{gradient flow} dynamics on o
 \end{align*}
 where $\boldsymbol{w}_0 \in \mathbb{R}^p$ is some starting vector. Practitioners of deep learning should understand the gradient flow as a continuous time analogue to gradient descent \cite{wibisono2016}. Rather than choosing some positive stepsize with which we update our weights at $t \in \{0, 1, 2, \ldots \}$, gradient flow specifies the instantaneous direction in which we should update our weights at every time $t \in \mathbb{R}_+$.
 
-\section{The Rich and Kernel Regimes, An Introduction}\label{richkernel}
+\section{The Kernel and Rich Regimes, An Introduction}\label{richkernel}
 
 \subsection{The Linearized Model}
 As we detailed in the previous section, suppose we have some model $h: \mathbb{R}^p \rightarrow \mathcal{F}$ mapping a weight vector to a predictor function. And let $L: \mathcal{F} \rightarrow \mathbb{R}_+$ be a loss function which computes the misfit for each predictor function. Let $h$ and $L$ satisfy the differentiability assumption from Section \ref{preliminaries}. Moreover, suppose that our model $h$ is $D$-positively homogeneous. Using the gradient flow on the objective function $L(h(\boldsymbol{w}))$, we would like to find a $\boldsymbol{w}^{\star}$ such that $h(\boldsymbol{w}^{\star})$ minimizes $L$. Let us denote the gradient flow on $L(h(\boldsymbol{w}))$ by $(\boldsymbol{w}(t))_{t \geq 0}$ with starting point $\boldsymbol{w}(0) = \boldsymbol{w}_0$.
@@ -200,11 +200,11 @@ As evidenced by the contemporary field of deep learning, the models that we wish
 
 The distinction between the kernel and rich regimes is important because gradient flow in each regime leads to distinct \textit{implicit biases} in the resulting model $h(\lim_{t \to\infty} \boldsymbol{w}_{\alpha}(t))$. In other words, the solution to the gradient flow on $\frac{1}{\alpha^2}L(h(\boldsymbol{w}))$ will result in a network $h(\lim_{t \to\infty} \boldsymbol{w}_{\alpha}(t)) = f(\lim_{t \to\infty} \boldsymbol{w}_{\alpha}(t), \boldsymbol{x}), \ \boldsymbol{x} \in \mathcal{X}$ that has different properties depending on whether gradient flow operated in the kernel or rich regime. As we will more thoroughly examine in Sections \ref{summarizekernel} and \ref{summarizekernel}, the most influential hypothesis made by Woodworth and colleagues in \cite{woodworth2020kernel} is that training a network in the rich regime implicitly imposes sparsity on its parameters, which is not the case for the kernel regime. If true, this would allow for better generalization in certain sparse problems (i.e. the underlying model from which the data $(\boldsymbol{x}, y)$ is generated is sparse) when the network is trained in the rich regime as opposed to the kernel regime.
 
-\section{Visualizing the Kernel Regime}\label{summarizekernel}
+\section{Visualizing the Kernel and Rich Regimes}\label{summarizekernel}
 
 In Section \ref{richkernel}, we rigorously defined the kernel and rich regimes for a $D$-homogeneous model $h: \mathbb{R}^p \rightarrow \mathcal{F}$ and loss function $L: \mathcal{F} \rightarrow \mathbb{R}_+$ satisfying some differentiability conditions. However, our discussion of the kernel and rich regimes has so far been purely theoretical. In this section, we seek to empirically demonstrate that the results from \cite{chizat2018lazy} do, in fact, hold. In order to do so, we focus our attention on the simple linear regression problem studied by Woodworth and colleagues in \cite{woodworth2020kernel}. Although the model under consideration is the same, the code, experiments, and visualizations we present are of our own formulation.
 
-\subsection{Simple Linear Regression}
+\subsection{Simple Linear Regression}\label{linregmodel}
 
 To begin, we introduce the simple linear regression model from \cite{woodworth2020kernel} with which we will demonstrate the kernel and rich regimes.
 
@@ -293,9 +293,9 @@ Now that we have given exact descriptions of the kernel and rich limits for the 
 
 Since $\boldsymbol{w}$ increases quickly in dimension as $n$ grows, we consider the case of $n =1$. That is, we have a simple linear regression model with a single slope coefficient $\beta_{\boldsymbol{w}} = \boldsymbol{w}_{+, 1}^2 - \boldsymbol{w}_{-, 1}^2$. For simplicity, let us define $w_1 := \boldsymbol{w}_{+, 1}$, $w_2 := \boldsymbol{w}_{-, 1}$, and so we can think of $f$ as a neural network with a one-dimensional input $x$ and two weights $w_1, w_2$. For our demonstrations, we choose the input $x = 1$ to be fixed. And so we are interested in the functions $f(w_1, w_2)(1), \bar{f}(w_1, w_2)(1): \mathbb{R}^2 \rightarrow \mathbb{R}$ mapping from the parameter space to the network output.
 
-In Figure \ref{img:linearization}, we plot each of $f(w_1, w_2)(1)$ and $\bar{f}(w_1, w_2)(1)$ on the square grid $[\alpha - 2, \alpha + 2] \times [\alpha - 2, \alpha + 2]$ for $\alpha = 10^{-1}, 10^1$. Notice that the initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ is at the center of this grid, and the black point represents $f(w_1, w_2)(1)$ evaluated at its initialization, $(\boldsymbol{w}_{\alpha}(0), f(\boldsymbol{w}_{\alpha}(0))(1)) = (\alpha \mathbbm{1}, 0)$. For all $\alpha \in \mathbb{R}_+, \alpha > 0$, $f$ is equal to $\bar{f}$ at its initialization: $f(\boldsymbol{w}_{\alpha}(0))(1) = \bar{f}(\boldsymbol{w}_{\alpha}(0))(1)$ . However, for $\alpha = 10^{-1}$ we indeed observe that $|f(w_1, w_2)(1) - \bar{f}(w_1, w_2)(1)|$ is large for $\left| (w_1, w_2) - \alpha \mathbbm{1} \right| > 0$. That is, $f$ is highly nonlinear in $(w_1, w_2)$, and so is far from the linearization around $\boldsymbol{w}_{\alpha}(0)$, $\bar{f}$. On the other hand, for $\alpha = 10^1$ we see that $|f(w_1, w_2)(1) - \bar{f}(w_1, w_2)(1) |$ is small for $\left| (w_1, w_2) - \alpha \mathbbm{1} \right| > 0$, meaning $f$ is close to the affine model $\bar{f}$. 
+In Figure \ref{img:linearization}, we plot each of $f(w_1, w_2)(1)$ and $\bar{f}(w_1, w_2)(1)$ on the square grid $[\alpha - 2, \alpha + 2] \times [\alpha - 2, \alpha + 2]$ for $\alpha = 10^{-1}, 10^1$. Notice that the initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ is at the center of this grid, and the black point represents $f(w_1, w_2)(1)$ evaluated at its initialization, $(\boldsymbol{w}_{\alpha}(0), f(\boldsymbol{w}_{\alpha}(0))(1)) = (\alpha \mathbbm{1}, 0)$. For all $\alpha \in \mathbb{R}_+, \alpha > 0$, $f$ is equal to $\bar{f}$ at its initialization: $f(\boldsymbol{w}_{\alpha}(0))(1) = \bar{f}(\boldsymbol{w}_{\alpha}(0))(1)$ . However, for $\alpha = 10^{-1}$ we indeed observe that $|f(w_1, w_2)(1) - \bar{f}(w_1, w_2)(1)|$ is large for $\| (w_1, w_2) - \alpha \mathbbm{1} \|_2 > 0$. That is, $f$ is highly nonlinear in $(w_1, w_2)$, and so is far from the linearization around $\boldsymbol{w}_{\alpha}(0)$, $\bar{f}$. On the other hand, for $\alpha = 10^1$ we see that $|f(w_1, w_2)(1) - \bar{f}(w_1, w_2)(1) |$ is small for $\| (w_1, w_2) - \alpha \mathbbm{1} \|_2 > 0$, meaning $f$ is close to the affine model $\bar{f}$. 
 
-We provide an even clearer representation of the relationship between the original model $f(w_1, w_2)(1)$ and the linearization of $f$ around $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$, $\bar{f}(w_1, w_2)(1)$, in Figure \ref{gif:linearization}. Once again, we take the grid of input weights to be the region $[\alpha - 2, \alpha + 2] \times [\alpha - 2, \alpha + 2]$ containing $\boldsymbol{w}_{\alpha}(0)$.
+Letting the initialization scale $\alpha$ vary between $10^{-1}$ and $10^{1}$, we provide an even clearer representation of the relationship between the original model $f(w_1, w_2)(1)$ and the linearization of $f$ around $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$, $\bar{f}(w_1, w_2)(1)$, in Figure \ref{gif:linearization}. Once again, we take the grid of input weights to be the region $[\alpha - 2, \alpha + 2] \times [\alpha - 2, \alpha + 2]$ containing $\boldsymbol{w}_{\alpha}(0)$.
 
 \begin{figure}[H]
 \animategraphics[loop, controls, width=\textwidth]{10}{Imgs/Linearized_Model/GIF_imgs/visualize_linearized_}{0}{99}
@@ -307,17 +307,74 @@ From our illustrations, it is evident that for $\alpha \ll 1$, the gradient flow
 
 \subsection{The Neural Tangent Kernel}
 
-% \begin{figure}[H]
-% \animategraphics[loop, controls, width=\textwidth]{10}{Imgs/NTK/NTK_0.1/GIF_imgs/linearized_NTK_0.1_}{0}{100}
-% \caption{}\label{gif:ntk1}
-% \end{figure}
+The next aspect of the kernel and rich limits that we wish to illustrate is the neural tangent kernel (NTK). Recall that in Section \ref{linregmodel} we derived the NTK corresponding to the linear regression model to be
+\begin{align*}
+K(\boldsymbol{x}_1, \boldsymbol{x}_2) &= \left\langle \nabla_{\boldsymbol{w}}f(\boldsymbol{w}, \boldsymbol{x}_1)|_{\boldsymbol{w} = \boldsymbol{w}_{\alpha}(0)}, \nabla_{\boldsymbol{w}}f(\boldsymbol{w}, \boldsymbol{x}_2)|_{\boldsymbol{w} = \boldsymbol{w}_{\alpha}(0)} \right\rangle\\
+&= \left\langle 2\alpha 
+    \begin{bmatrix}
+        \boldsymbol{x}_1\\
+        -\boldsymbol{x}_1
+    \end{bmatrix}, 2\alpha 
+    \begin{bmatrix}
+        \boldsymbol{x}_2\\
+        -\boldsymbol{x}_2
+    \end{bmatrix} \right\rangle\\
+&= 8\alpha^2 \langle \boldsymbol{x}_1, \boldsymbol{x}_2 \rangle \quad \boldsymbol{x}_1 \boldsymbol{x}_2 \in \mathcal{X},
+\end{align*}
+which is just proportional to the $\ell^2$ kernel \cite{woodworth2020kernel}. One will also recall our discussion in Section \ref{kernelmethod} that since $L$ is a scaling of the square loss (the MSE) and $h$ is unbiased at its initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$, then the gradient flow on $L(h(\boldsymbol{w}))$ is equivalent to a kernel method with kernel $K$ in the limit $\alpha \rightarrow \infty$. Put differently, in the kernel limit we are looking for a function $f^{\star}$ in the fixed feature space given by $\varphi(\boldsymbol{x})$ which is a global minimizer of $L(f), \ f \in (\mathbb{R}^n)^*$ \cite{wei2019regularization}.
 
-% \begin{figure}[H]
-% \animategraphics[loop, controls,  % width=\textwidth]{10}{Imgs/NTK/NTK_1/GIF_imgs/linearized_NTK_1_}{0}{75}
-% \caption{}\label{gif:ntk2}
-% \end{figure}
+\begin{figure}[H]
+\centering
+\subfloat[$\alpha = 10^{-1}$]{\includegraphics[width=.45\linewidth]{Imgs/NTK/NTK_0.1/NTK_0.1_change_total_cropped.png}}\hfill
+\subfloat[$\alpha = 1$]{\includegraphics[width=.45\linewidth]{Imgs/NTK/NTK_1/NTK_1_change_total_cropped.png}}\par 
+\subfloat[$\alpha = 10^{1}$]{\includegraphics[width=.45\linewidth]{Imgs/NTK/NTK_10/NTK_10_change_total_cropped.png}}
+\caption{The change in the neural tangent kernel (NTK) on the grid of $N= 10$ training points $\{ \boldsymbol{x}_i \}_{i=1}^{10}$ throughout training with gradient descent. For each of $\alpha = 10^{-1}, \ 1, \ 10^{1}$, we display the difference between the NTK at initialization $\boldsymbol{w}_{\alpha}(0)$ and at the end of training $\boldsymbol{w}_{\alpha}(t_{\text{end}})$.}\label{img:ntkchange}
+\end{figure}
 
+Summarizing our theoretical discussion, we know that in the kernel limit, the neural tangent kernel $K(\boldsymbol{x}_1, \boldsymbol{x}_2)$,\\ $\boldsymbol{x}_1, \boldsymbol{x}_2 \in \mathcal{X}$ should remain constant for all times $t \in \mathbb{R}_+$ in the gradient flow $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}, \ \boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ on $L(h(\boldsymbol{w}))$. On the other hand, in the rich limit $\alpha \rightarrow 0$ we should instead observe that $K(\boldsymbol{x}_1, \boldsymbol{x}_2)$ evolves greatly throughout the gradient flow dynamics.
 
+In order to demonstrate that the neural tangent kernel $K$ does, in fact, behave in this way, we consider gradient descent on $L(h(\boldsymbol{w}))$.  We once again start with $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ and let $(\boldsymbol{w}_{\alpha}(t))_{t \in \mathbb{N}\cup \{0\}}$ be our gradient descent path. As we previously hinted at in Section \ref{preliminaries}, gradient descent can be viewed as a forward Euler discretization of the gradient flow dynamics with positive stepsize $\eta > 0$. Accordingly, the gradient descent update is given by $\boldsymbol{w}_{\alpha}(t+1) = \boldsymbol{w}_{\alpha}(t) - \eta \nabla_{\boldsymbol{w}} L(h(\boldsymbol{w}))|_{\boldsymbol{w} = \boldsymbol{w}_{\alpha}(t)}$ for each $t \in \mathbb{N}$.
+
+As for our training data, we consider $N=10$ points $\{ (\boldsymbol{x}_i, y_i) \}_{i=1}^N$ where each $\boldsymbol{x}_i \in \mathbb{R}^{n}$, $n = 20$ and $y_i \in \mathbb{R}$. This indeed satisfies the overparameterization assumption from Section \ref{linregmodel} since the dimension of the input space is much larger than the number of training points. As was done by Woodworth and colleagues in \cite{woodworth2020kernel}, we draw our input points according to $\boldsymbol{x}_i \overset{i.i.d.}{\sim} \mathcal{N}(\boldsymbol{0}, \mathbbm{I}_{n \times n})$. And to generate the corresponding set of response points, we compute $y_i = \langle \boldsymbol{x}_i, \boldsymbol{\beta} \rangle$, where $\boldsymbol{\beta}$ is generated according to the joint uniform distribution on $[-1, 1]^n$. Clearly, there is at least one vector, namely $\boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{\beta}$, such that $h = \langle \boldsymbol{\beta}, \boldsymbol{x} \rangle, \ \boldsymbol{x} \in \mathcal{X}$ is a global minimizer of $L$.
+
+Since our goal is to study the NTK in the kernel and rich regimes, we consider the gradient descent paths corresponding to initialization scales $\alpha = 10^{-1}, \ 1, \ 10^{1}$. To ensure that no one gradient descent path achieves smaller loss than the others, we stop training for each path once $L(h(\boldsymbol{w}_{\alpha}(t))) < 10^{-4}$. As one could likely predict, the challenge then becomes choosing a stepsize $\eta > 0$ such that $L(h(\boldsymbol{w}_{\alpha}(t)))$ converges within $10^{-4}$ of the global minimum. In particular, we would like to choose $\eta$ to be as small as possible while still achieving the desired convergence within a maximum of $10^4$ training epochs. A small $\eta$ is preferable because in the limit $\eta \rightarrow 0$, the gradient descent with stepsize $\eta$ reproduces the gradient flow dynamics. In the table below, we summarize our choice of stepsize $\eta$ for each gradient descent path:
+\begin{table}[H]
+\centering
+\begin{tabular}{ c|c|c } 
+$\alpha$ & $\eta$ & Number of Iterations to Convergence \\
+\hline
+$10^{-1}$ & $10^{-2}$ & $1001$ \\ 
+$1$ & $10^{-3}$ & $757$ \\
+$10^1$ & $10^{-4}$ & $77$
+\end{tabular}
+\caption{}\label{table:NTK}
+\end{table}
+Evidently, no single stepsize $\eta > 0$ works for all initialization scales. One aspect of our experiment that is potentially problematic is that the stepsize corresponding to the gradient descent path $\alpha = 10^{-1}$ is quite large. Therefore, it may be the case that the gradient descent path $(\boldsymbol{w}_{\alpha = 10^{-1}}(t))_{t \in \mathbb{N} \cup \{ 0 \}}$ is quite far from the corresponding gradient flow dynamics $(\boldsymbol{w}_{\alpha = 10^{-1}}(t))_{t\geq 0}$. With more computational power, it may be possible to achieve convergence with a smaller stepsize by increasing the maximum number of training epochs to be greater than $10^4$.
+
+Before the first training epoch and after the final epoch we evaluate the neural tangent kernel $K_{\boldsymbol{w}_{\alpha}(t)}$ on the $10 \times 10$ grid of training points $\{ \boldsymbol{x}_i \}_{i=1}^N$. We do the same every ten training epochs in order to understand how the neural tangent kernel evolves throughout training. Note that $K_{\boldsymbol{w}_{\alpha}(t)}$ denotes the neural tangent kernel determined by the weight vector at epoch $t$ of training, $\boldsymbol{w}_{\alpha}(t)$. That is, 
+\begin{align*}
+    K_{\boldsymbol{w}_{\alpha}(t)}(\boldsymbol{x}_1, \boldsymbol{x}_2) &= \left\langle \nabla_{\boldsymbol{w}}f(\boldsymbol{w}, \boldsymbol{x}_1)|_{\boldsymbol{w} = \boldsymbol{w}_{\alpha}(t)}, \nabla_{\boldsymbol{w}}f(\boldsymbol{w}, \boldsymbol{x}_2)|_{\boldsymbol{w} = \boldsymbol{w}_{\alpha}(t)} \right\rangle, \quad \boldsymbol{x}_1, \boldsymbol{x}_2 \in \mathcal{X}.
+\end{align*}
+
+In Figure \ref{img:ntkchange}, we report the overall change in the NTK
+\begin{align*}
+   K_{\boldsymbol{w}_{\alpha}(t_{\text{end}})}(\boldsymbol{x}_i, \boldsymbol{x}_j) -  K_{\boldsymbol{w}_{\alpha}(0)}(\boldsymbol{x}_i, \boldsymbol{x}_j)
+\end{align*}
+on $\{ \boldsymbol{x}_i \}_{i=1}^N$ for the gradient descent paths with initialization scales $\alpha = 10^{-1}, \ 1, \ 10^1$. Here, $t_{\text{end}}$ denotes the final epoch of gradient descent as indicated in Table \ref{table:NTK}. Noticeably, for the large initialization scale $\alpha = 10$, the neural tangent kernel evaluated on the training grid changes very little from the beginning to the end of gradient descent. This empirically verifies our previous remarks about how we would expect the NTK to behave in the kernel regime, since in the kernel limit we have $K_{\boldsymbol{w}_{\alpha}(t)} = K_{\boldsymbol{w}_{\alpha}(0)}$ for all times $t \geq 0$ for the gradient flow $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}, \ \boldsymbol{w}_{\alpha}(t) = \alpha \mathbbm{1}$ on $L(h(\boldsymbol{w}))$. Conversely, for the small initialization scale $\alpha = 10^{-1}$, we observe that the NTK varies greatly from the beginning to the end of training. That is, $K_{\boldsymbol{w}_{\alpha}(t_{\text{end}})}$ is very different from $K_{\boldsymbol{w}_{\alpha}(0)}$. Once again, this is how we would expect the NTK to evolve in the rich regime since the feature space determined by $\varphi_t(\boldsymbol{x}) = \nabla_{\boldsymbol{w}}f(\boldsymbol{w}, \boldsymbol{x})|_{\boldsymbol{w} = \boldsymbol{w}_{\alpha}(t)}$ is not fixed in time $t \geq 0$ in the rich limit as it is in the kernel limit. From our experiment, we also see the interpolation between the kernel and rich regimes. At $\alpha = 1$, we remark that that the NTK exhibits behavior between the kernel and rich regimes. As we had previously commented on, how the solutions reached by the gradient flow dynamics $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}$ $\boldsymbol{w}(0) = \alpha \mathbbm{1}$ vary between the rich $\alpha \rightarrow 0$ and kernel $\alpha \rightarrow \infty$ limits is considered rigorously by Woodworth and colleagues \cite{woodworth2020kernel}.
+
+\begin{figure}[H]
+\animategraphics[loop, controls, width=\textwidth]{10}{Imgs/NTK/NTK_0.1/GIF_imgs/linearized_NTK_0.1_}{0}{100}
+\caption{The neural tangent kernel (NTK) evaluated on the grid of training points $\{ \boldsymbol{x}_i \}_{i=1}^N$ for every 10 epochs of gradient descent with initialization $\boldsymbol{w}_{\alpha = 10^{-1}}(0) = 10^{-1}\mathbbm{1}$.}\label{gif:ntk1}
+\end{figure}
+
+\begin{figure}[H]
+\animategraphics[loop, controls, width=\textwidth]{10}{Imgs/NTK/NTK_1/GIF_imgs/linearized_NTK_1_}{0}{75}
+\caption{The neural tangent kernel (NTK) evaluated on the grid of training points $\{ \boldsymbol{x}_i \}_{i=1}^N$ for every 10 epochs of gradient descent with initialization $\boldsymbol{w}_{\alpha = 1}(0) = \mathbbm{1}$}\label{gif:ntk2}
+\end{figure}
+
+Although Figure \ref{img:ntkchange} certainly does portray how the neural tangent kernel changes from the beginning to the end of training, it does not fully capture how it evolves throughout training. To better understand the continuous time change of the NTK, we plot $K_{\boldsymbol{w}_{\alpha}(t)}$ on $\{ \boldsymbol{x}_i \}_{i=1}^N$ evaluated at every 10 epochs of gradient descent for the paths corresponding to $\alpha = 10^{-1}, \ 1$. We fix the scale of each plot Figure \ref{gif:ntk1} and Figure \ref{gif:ntk2} at $t = 0$ so that it does not automatically adjust at each evaluation of the NTK. Just as we would expect, the NTK corresponding to $\alpha = 10^{-1}$ experiences large relative changes, even at the end of training when $\boldsymbol{w}_{\alpha}(t)$ is close to a global minimum. This is not the case for the gradient descent path corresponding to initialization scale $\alpha = 1$; in fact, it may appear as if the NTK does not change whatsoever. From Figure \ref{img:ntkchange} we know that this is not the case. Rather, the changes in the NTK $K_{\boldsymbol{w}_{\alpha}(t)}$ are small relative to its scale at $\boldsymbol{w}_{\alpha}(0)$ for $\alpha = 1$.
+
+\subsection{The Model Weights}
 
 \pagebreak
 % References
