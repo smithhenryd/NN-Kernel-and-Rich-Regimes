@@ -47,11 +47,11 @@
 }{\endmanualtheoreminner}
 
 % Title content
-\title{\textbf{Title}}
+\title{\textbf{Implicit Sparsity in Deep Learning:\\The Kernel and Rich Regimes}}
 \author[]{Henry Smith\\
 Advised by Professor Harrison Zhou}
 \affil[]{\normalsize Yale University}
-\date{\today}
+\date{May 6, 2022}
 
 \begin{document}
 
@@ -152,7 +152,7 @@ That is, for all times $t \in \mathbb{R}_+$, $\bar{h}(\boldsymbol{\bar{w}}(t))$ 
 
 Therefore, finding a $\boldsymbol{w}^{\star} \in \mathbb{R}^p$ which minimizes $L(f(\boldsymbol{w}))$ is equivalent to finding a function $f^{\star}$ in the RKHS defined by feature map $\varphi$ which minimizes the square loss. More precisely stated, when $h(\boldsymbol{w}_0) = 0$ and $L$ is the square loss, then the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ is equivalent to a kernel method with the \textit{neural tangent kernel} $K$ given by (\ref{NTK}) \cite{chizat2018lazy} \cite{jacot2018neural}.
 
-\subsection{Relating the Nonlinear and Linearized Models}
+\subsection{Relating the Nonlinear and Linearized Models}\label{kerneltheory}
 
 So far, we have characterized the linearized model $\bar{h}$ corresponding to model $h$ and have justified that, under appropriate circumstances, gradient flow on the linearized objective $L(\bar{h}(\boldsymbol{w}))$ is equivalent to a kernel method. However, we have provided no reason to suggest that the original model $h$ should be at all similar to the linearized model $\bar{h}$: in general, even the most simple neural networks are highly nonlinear in their weights. 
 
@@ -285,9 +285,9 @@ And so we have written down explicit formulas both for the kernel and rich limit
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.5\textwidth]{Imgs/Linearized_Model/visualize_linearized_0.1.png}\hfill
-    \includegraphics[width=.5\textwidth]{Imgs/Linearized_Model/visualize_linearized_10.png}
-    \caption{The linear regression model $f(\boldsymbol{w}, \boldsymbol{x})$ with one dimensional input $\boldsymbol{x} = 1$ and weights $\boldsymbol{w} = (\boldsymbol{w}_1, \boldsymbol{w}_2)$ initialized at $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$. (Left) The original linear regression model $f(w_1, w_2)(1)$ (blue) and the linearized model $\bar{f}(w_1, w_2)(1)$ (orange) with initialization scale $\alpha = 10^{-1}$. (Right) $f(w_1, w_2)(1)$ (blue) and $\bar{f}(w_1, w_2)(1)$ (orange) with initialization scale $\alpha = 10^1$.}\label{img:linearization}
+    \subfloat[$\alpha = 10^{-1}$]{\includegraphics[width=.5\linewidth]{Imgs/Linearized_Model/visualize_linearized_0.1.png}}\hfill
+    \subfloat[$\alpha = 10^1$]{\includegraphics[width=.5\linewidth]{Imgs/Linearized_Model/visualize_linearized_10.png}}
+    \caption{The linear regression model $f(\boldsymbol{w}, \boldsymbol{x})$ with one dimensional input $\boldsymbol{x} = 1$ and weights $\boldsymbol{w} = (w_1, w_2)$ initialized at $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$. The original linear regression model $f(w_1, w_2)(1)$ is plotted in blue, and the linearized model $\bar{f}(w_1, w_2)(1)$ is in orange.}\label{img:linearization}
 \end{figure}
 
 Now that we have given exact descriptions of the kernel and rich limits for the linear regression problem, we wish to empirically demonstrate the transition between the two limits. Our first demonstration aims to represent the relationship between the original model $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^n (\boldsymbol{w}_{i,+}^2 - \boldsymbol{w}_{i,-}^2)\boldsymbol{x}_i$ and the linearized model $\bar{f}(\boldsymbol{w}, \boldsymbol{x}) = \langle \varphi(\boldsymbol{x}), \boldsymbol{w} - \boldsymbol{w}_{\alpha}(0) \rangle = 2\alpha \langle \boldsymbol{x} , \boldsymbol{w}_+^2 -  \boldsymbol{w}_-^2\rangle$ with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$. In particular, we know from Section \ref{defkernelrich} that as $\alpha \rightarrow 0$, we should observe that for fixed $\boldsymbol{x} \in \mathcal{X}$, $f(\boldsymbol{w}, \boldsymbol{x})$ and $\bar{f}(\boldsymbol{w}, \boldsymbol{x})$ are very different from one another as a function of the model's weights $\boldsymbol{w} \in \mathbb{R}^{2n}$. Conversely, as $\alpha \rightarrow \infty$ we should observe that for fixed $\boldsymbol{x}$, $f(\boldsymbol{w}, \boldsymbol{x})$ is approximately equal to  $\bar{f}(\boldsymbol{w}, \boldsymbol{x})$, the linearization around its initialization.
@@ -306,7 +306,7 @@ Letting the initialization scale $\alpha$ vary between $10^{-1}$ and $10^{1}$, w
 From our illustrations, it is evident that for $\alpha \ll 1$, the gradient flow on $L(h(\boldsymbol{w}))$ with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ would result in quite a different model than that from the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ with $\boldsymbol{\bar{w}}_{\alpha}(0) = \boldsymbol{w}_{\alpha}(0)$. But as $\alpha$ grows away from $0$, then $h$ approaches $\bar{h}$ and the two solutions achieved by gradient flow $\lim_{t \to \infty} \boldsymbol{w}(t)$,  $\lim_{t \to \infty} \boldsymbol{\bar{w}}(t)$ are nearly identical.
 
 
-\subsection{The Neural Tangent Kernel}
+\subsection{The Neural Tangent Kernel}\label{visualizeNTK}
 
 The next aspect of the kernel and rich limits that we wish to illustrate is the neural tangent kernel (NTK). Recall that in Section \ref{linregmodel} we derived the NTK corresponding to the linear regression model to be
 \begin{align*}
@@ -376,6 +376,20 @@ on $\{ \boldsymbol{x}_i \}_{i=1}^N$ for the gradient descent paths with initiali
 Although Figure \ref{img:ntkchange} certainly does portray how the neural tangent kernel changes from the beginning to the end of training, it does not fully capture how it evolves throughout training. To better understand the continuous time change of the NTK, we plot $K_{\boldsymbol{w}_{\alpha}(t)}$ on $\{ \boldsymbol{x}_i \}_{i=1}^N$ evaluated at every 10 epochs of gradient descent for the paths corresponding to $\alpha = 10^{-1}, \ 1$. We fix the scale of each plot Figure \ref{gif:ntk1} and Figure \ref{gif:ntk2} at $t = 0$ so that it does not automatically adjust at each evaluation of the NTK. Just as we would expect, the NTK corresponding to $\alpha = 10^{-1}$ experiences large relative changes, even at the end of training when $\boldsymbol{w}_{\alpha}(t)$ is close to a global minimum of the loss $L$. This is not the case for the gradient descent path corresponding to initialization scale $\alpha = 1$; in fact, it may appear as if the NTK does not change whatsoever. From Figure \ref{img:ntkchange} we know that this is not the case. Rather, the changes in the NTK $K_{\boldsymbol{w}_{\alpha}(t)}$ are small relative to its scale at $\boldsymbol{w}_{\alpha}(0)$ for $\alpha = 1$.
 
 \subsection{The Model Weights}
+
+\begin{figure}[H]
+    \centering
+    \subfloat[]{\includegraphics[width=.5\linewidth]{Imgs/Weights/visualize_change.png}\label{fig:weights:change}}\hfill
+    \subfloat[]{\includegraphics[width=.5\linewidth]{Imgs/Weights/visualize_weights.png}\label{fig:weights:diff}}
+    \caption{(a) The $\ell^2$ distance between the weights of the model at epoch $t$ of gradient descent, $\boldsymbol{w}_{\alpha}(t)$, and at initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$. (b) The $\ell^2$ distance between the weights of the model $h$, $\boldsymbol{w}_{\alpha}(t)$, and the linearized model $\bar{h}$, $\boldsymbol{\bar{w}}_{\alpha}(t)$, at epoch $t$ of gradient descent. The initialization scale of each gradient descent path is indicated by the line color as reported in the plot legends.}\label{fig:weights}
+\end{figure}
+
+For our final demonstration of the kernel and rich limits in the linear regression problem, we consider how the weights of the model themselves $\boldsymbol{w}_{\alpha}(t)$ evolve throughout the gradient flow dynamics on $L(h(\boldsymbol{w}))$. From the theoretical results that we presented and discussed in Section \ref{kerneltheory}, we know that in the kernel limit $\alpha \rightarrow \infty$ it holds that $\| \boldsymbol{w}_{\alpha}(t) -  \boldsymbol{w}_{\alpha}(0) \|_2 \rightarrow 0$ as well as $\| \boldsymbol{w}_{\alpha}(t) -  \boldsymbol{\bar{w}}_{\alpha}(t) \|_2 \rightarrow 0$ for each $t \in \mathbb{R}_+$. The first result tells us that for all times $t \in \mathbb{R}_+$, the gradient flow path is asymptotically fixed at its initialization in the kernel limit. The second statement tells us that in the kernel limit, gradient flow on the original objective $L(h(\boldsymbol{w}))$ is equivalent to the gradient flow on $L(\bar{h}(\boldsymbol{w}))$. Using a similar setup to that in Section \ref{visualizeNTK}, we exhibit empirically that each of these two limits do indeed hold.
+
+
+Just as in Section \ref{visualizeNTK}, we consider a training dataset of $N = 10$ points $\{(\boldsymbol{x}_i, y_i) \}_{i=1}^N$ with each $\boldsymbol{x}_i \in \mathbb{R}^n$, $n=20$ and $y_i \in \mathbb{R}$. The specifics of how we generate these $(\boldsymbol{x}_i, y_i)$ are exactly the same as in Section \ref{visualizeNTK}, and so we omit the details here. Similar to our experiment for the neural tangent kernel, we once again consider the gradient descent with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ , denoted $(\boldsymbol{w}_{\alpha}(t))_{t \in \mathbb{N}\cup\{0\}}$, as a discretization of the gradient flow dynamics. Here, we specifically look at the gradient descent paths corresponding to intialization scales $\alpha = \{ 5\times10^{-2}, 10^{-1}, 5 \times 10^{-1}, 1, 5\}$. Unlike in the previous experiment, though, we fix a stepsize $\eta = 10^{-3}$ for each $\alpha$ and do not stop training once $L(h(\boldsymbol{w}_{\alpha}(t))) < 10^{-4}$. Rather, we run each gradient descent for path for a total of $10^4$ epochs. The reason for this is that we would like to compare $\boldsymbol{w}_{\alpha}(t)$ for these various $\alpha$, which we cannot do if the stepsize varies with $\alpha$.
+
+Now with regard to the first limit, $\| \boldsymbol{w}_{\alpha}(t) -  \boldsymbol{w}_{\alpha}(0) \|_2 \rightarrow 0$ as $\alpha \rightarrow \infty$, we store the network weights $\boldsymbol{w}_{\alpha}(t)$ both at the beginning of training $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ as well as after every 10 epochs of gradient descent. In Figure \ref{fig:weights:change}, we display the $\ell^2$ distance of $\boldsymbol{w}_{\alpha}(t)$ from the initialization $\boldsymbol{w}_{\alpha}(0)$ as a function of $t$. Just as we would expect under the aforementioned theory, the gradient descent path remains close to $\boldsymbol{w}(0)$ for all times $t$ whenever $\alpha$ is large. In fact, for initialization scale $\alpha = 5$, we observe that $\boldsymbol{w}_{\alpha}(t)$ barely moves from the initialization. On the opposite end of the paradigm, for $\alpha = 10^{-1}, \ 5 \times 10^{-2}$ we observe large changes in $\boldsymbol{w}_{\alpha}(t)$ throughout training. As we have previously discussed, this active training is synonymous with the rich limit $\alpha \rightarrow 0$.
 
 \section{Rich Training and Sparse Generalization}
 
