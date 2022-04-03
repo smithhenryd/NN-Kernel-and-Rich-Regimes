@@ -115,7 +115,7 @@ The model $h: \mathbb{R}^p \rightarrow \mathcal{F}$ is differentiable with a loc
 \end{assumption}
 As a consequence, we are able to define the \textit{gradient flow} dynamics on objective function $L(h(\boldsymbol{w}))$ with respect to $\boldsymbol{w} \in \mathbb{R}^p$. That is, we suppose that the network weights $\boldsymbol{w}(t)$ evolve in time $t \in \mathbb{R}_+$ according to the differential equation
 \begin{align*}
-    \boldsymbol{w}(t) = -\nabla L(\boldsymbol{w}(t)), \qquad \boldsymbol{w}(0) = \boldsymbol{w}_0
+    \boldsymbol{w}'(t) = -\nabla L(\boldsymbol{w}(t)), \qquad \boldsymbol{w}(0) = \boldsymbol{w}_0
 \end{align*}
 where $\boldsymbol{w}_0 \in \mathbb{R}^p$ is some starting vector. Practitioners of deep learning should understand the gradient flow as a continuous time analogue to gradient descent \cite{wibisono2016}. Rather than choosing some positive stepsize with which we update our weights at $t \in \{0, 1, 2, \ldots \}$, gradient flow specifies the instantaneous direction in which we should update our weights at every time $t \in \mathbb{R}_+$.
 
@@ -138,19 +138,30 @@ One will notice that the linearized model $\bar{h} = \bar{f}(\boldsymbol{w}, \cd
 
 \subsection{Gradient Flow as a Kernel Method}\label{kernelmethod}
 
-Now that we have presented the definition of the linearized model, let us analyze the special case of $h$ identically zero at its initialization $\boldsymbol{w}_0$ and loss $L(h(\boldsymbol{w})) = \sum_{i=1}^N (y_i - f(\boldsymbol{w}, \boldsymbol{x}_i))^2$ the square loss, which is simply (\ref{mse}) scaled by a factor of $N$. Under these assumptions, the corresponding linearized model $\bar{h}$ is
+Now that we have presented the definition of the linearized model, let us analyze the special case of $h$ identically zero at its initialization $\boldsymbol{w}_0$ and $L(f(\boldsymbol{w})) = \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}} [\ell(y, f(\boldsymbol{w}, \boldsymbol{x}))]$, where $\nabla \ell(y, y')$ depends only on $y - y'$ \cite{chizat2018note}. As in Section \ref{preliminaries}, $\mathcal{D}$ denotes the empirical distribution determined by the training data $\{ (\boldsymbol{x}_i, y_i) \}_{i=1}^N$. The mean-squared error (\ref{mse}) is an example of such an $L$ with $\ell(y, y') = (y - y')^2$. 
+
+Under these assumptions, the corresponding linearized model $\bar{h}$ is
 \begin{align*}
     \bar{h}(\boldsymbol{w}) = \bar{f}(\boldsymbol{w}, \boldsymbol{x}) = \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}), \boldsymbol{w}-\boldsymbol{w}_0\rangle, \quad \boldsymbol{x} \in \mathcal{X}. 
 \end{align*}
-Let $(\boldsymbol{\bar{w}}(t))_{t \geq 0}$ be the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ with $\boldsymbol{\bar{w}}(0) = \boldsymbol{w}_0$. We observe that for all times $t\in \mathbb{R}_+$, the predictor function $\bar{h}(\boldsymbol{\bar{w}}(t))$ can be expressed as $\langle \varphi(\boldsymbol{x}), \boldsymbol{\bar{w}}(t) - \boldsymbol{w}_0 \rangle$ for every $\boldsymbol{x} \in \mathcal{X}$, where $\varphi(\boldsymbol{x}) = \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x})$ and $\boldsymbol{w}(t) - \boldsymbol{w}_0 \in \mathbb{R}^p$. 
+And so since $\nabla \ell(y, y') = \nabla \ell(y - y')$ is a function in $y - y'$, then the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ is given by
+\begin{align*}
+    \boldsymbol{\bar{w}}'(t) = - \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}}[\nabla \ell(y - \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}), \boldsymbol{\bar{w}}(t)-\boldsymbol{w}_0\rangle)], \quad \boldsymbol{\bar{w}}(0) = \boldsymbol{w}_0.
+\end{align*}
+But this is no more than a linear model in the input variables $\nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}_i)$ and the output variables $y_i$. 
 
-That is, for all times $t \in \mathbb{R}_+$, $\bar{h}(\boldsymbol{\bar{w}}(t))$ lies in the Reproducing Kernel Hilbert Space (RKHS) defined by the feature map $\varphi: \mathcal{X} \rightarrow \mathbb{R}^p$. The positive-definite kernel function $K: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ corresponding to this feature map $\varphi(\boldsymbol{x})$ is defined by
+Before we can fully grasp the significance of the prior statement, we must first define the \textit{neural tangent kernel} proposed by Jacot and colleagues \cite{jacot2018neural}. In particular, the neural tangent kernel is the positive-definite kernel function $K: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ corresponding to this feature map $\varphi(\boldsymbol{x}) = \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x})$:
 \begin{align}
     K(\boldsymbol{x}_1, \boldsymbol{x}_2) :&= \langle \varphi(\boldsymbol{x}_1), \varphi(\boldsymbol{x}_2) \rangle \nonumber \\
     &= \langle \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}_1), \nabla_{\boldsymbol{w}} f(\boldsymbol{w}_0, \boldsymbol{x}_2) \rangle, \quad \forall \boldsymbol{x}_1, \boldsymbol{x}_2 \in \mathcal{X}\label{NTK}.
 \end{align}
+The neural tangent kernel $K$ defines a Reproducing Kernel Hilbert Space (RKHS) $H_{\varphi}$ consisting of those $f \in \mathcal{F}$ for which there exists a  $\boldsymbol{w} \in \mathbb{R}^p$ such that $f(\boldsymbol{x}) = \langle \varphi(\boldsymbol{x}), \boldsymbol{x} \rangle, \forall \boldsymbol{x} \in \mathcal{X}$. 
 
-Therefore, finding a $\boldsymbol{w}^{\star} \in \mathbb{R}^p$ which minimizes $L(f(\boldsymbol{w}))$ is equivalent to finding a function $f^{\star}$ in the RKHS defined by feature map $\varphi$ which minimizes the square loss. More precisely stated, when $h(\boldsymbol{w}_0) = 0$ and $L$ is the square loss, then the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ is equivalent to a kernel method with the \textit{neural tangent kernel} $K$ given by (\ref{NTK}) \cite{chizat2018lazy} \cite{jacot2018neural}.
+Since the gradient flow of $L(\bar{h}(\boldsymbol{w}))$ is a linear model in the inputs $\varphi(\boldsymbol{x}_i)$ and the outputs $y_i$, then it is equivalent to a kernel method with the neural tangent kernel (\ref{NTK}). For the case of $L$ the mean-squared error, we have that the gradient flow is equivalent to solving the kernelized linear regression problem
+\begin{align*}
+    \argmin_{f \in H_{\varphi}} \ \mathbb{E}_{(\boldsymbol{x}_i, y_i) \sim \mathcal{D}}\left[(y_i - f(\boldsymbol{w}, \boldsymbol{x}_i))^2 \right].
+\end{align*}
+That is, finding a vector $\boldsymbol{w}^{\star} \in \mathbb{R}^p$ which minimizes $L(f(\boldsymbol{w}))$ is equivalent to finding a function $f^{\star}$ in the RKHS $H_{\varphi}$ which minimizes $L$.
 
 \subsection{Relating the Nonlinear and Linearized Models}\label{kerneltheory}
 
