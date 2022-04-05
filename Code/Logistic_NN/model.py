@@ -21,6 +21,7 @@ def get_ReLU_NN(d, units, rw =1, ru=1, lambd=0)->tf.keras.Model:
 
     u = []
     for i in range(units):
+
         # For each unit in the hidden layer, the vector u_j is initalized from a multivariate normal distribution
         u.append(np.random.multivariate_normal(mean=np.zeros(d), cov=(ru**2)*np.eye(d)))
 
@@ -42,52 +43,100 @@ def get_logistic_dataset(num_samples, d)->[tf.Tensor, tf.Tensor]:
     Constructs the dataset corresponding to the logstic regression problem from Wei et al. 2020
     """
 
+    # The first two coordinates of the input data
     true_x = np.array([[1, 0], [-1, 0], [0, 1], [0, -1]])
+    
+    # The true labels associated with the input data
     true_y = np.array([1, 1, -1, -1])
 
     if not d > 2:
         raise ValueError(f"Dimension of dataset {d} must be > 2.")
     
-    # Sample first two coordinates as specified in Wei et al. 2020
+    # Sample a point (x, y) from the distribution specified by Wei et al. 2020
     vals = np.random.randint(0, 4, size=num_samples)
     X = true_x[vals]
     Y = np.reshape(true_y[vals], (num_samples, 1))
+
+    # The last d-2 coordinates of each input point is a random bit {-1, 1}
     X = np.concatenate((X, np.random.choice([-1, 1], size=(num_samples, d-2))), axis=1)
 
     return X, Y
 
 class LogisticLoss(tf.keras.losses.Loss):
+    """
+    The logistic loss function for data (x_i, y_i), where the labels y_i \in {1, -1}
 
+    Note that whenever y_i*f(x_i) > 0, then the loss is small; whenever y_i*f(x_i) <= 0,
+    the loss is large
+    """
     def __init__(self, **kwargs):
         
         super(LogisticLoss, self).__init__(**kwargs)
         
     def call(self, y_true, y_pred):
+        """
+        Implements the logistic loss for labels y_true and predictions y_pred
 
+        \frac{1}{n} \sum_{i=1}^n \log(1 + \exp(-y_i f^{\text{NN}}(x_i, \Theta)))
+        """
+
+        # Convert y_true to a float
         y_true = tf.cast(y_true, y_pred.dtype)
+
+        # And compute the loss as specified above
+        print(tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
         loss = tf.math.log(1 + tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
         return tf.reduce_mean(tf.reshape(loss, [-1]))
 
-class ClassificationError(tf.keras.metrics.Metric):
+class ClassificationCallback(tf.keras.callbacks.Callback):
+    """
+    A callback function, stores the classification error of the network for {1, -1} labels
+    at each epoch of training
+    """
 
-    def __init__(self, **kwargs):
-
-        super(ClassificationError, self).__init__(**kwargs)
-
-        # Add a weight to store the classification (0-1) error throughout training
-        self.binary_err = self.add_weight(initializer='zeros')
-    
-    def update_state(self, y_true, y_pred, sample_weight=None):
+    def __init__(self, train_set, test_set=None, **kwargs):
         """
-        Updates the classification error after each epoch of training
-        
-        An observation is misclassified if y_i*f(x_i) <= 0 and correctly classified if y_i*f(x_i) > 0 
+        train_set: a tuple of tf.Tensor objects, (1) an N x d dimensional tensor whose rows contain the input points of the training set,
+        (2) an N x 1 dimensional tensor whose rows contain the ouputs (labels) of the training dataset
+        train_set: a tuple of tf.Tensor objects, with the same format as train_set (the number of training observations N and test observations M
+        need not be equal), by default None (no test data)
         """
 
-        raise NotImplementedError
+        super(ClassificationCallback, self).__init__(**kwargs)
+
+        self.x_train = train_set[0]
+        self.y_train = train_set[1]
+        self.train_err = []
+
+        if test_set:
+            self.x_test = test_set[0]
+            self.y_test = test_set[1]
+            self.test_err = []
+        else:
+            self.x_test = None
+            self.y_test = None
+
+    def on_epoch_end(self, epoch, logs=None):
+
+        train_err_epoch = self._compute_classification_error(self.y_train, self.model(self.x_train))
+        self.train_err.append(train_err_epoch)
+        if self.x_test is not None:    
+            test_err_epoch = self._compute_classification_error(self.y_test, self.model(self.x_test))
+            self.test_err.append(test_err_epoch)
+            print(f"\n Classification Error: {train_err_epoch} (Training), {test_err_epoch} (Test)")
+        else:
+            print(f"\n Classification Error: {train_err_epoch} (Training)")
+
     
-    def result(self):
-        raise NotImplementedError
+    def _compute_classification_error(self, y_true, y_pred):
+        """
+        Computes the classification error for labels y_true \in {1, -1} and predictions y_pred
+        """
+
+        pred_sign =  tf.math.multiply(tf.cast(y_true, dtype=y_pred.dtype), y_pred)
+        pred_sign = tf.math.greater(pred_sign, tf.constant([0], dtype=pred_sign.dtype))
+        pred_sign = tf.reshape(tf.cast(pred_sign, tf.float32), [-1])
+        return 1 - tf.math.reduce_mean(pred_sign)
 
 if __name__ == "__main__":
 
@@ -105,11 +154,13 @@ if __name__ == "__main__":
     # Finally, let's try evaluating the network at a sample point
     print(NN(tf.ones(shape=[1,d])))
 
-    X_train, Y_train = get_logistic_dataset(200, d)
-    X_test, Y_test = get_logistic_dataset(200,d)
+    X_train, Y_train = get_logistic_dataset(100, d)
+    X_test, Y_test = get_logistic_dataset(1000, d)
 
-    optimizer = tf.keras.optimizers.SGD(learning_rate=10e-1)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=10e-2)
     logloss= LogisticLoss()
 
+    mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
+
     NN.compile(optimizer, loss=logloss)
-    NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=2*10**4)
+    NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=10**3, callbacks=[mycallback])
