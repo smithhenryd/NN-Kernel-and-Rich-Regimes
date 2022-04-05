@@ -40,7 +40,13 @@ def get_ReLU_NN(d, units, rw =1, ru=1, lambd=0)->tf.keras.Model:
 
 def get_logistic_dataset(num_samples, d)->[tf.Tensor, tf.Tensor]:
     """
-    Constructs the dataset corresponding to the logstic regression problem from Wei et al. 2020
+    Constructs a dataset drawn from the distribution specified by Wei, Lee, Liu, and Ma 2020
+    
+    The first two dimensions take values in x_i \in {0, 1} that encode the output y_i \in {-1, 1}, 
+    the remaining d-2 input dimensions are random {-1, 1} bits i.e. noise
+
+    num_samples: a positive integer, the number of samples in the dataset
+    d: a positive integer > 2, the dimension of the input space
     """
 
     # The first two coordinates of the input data
@@ -52,7 +58,7 @@ def get_logistic_dataset(num_samples, d)->[tf.Tensor, tf.Tensor]:
     if not d > 2:
         raise ValueError(f"Dimension of dataset {d} must be > 2.")
     
-    # Sample a point (x, y) from the distribution specified by Wei et al. 2020
+    # Sample a point (x, y) from the distribution
     vals = np.random.randint(0, 4, size=num_samples)
     X = true_x[vals]
     Y = np.reshape(true_y[vals], (num_samples, 1))
@@ -77,14 +83,13 @@ class LogisticLoss(tf.keras.losses.Loss):
         """
         Implements the logistic loss for labels y_true and predictions y_pred
 
-        \frac{1}{n} \sum_{i=1}^n \log(1 + \exp(-y_i f^{\text{NN}}(x_i, \Theta)))
+        \frac{1}{n} \sum_{i=1}^n \log(1 + \exp(-y_i f^{\text{NN}}(x_i; \Theta)))
         """
 
         # Convert y_true to a float
         y_true = tf.cast(y_true, y_pred.dtype)
 
         # And compute the loss as specified above
-        print(tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
         loss = tf.math.log(1 + tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
         return tf.reduce_mean(tf.reshape(loss, [-1]))
 
@@ -140,9 +145,11 @@ class ClassificationCallback(tf.keras.callbacks.Callback):
 
 if __name__ == "__main__":
 
-    # Suppose we have two-dimensional inputs and want to create a NN with 5 neurons in the hidden layer
-    d = 20
-    units = 10
+    # Suppose we have 5-dimensional inputs and want to create a NN with 5 neurons in the hidden layer
+    d = 5
+    units = 5
+
+    # Initialize ReLU NN with r_w = r_u = 0.1
     NN = get_ReLU_NN(d, units, rw=0.1, ru=0.1, lambd=0)
 
     # Print the model summary
@@ -154,13 +161,17 @@ if __name__ == "__main__":
     # Finally, let's try evaluating the network at a sample point
     print(NN(tf.ones(shape=[1,d])))
 
-    X_train, Y_train = get_logistic_dataset(100, d)
+    # Get 20 training points sampled from the distribution in Wei, Lee, Liu, and Ma 2020
+    X_train, Y_train = get_logistic_dataset(20, d)
     X_test, Y_test = get_logistic_dataset(1000, d)
 
-    optimizer = tf.keras.optimizers.SGD(learning_rate=10e-2)
+    # Optimize the network using gradient descent with stepsize 0.1
+    optimizer = tf.keras.optimizers.SGD(learning_rate=1e-1)
     logloss= LogisticLoss()
 
+    # Store the training and test classification error at each epoch of training
     mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
 
+    # Finally, compile and fit the model
     NN.compile(optimizer, loss=logloss)
     NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=10**3, callbacks=[mycallback])
