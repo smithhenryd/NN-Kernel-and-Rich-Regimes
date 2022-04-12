@@ -87,7 +87,8 @@ class LogisticLoss(tf.keras.losses.Loss):
         """
 
         # Convert y_true to a float
-        y_true = tf.cast(y_true, y_pred.dtype)
+        y_pred = tf.cast(y_pred, tf.float32)
+        y_true = tf.cast(y_true, tf.float32)
 
         # And compute the loss as specified above
         loss = tf.math.log(1 + tf.math.exp((-1)*tf.multiply(y_true, y_pred)))
@@ -146,8 +147,8 @@ class ClassificationCallback(tf.keras.callbacks.Callback):
 if __name__ == "__main__":
 
     # Suppose we have 5-dimensional inputs and want to create a NN with 5 neurons in the hidden layer
-    d = 5
-    units = 5
+    d = 20
+    units = 10
 
     # Initialize ReLU NN with r_w = r_u = 0.1
     NN = get_ReLU_NN(d, units, rw=0.1, ru=0.1, lambd=0)
@@ -173,5 +174,5 @@ if __name__ == "__main__":
     mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
 
     # Finally, compile and fit the model
-    NN.compile(optimizer, loss=logloss)
-    NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=10**3, callbacks=[mycallback])
+    #NN.compile(optimizer, loss=logloss)
+    #NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=10**3, callbacks=[mycallback])
