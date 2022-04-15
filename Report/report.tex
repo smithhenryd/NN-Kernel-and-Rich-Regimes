@@ -436,14 +436,12 @@ Now that we have detailed the sparse regression problem from \cite{woodworth2020
 
 \begin{figure}[H]
     \centering
-    \subfloat[]{\includegraphics[width=.5\linewidth]{Imgs/Sparse Linear Regression/11_population_error_log_all.png}\label{fig:l1poperrorlog}}\hfill
-    \subfloat[]{\includegraphics[width=.5\linewidth]{Imgs/Sparse Linear Regression/11_population_error_all.png}\label{fig:l1poperror}}
-    \caption{The excess $\ell^1$ population error of the gradient descent solution, $\boldsymbol{\beta}_{\boldsymbol{w}_{\alpha}(t_{\text{end}})}$, as a function of the number of training samples $n$ and the initialization scale $\alpha$. A dashed line indicates that the gradient descent path with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ did not achieve the specified convergence. $\boldsymbol{\beta}^{\star}$ denotes $\boldsymbol{\beta}_{\boldsymbol{w}}$, the ground truth vector with which the response data is generated.}\label{fig:l1error}
+    \subfloat[]{\includegraphics[width=.5\linewidth]{Imgs/Sparse Linear Regression/excess_l1_log_all.png}\label{fig:excessl1error}}\hfill
+    \subfloat[]{\includegraphics[width=.5\linewidth]{Imgs/Sparse Linear Regression/11_population_error_log_all.png}\label{fig:l1populationerror}}
+    \caption{(a) The $\ell^1$ difference between the gradient descent solution $\boldsymbol{\beta}_{\boldsymbol{w}_{\alpha}(t_{\text{end}})}$ and the minimum $\ell^1$ solution $\argmin_{\boldsymbol{\beta} \in \mathbb{R}^n} \| \boldsymbol{\beta} \|_1, \ \boldsymbol{X} \boldsymbol{\beta}  = \boldsymbol{y}$, where $\boldsymbol{X} \in \mathbb{R}^{N \times n}$ is the matrix of training inputs $\{ \boldsymbol{x}_i \}_{i=1}^N$, $\boldsymbol{y} \in \mathbb{R}^N$ the vector of training outputs $\{y_i\}_{i=1}^N$. (b) The $\ell^1$ difference between the gradient descent solution and the ground truth vector $\boldsymbol{\beta}_{\boldsymbol{w}}$ from which the output data is generated.}\label{fig:l1error}
 \end{figure}
 
 Unlike in our previous experiments, though, we consider the gradient descent path both as a function of the number of training samples, $N$, as well as the initialization scale, $\alpha$. To be more specific, we evaluate the gradient descent path using a training dataset of $N = 50, \ 100,$ and $200$ points $(\boldsymbol{x}_i, y_i)$. And for each fixed $N$, we choose $20$ logarithmically-spaced points on the interval $[10^{-3}, 1]$ for the initialization scale $\alpha$. Altogether, each combination of $N$ and $\alpha$ specifies a gradient descent path which we simulate as previously described.
-
-In Figure \ref{fig:l1error}, we report the $\ell^1$ population error of the gradient descent solution. Here, \enquote{population error} refers to the distance between the gradient descent solution $\boldsymbol{\beta}_{\boldsymbol{w}(t_{\text{end}})} \in \mathbb{R}^n$ and the true vector $\boldsymbol{\beta}_{\boldsymbol{w}}$ with which the response data $y$ is generated. We plot the population error both with and without a logarithmic scale so that we can compare our results with those of Woodworth and colleagues. 
 
 \begin{figure}[H]
     \centering
