@@ -42,8 +42,8 @@ for i in range(N):
 
   print(f"**************** \n Iteration {i+1}/{N} \n****************")
 
-  NN = get_ReLU_NN(d, units, rw=1, ru=1, lambd=0)
-  optimizer = tf.keras.optimizers.SGD(learning_rate=0.1)
+  NN = get_ReLU_NN(d, units, rw=0.01, ru=0.01, lambd=0)
+  optimizer = tf.keras.optimizers.SGD(learning_rate=0.005)
     
   mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
   NN.compile(optimizer, loss=logloss)
@@ -56,11 +56,11 @@ for i in range(N):
   NN_weights = [i.numpy() for i in NN.weights]
   weights.append(NN_weights)
 
-with open('train_err_simulations_100_2.pk', 'wb') as f:
+with open('train_err_simulations_100_0.01_2.pk', 'wb') as f:
         pickle.dump(train_err_arrays, f)
 
-with open('test_err_simulations_100_2.pk', 'wb') as f:
+with open('test_err_simulations_100_0.01_2.pk', 'wb') as f:
         pickle.dump(test_err_arrays, f)
 
-with open('network_weights_simulations_100_2.pk', 'wb') as f:
+with open('network_weights_simulations_100_0.01_2.pk', 'wb') as f:
         pickle.dump(weights, f)
