@@ -8,7 +8,7 @@ from model import get_ReLU_NN, get_logistic_dataset, LogisticLoss, Classificatio
 N = 10
 
 # Dimension of input space
-d = 20
+d = 100
 
 # Number of hidden units in ReLU NN
 units = 10
@@ -43,7 +43,7 @@ for i in range(N):
   print(f"**************** \n Iteration {i+1}/{N} \n****************")
 
   NN = get_ReLU_NN(d, units, rw=0.01, ru=0.01, lambd=0)
-  optimizer = tf.keras.optimizers.SGD(learning_rate=0.005)
+  optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
     
   mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
   NN.compile(optimizer, loss=logloss)
