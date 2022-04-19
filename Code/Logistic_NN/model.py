@@ -172,6 +172,7 @@ if __name__ == "__main__":
 
     # Store the training and test classification error at each epoch of training
     mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
+    mycallback._compute_classification_error((X_train, Y_train))
 
     # Finally, compile and fit the model
     #NN.compile(optimizer, loss=logloss)

@@ -8,28 +8,28 @@ from model import get_ReLU_NN, get_logistic_dataset, LogisticLoss, Classificatio
 N = 10
 
 # Dimension of input space
-d = 100
+d = 640
 
 # Number of hidden units in ReLU NN
 units = 10
 
 # Get our training, test data
 try:
-    with open('training_data_logistic_100.pk', 'rb') as f:
+    with open('training_data_logistic_foo.pk', 'rb') as f:
         X_train, Y_train = pickle.load(f)
 
 except FileNotFoundError:
-    X_train, Y_train = get_logistic_dataset(100, d)
-    with open('training_data_logistic_100.pk', 'wb') as f:
+    X_train, Y_train = get_logistic_dataset(600, d)
+    with open('training_data_logistic_foo.pk', 'wb') as f:
         pickle.dump((X_train, Y_train), f)
 
 try:
-    with open('test_data_logistic.pk', 'rb') as f:
+    with open('test_data_logistic_foo.pk', 'rb') as f:
         X_test, Y_test = pickle.load(f)
 
 except FileNotFoundError:
     X_test, Y_test = get_logistic_dataset(1000, d)
-    with open('test_data_logistic.pk', 'wb') as f:
+    with open('test_data_logistic_foo.pk', 'wb') as f:
         pickle.dump((X_test, Y_test), f)
 
 logloss= LogisticLoss()
@@ -43,7 +43,7 @@ for i in range(N):
   print(f"**************** \n Iteration {i+1}/{N} \n****************")
 
   NN = get_ReLU_NN(d, units, rw=0.01, ru=0.01, lambd=0)
-  optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
+  optimizer = tf.keras.optimizers.SGD(learning_rate=0.1)
     
   mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
   NN.compile(optimizer, loss=logloss)
