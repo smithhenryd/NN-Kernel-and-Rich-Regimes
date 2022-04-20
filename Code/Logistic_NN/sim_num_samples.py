@@ -2,8 +2,16 @@ from model import get_ReLU_NN, get_logistic_dataset, LogisticLoss
 
 import numpy as np
 import tensorflow as tf
+import pickle
+import os
+
+### NOTE: our implementation drew inspiration from that of Woodworth et al. 2020.
+### Thank you to Dr. Woodworth for generously sending his code. ###
 
 def compute_classification_err(y_true, y_pred):
+    """
+    Computes the classification error for the labels `y_true` and predictions `y_pred`
+    """
 
     pred_sign =  tf.math.multiply(tf.cast(y_true, dtype=y_pred.dtype), y_pred)
     pred_sign = tf.math.greater(pred_sign, tf.constant([0], dtype=pred_sign.dtype))
@@ -13,6 +21,9 @@ def compute_classification_err(y_true, y_pred):
 
 
 def run_simulation(d, n, num_trials=20, num_epochs=2e4, init_scale=0.1, num_units=10, num_test_samples=1e3):
+    """
+    Approximates the population error for the neural network trained with n samples of input dimension d
+    """
 
     # Generate training, test data
     n = int(n)
@@ -20,9 +31,7 @@ def run_simulation(d, n, num_trials=20, num_epochs=2e4, init_scale=0.1, num_unit
     num_epochs = int(num_epochs)
 
     X_train, Y_train = get_logistic_dataset(num_samples=n, d=d)
-    print(X_train.shape)
     X_test, Y_test = get_logistic_dataset(num_samples=num_test_samples, d=d)
-    print(X_test.shape)
 
     # We will use the logistic loss function
     logloss = LogisticLoss()
@@ -51,6 +60,10 @@ def run_simulation(d, n, num_trials=20, num_epochs=2e4, init_scale=0.1, num_unit
 
 
 def recurse_simulate(threshold, d, n, num_trials=20, num_epochs=2e4, init_scale=0.1, num_units=10, num_test_samples=1e3, nlow=10, nhigh=10e5):
+    """
+    Recursively approximates the test accuracy for a neural network trained with input dimension d;
+    varies n to find the smallest n such that a test accuracy >= threshold is achieved
+    """
 
     print(f"Trying n={n}")
 
@@ -59,6 +72,10 @@ def recurse_simulate(threshold, d, n, num_trials=20, num_epochs=2e4, init_scale=
 
     print(f"(d, n) = ({d}, {n}), test error= {sim_err}")
     
+    # New n to try if simnulation does not achieve the desired accuracy
+    # Note that this is the geometric mean of nlow and nhigh
+    new_n = int(np.sqrt(nlow*nhigh))
+
     # If model does achieve the desired test accuracy
     if (1 - sim_err) >= threshold:
         
@@ -67,7 +84,8 @@ def recurse_simulate(threshold, d, n, num_trials=20, num_epochs=2e4, init_scale=
             return n
         # Otherwise, look for n lower than the current n
         else:
-            return recurse_simulate(threshold=threshold, d=d, n=int(0.5*n), num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=nlow, nhigh=n)
+            new_n = int(np.sqrt(nlow*n))
+            return recurse_simulate(threshold=threshold, d=d, n=new_n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=nlow, nhigh=n)
 
     # If model does not achieve the desired test accuracy
     else: 
@@ -77,7 +95,8 @@ def recurse_simulate(threshold, d, n, num_trials=20, num_epochs=2e4, init_scale=
 
         # Otherwise, look for n larger than the current n 
         else:
-            return recurse_simulate(threshold=threshold, d=d, n=int(1.5*n), num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=n, nhigh=nhigh)            
+            new_n = int(np.sqrt(n*nhigh))
+            return recurse_simulate(threshold=threshold, d=d, n=new_n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=n, nhigh=nhigh)            
 
 def sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320, 640], num_trials=20, num_epochs=2e4, init_scale=0.1, num_units=10, num_test_samples=1e3, print_progress=True):
     """
@@ -97,11 +116,22 @@ def sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320, 640], num_trial
     default=10
     num_test_samples: a positive integer, the number of test samples used to compute the test error of the
     network; default = 1e3
-    print_progress: a boolean, True if simulation progress should be printed to stdout, False otherwise;
+    print_progress: a boolean, True if simulation progress should be written to `progress.txt`, False otherwise;
     default = True
 
-    return: a list whci
+    return: a list containing an approximation of the smallest number of samples necessary to achieve
+    the desired test accuracy
     """
+
+    if print_progress:
+        f = open("progress.txt", "w")
+        f.write(f"sim_num_samples.py,\td={d_list},\tthreshold={threshold}:\n")
+        f.write("*----*----*----*----*----*----*----*----*----*----*----*----*----*\n")
+        f.write(f"Number of CPUs in use: {len(tf.config.list_physical_devices('CPU'))}\n")
+        f.write(f"Number of GPUs in use: {len(tf.config.list_physical_devices('GPU'))}\n")
+        f.write("*----*----*----*----*----*----*----*----*----*----*----*----*----*\n")
+        f.flush()
+        os.fsync(f.fileno())
 
     smallest_N = []
     num_d_vals = len(d_list)
@@ -109,20 +139,35 @@ def sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320, 640], num_trial
     for i in range(num_d_vals):
 
         if print_progress:
-            print(f"Starting trials for d={d_list[i]}")
+            f.write(f"Starting trials for d={d_list[i]}\n")
+            f.flush()
+            os.fsync(f.fileno())
 
         # Sample size with which we begin our experiment
         d = d_list[i] 
         n = int(20*np.log(d))
 
-        opt_n = recurse_simulate(threshold=threshold, d=d, n=n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples)
+        # Minimum and maximum sample size
+        min_n = 10
+        max_n= d**2
+
+        opt_n = recurse_simulate(threshold=threshold, d=d, n=n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=min_n, nhigh=max_n)
         
         if print_progress:
-             print(f"Smallest n which achieves test accuracy >= {threshold} for d={d}: {opt_n}")
+            f.write(f"Smallest n which achieves test accuracy >= {threshold} for d={d}: {opt_n}\n")
+            f.flush()
+            os.fsync(f.fileno())
 
         smallest_N.append(opt_n)
 
+    if print_progress:
+        f.write("*----*----*----*----*----*----*----*----*----*----*----*----*\n")
+        f.close()
     return smallest_N
 
 if __name__ == "__main__":
-    sim_num_samples(d_list=[20], num_epochs=3000, num_trials=3)
+    
+    smallest_N = sim_num_samples(threshold=0.6)
+
+    with open('smallest_N_list.pk', 'wb') as f:
+        pickle.dump(smallest_N, f)

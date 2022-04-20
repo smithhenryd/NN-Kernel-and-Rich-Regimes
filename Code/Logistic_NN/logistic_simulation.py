@@ -8,23 +8,23 @@ from model import get_ReLU_NN, get_logistic_dataset, LogisticLoss, Classificatio
 N = 10
 
 # Dimension of input space
-d = 640
+d = 20
 
 # Number of hidden units in ReLU NN
 units = 10
 
 # Get our training, test data
 try:
-    with open('training_data_logistic_foo.pk', 'rb') as f:
+    with open('training_data_logistic.pk', 'rb') as f:
         X_train, Y_train = pickle.load(f)
 
 except FileNotFoundError:
-    X_train, Y_train = get_logistic_dataset(600, d)
+    X_train, Y_train = get_logistic_dataset(200, d)
     with open('training_data_logistic_foo.pk', 'wb') as f:
         pickle.dump((X_train, Y_train), f)
 
 try:
-    with open('test_data_logistic_foo.pk', 'rb') as f:
+    with open('test_data_logistic.pk', 'rb') as f:
         X_test, Y_test = pickle.load(f)
 
 except FileNotFoundError:
@@ -56,11 +56,11 @@ for i in range(N):
   NN_weights = [i.numpy() for i in NN.weights]
   weights.append(NN_weights)
 
-with open('train_err_simulations_100_0.01_2.pk', 'wb') as f:
+with open('train_err_simulations_200_0.01.pk', 'wb') as f:
         pickle.dump(train_err_arrays, f)
 
-with open('test_err_simulations_100_0.01_2.pk', 'wb') as f:
+with open('test_err_simulations_200_0.01.pk', 'wb') as f:
         pickle.dump(test_err_arrays, f)
 
-with open('network_weights_simulations_100_0.01_2.pk', 'wb') as f:
+with open('network_weights_simulations_200_0.01.pk', 'wb') as f:
         pickle.dump(weights, f)
