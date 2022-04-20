@@ -175,5 +175,5 @@ if __name__ == "__main__":
     mycallback._compute_classification_error((X_train, Y_train))
 
     # Finally, compile and fit the model
-    #NN.compile(optimizer, loss=logloss)
-    #NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=10**3, callbacks=[mycallback])
+    NN.compile(optimizer, loss=logloss)
+    NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=10**3, callbacks=[mycallback])
