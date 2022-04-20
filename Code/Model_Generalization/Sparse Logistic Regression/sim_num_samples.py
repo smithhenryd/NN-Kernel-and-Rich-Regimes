@@ -5,8 +5,8 @@ import tensorflow as tf
 import pickle
 import os
 
-### NOTE: our implementation drew inspiration from that of Woodworth et al. 2020.
-### Thank you to Dr. Woodworth for generously sending his code. ###
+### NOTE: our implementation drew inspiration from that of Woodworth et al. 2020. ###
+### We extend our gratitude to Dr. Woodworth for generously sending his code. ###
 
 def compute_classification_err(y_true, y_pred):
     """
