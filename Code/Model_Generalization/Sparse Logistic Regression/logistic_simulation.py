@@ -15,12 +15,12 @@ units = 10
 
 # Get our training, test data
 try:
-    with open('training_data_logistic.pk', 'rb') as f:
+    with open('training_data_logistic_100.pk', 'rb') as f:
         X_train, Y_train = pickle.load(f)
 
 except FileNotFoundError:
-    X_train, Y_train = get_logistic_dataset(200, d)
-    with open('training_data_logistic_foo.pk', 'wb') as f:
+    X_train, Y_train = get_logistic_dataset(100, d)
+    with open('training_data_logistic_100.pk', 'wb') as f:
         pickle.dump((X_train, Y_train), f)
 
 try:
@@ -29,7 +29,7 @@ try:
 
 except FileNotFoundError:
     X_test, Y_test = get_logistic_dataset(1000, d)
-    with open('test_data_logistic_foo.pk', 'wb') as f:
+    with open('test_data_logistic.pk', 'wb') as f:
         pickle.dump((X_test, Y_test), f)
 
 logloss= LogisticLoss()
@@ -42,7 +42,7 @@ for i in range(N):
 
   print(f"**************** \n Iteration {i+1}/{N} \n****************")
 
-  NN = get_ReLU_NN(d, units, rw=0.01, ru=0.01, lambd=0)
+  NN = get_ReLU_NN(d, units, rw=1, ru=1, lambd=0)
   optimizer = tf.keras.optimizers.SGD(learning_rate=0.1)
     
   mycallback = ClassificationCallback((X_train, Y_train), (X_test, Y_test))
@@ -56,11 +56,11 @@ for i in range(N):
   NN_weights = [i.numpy() for i in NN.weights]
   weights.append(NN_weights)
 
-with open('train_err_simulations_200_0.01.pk', 'wb') as f:
-        pickle.dump(train_err_arrays, f)
+#with open('train_err_simulations_100_0.01_2.pk', 'wb') as f:
+        # pickle.dump(train_err_arrays, f)
 
-with open('test_err_simulations_200_0.01.pk', 'wb') as f:
-        pickle.dump(test_err_arrays, f)
+#with open('test_err_simulations_100_0.01_2.pk', 'wb') as f:
+        #pickle.dump(test_err_arrays, f)
 
-with open('network_weights_simulations_200_0.01.pk', 'wb') as f:
+with open('network_weights_simulations_100_1.pk', 'wb') as f:
         pickle.dump(weights, f)

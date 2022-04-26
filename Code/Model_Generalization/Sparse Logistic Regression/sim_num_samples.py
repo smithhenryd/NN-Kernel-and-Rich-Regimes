@@ -49,7 +49,7 @@ def run_simulation(d, n, num_trials=20, num_epochs=2e4, init_scale=0.1, num_unit
 
         # Train the network
         NN.compile(optimizer, loss=logloss)
-        NN.fit(X_train, Y_train, validation_data= (X_test, Y_test), epochs=num_epochs, verbose=0)
+        NN.fit(X_train, Y_train, epochs=num_epochs, verbose=0)
 
         # Get the classification error for the model on the test set
         predictions_test = NN(X_test)
@@ -65,12 +65,8 @@ def recurse_simulate(threshold, d, n, num_trials=20, num_epochs=2e4, init_scale=
     varies n to find the smallest n such that a test accuracy >= threshold is achieved
     """
 
-    print(f"Trying n={n}")
-
     # Run the simulation on (d, n) = (d, n)
     sim_err = run_simulation(d=d, n=n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples)
-
-    print(f"(d, n) = ({d}, {n}), test error= {sim_err}")
     
     # New n to try if simnulation does not achieve the desired accuracy
     # Note that this is the geometric mean of nlow and nhigh
@@ -150,11 +146,12 @@ def sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320, 640], num_trial
         # Minimum and maximum sample size
         min_n = 10
         max_n= d**2
-
-        opt_n = recurse_simulate(threshold=threshold, d=d, n=n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=min_n, nhigh=max_n)
         
+        opt_n = recurse_simulate(threshold=threshold, d=d, n=n, num_trials=num_trials, num_epochs=num_epochs, init_scale=init_scale, num_units=num_units, num_test_samples=num_test_samples, nlow=min_n, nhigh=max_n)
+
         if print_progress:
             f.write(f"Smallest n which achieves test accuracy >= {threshold} for d={d}: {opt_n}\n")
+            f.write("*----*----*----*----*----*----*----*----*----*----*----*----*----*\n")
             f.flush()
             os.fsync(f.fileno())
 
@@ -167,7 +164,7 @@ def sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320, 640], num_trial
 
 if __name__ == "__main__":
     
-    smallest_N = sim_num_samples(threshold=0.6)
+    smallest_N = sim_num_samples(threshold=0.6, d_list=[160, 320, 640])
 
     with open('smallest_N_list.pk', 'wb') as f:
         pickle.dump(smallest_N, f)

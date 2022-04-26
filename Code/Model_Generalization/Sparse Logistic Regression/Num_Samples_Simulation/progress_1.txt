@@ -1,0 +1,12 @@
+sim_num_samples.py,	d=[20, 40, 80, 160, 320, 640],	threshold=0.6:
+*----*----*----*----*----*----*----*----*----*----*----*----*----*
+Number of CPUs in use: 1
+Number of GPUs in use: 1
+*----*----*----*----*----*----*----*----*----*----*----*----*----*
+Starting trials for d=20
+Smallest n which achieves test accuracy >= 0.6 for d=20: 83
+*----*----*----*----*----*----*----*----*----*----*----*----*----*
+Starting trials for d=40
+Smallest n which achieves test accuracy >= 0.6 for d=40: 209
+*----*----*----*----*----*----*----*----*----*----*----*----*----*
+Starting trials for d=80
