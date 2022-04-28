@@ -8,6 +8,7 @@ __pycache__/
 
 # Ignore Mac system files
 .DS_store
+.gif.icloud
 
 # Distribution / packaging
 .Python
