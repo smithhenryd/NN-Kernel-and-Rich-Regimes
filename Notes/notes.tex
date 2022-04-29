@@ -524,7 +524,7 @@ Notice that the expectation is taken over the weights of the network since they 
 
 This formulation of the problem leads us to present the main of the paper:
 \begin{manualtheorem}{2.1}
-Let \mathcal{D} be the distribution defined previously. With probability $1 - d^{-5}$ over the random draw of $n \lesssim d^2$ samples $(x_1, y_1), \ldots, (x_n, y_n)$ from $\mathcal{D}$, for all choices of $\beta$, the kernel prediction function $f^{\text{kernel}}(\cdot, \beta)$ will have at least $\Omega(1)$ error:
+Let $\mathcal{D}$ be the distribution defined previously. With probability $1 - d^{-5}$ over the random draw of $n \lesssim d^2$ samples $(x_1, y_1), \ldots, (x_n, y_n)$ from $\mathcal{D}$, for all choices of $\beta$, the kernel prediction function $f^{\text{kernel}}(\cdot, \beta)$ will have at least $\Omega(1)$ error:
 \begin{align*}
     \underset{(x, y) \sim \mathcal{D}}{\mathbb{P}}[f^{\text{kernel}}(x; \beta)y \leq 0] = \Omega(1).
 \end{align*}
