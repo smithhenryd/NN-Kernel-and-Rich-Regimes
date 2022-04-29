@@ -70,7 +70,7 @@ Advised by Professor Harrison Zhou}
 
 \begin{centering}
 \section*{Acknowledgement}
-Thank you to my family, especially my parents, for their steadfast support over the past four years. I would not have made it here had you not pushed me to pursue my interest in statistics and mathematics. And to Professor Zhou, thank you for your guidance and insight over the past few months. Your kind mentorship has meant a lot to me and sets a great example for how I hope to interact with my peers (and perhaps my students) in the future. 
+Thank you to my family, especially my parents, for their steadfast support over the past four years. I would not have made it here had you not pushed me to wholeheartedly pursue my interest in statistics. And to Professor Zhou, thank you for your guidance and insight over the past few months. Your kind mentorship has meant a lot to me and sets a great example for how I hope to interact with my peers (and perhaps my students) in the future. 
 \end{centering}
 
 \vspace*{\fill}
@@ -95,7 +95,7 @@ Thank you to my family, especially my parents, for their steadfast support over 
 
 The notation we present mirrors that of \cite{chizat2018lazy} and \cite{woodworth2020kernel}, since these two papers provide the main motivation for our research.
 
-In particular, let $h: \mathbb{R}^P \rightarrow \mathcal{F}$ be a model mapping from parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$. In the context of neural networks, we take $\mathcal{F}$ to be the Hilbert space consisting of all possible network functions. Then for each weight vector $\boldsymbol{w} \in \mathbb{R}^p$, our model $h$ specifies an associated network function $f \in \mathcal{F}$. More explicitly, we have the map $\boldsymbol{w} \mapsto f(\boldsymbol{w}, \cdot)$, where $f(\boldsymbol{w}, \cdot): \mathcal{X} \rightarrow \mathbb{R}$ is the neural network parameterized by weight vector $\boldsymbol{w}$. Here, $\mathcal{X}$ denotes the input space of the network $f$; for the purposes of our studies, we consider a Euclidean input space $\mathcal{X} \subseteq \mathbb{R}^n$. Of key importance in this notation is the distinction between $h$, which maps an individual weight vector to a network function, and $f(\boldsymbol{w}, \cdot)$, which maps an input point to a response value.
+In particular, let $h: \mathbb{R}^p \rightarrow \mathcal{F}$ be a model mapping from parameter space $\mathbb{R}^p$ to Hilbert space $\mathcal{F}$. In the context of neural networks, we take $\mathcal{F}$ to be the Hilbert space consisting of all possible network functions. Then for each weight vector $\boldsymbol{w} \in \mathbb{R}^p$, our model $h$ specifies an associated network function $f \in \mathcal{F}$. More explicitly, we have the map $\boldsymbol{w} \mapsto f(\boldsymbol{w}, \cdot)$, where $f(\boldsymbol{w}, \cdot): \mathcal{X} \rightarrow \mathbb{R}$ is the neural network parameterized by weight vector $\boldsymbol{w}$. Here, $\mathcal{X}$ denotes the input space of the network $f$; for the purposes of our studies, we consider a Euclidean input space $\mathcal{X} \subseteq \mathbb{R}^n$. Of key importance in this notation is the distinction between $h$, which maps an individual weight vector to a network function, and $f(\boldsymbol{w}, \cdot)$, which maps an input point to a response value.
 
 Since this notation is admittedly quite difficult to parse, we provide two illustrative examples which are of interest to our research. First, we consider the case in which $\mathcal{F} = \mathcal{X}^*$, the dual space of $\mathcal{X}$. Then for each weight vector $\boldsymbol{w} \in \mathbb{R}^p$, we get the corresponding network function $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^n (\boldsymbol{\beta}_{\boldsymbol{w}})_i\boldsymbol{x}_i = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle$ for some $\boldsymbol{\beta}_{\boldsymbol{w}} \in \mathbb{R}^n$. That is, we associate with each weight vector in $\mathbb{R}^p$ a linear function in the input space $\mathcal{X}$. Let $(\boldsymbol{x}_1, y_1), \ldots, (\boldsymbol{x}_N, y_N)$ be the training points for our neural network, where each $\boldsymbol{x}_i \in \mathcal{X}$ and $y_i \in \mathbb{R}$. Moreover, let $\mathcal{D}$ be the empirical distribution determined by the training data $\{(\boldsymbol{x}_i, y_i) \}_{i=1}^N$. The keen reader will recognize that minimizing the empirical risk with respect to $\boldsymbol{w} \in \mathbb{R}^p$, $\argmin_{\boldsymbol{w} \in \mathbb{R}^p} \  \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}}\left[\left(y - f(\boldsymbol{w}, \boldsymbol{x}) \right)^2 \right] = \argmin_{\boldsymbol{w} \in \mathbb{R}^p} \  \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}}\left[\left(y - \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle \right)^2 \right]$, gives an alternative parameterization of the linear regression problem where $\boldsymbol{\beta}_{\boldsymbol{w}}$ is the coefficient vector. As for the intercept term, one can suppose that the training data $\{ \boldsymbol{x}_i \}_{i=1}^N$ satisfies $(\boldsymbol{x}_i)_1 = 1$. This linear regression example is that which is studied in \cite{woodworth2020kernel}. 
 
@@ -258,6 +258,7 @@ Having described both the linear regression model $h$ as well as the mean-square
 Let $N \leq n$, meaning the dimension of the input space is at least as large as the number of training points.
 \end{assumption}
 We make this assumption because, as previously discussed, we are interested in the different solutions to the gradient flow dynamics when trained in the kernel and rich regimes. Taking $N \leq n$ ensures that the system $\boldsymbol{X}\boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{y}$ is underdetermined, and so there are usually (but not always), many solutions for $\boldsymbol{\beta}_{\boldsymbol{w}}$. Equivalently stated, we choose our network $f(\boldsymbol{w}, \boldsymbol{x})$ to be overparameterized so that there are many potential weight vectors $\boldsymbol{w}$ which minimize the objective $L(h(\boldsymbol{w}))$.
+
 
 \subsubsection{Explicit Solutions for the Kernel and Rich Limits}
 Albeit quite straightforward and lacking in complexity, the linear regression problem is well-suited for studying the implicit biases resulting from training in the kernel and rich regimes. Woodworth and colleagues provide a thorough characterization of these implicit biases, which we summarize in the remainder of this section. In particular, let us consider the gradient flow on $L(h(\boldsymbol{w}))$, $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}$, with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$. That is, we are looking at the gradient flow on the objective with initialization scaled by a factor of $\alpha \in \mathbb{R}_{++}$. Also, we are explicitly choosing $\boldsymbol{w}_0 = \mathbbm{1}$ so that $h(\boldsymbol{w}_0) = 0$, as we pointed out above.
@@ -428,7 +429,7 @@ Thus far, we have provided theoretical characterizations of the kernel and rich 
 
 To address this question, we must study the implicit biases of networks trained in the kernel and rich limits. One will recall that in Section \ref{linregmodel} we derived the explicit kernel and rich limits for the linear regression model from \cite{woodworth2020kernel}. In particular, the gradient flow solution in kernel limit is the minimum $\ell^2$ norm solution whereas the solution in the rich limit is the minimum $\ell^1$ norm solution. As Woodworth and colleagues point out, this result suggests benefits to training in the rich regime when one suspects that there is sparsity in the underlying model. This association of the rich limit with implicit $\ell^1$ regularization does not appear to be limited to the linear regression model, though. In Section \ref{richgeneralization}, we provide experimental results which suggest that for a particular sparse logistic regression problem, the rich limit similarly imposes $\ell^1$ regularization of the solution.
 
-\subsection{The Sparse Linear Regression Problem}
+\subsection{The Sparse Linear Regression Problem}\label{sparselinear}
 
 For the first step in our examination of the implicit biases corresponding to the kernel and rich limits, we will look at the linear regression problem studied in Section \ref{linreg}. In particular, we know that for the model
 \begin{align*}
@@ -478,20 +479,97 @@ It is also worth mentioning that these experimental results agree with those ori
 
 Similarly, in Figure 1(b) of \cite{woodworth2020kernel}, the authors plot the excess $\ell^1$ norm of the gradient descent solution vector $\boldsymbol{\beta}_{\boldsymbol{w}_{\alpha}(t_{\text{end}})}$. Just as we see from our own experiments in Figure \ref{fig:excessl1error}, starting once again at around $\alpha \approx 10^{-1}$, there is a sharp decrease in the excess $\ell^1$ norm. It then appears to continue decreasing monotonically as $\alpha \rightarrow 0$. As we have mentioned before, because we know that $\boldsymbol{\beta}_{\alpha}^* \rightarrow \boldsymbol{\beta}^{\ell^1}$ as $\alpha \rightarrow \infty$, where $\boldsymbol{\beta}_{\alpha}^* = \lim_{t \to \infty} \boldsymbol{\beta}_{\boldsymbol{w}_{\alpha}(t)}$, then we would expect the excess $\ell^1$ norm of the gradient descent solution to approach $0$ as $\alpha \rightarrow 0$.
 
-In summary, reproducing the work of Woodworth and colleagues, we have suggested a problem in which training near the rich limit is preferable to training near the kernel limit. In particular, we have shown that for the linear regression problem \ref{linreg}, the rich limit corresponds to the minimum $\ell^1$ solution to the system $\boldsymbol{X}\boldsymbol{\beta} = \boldsymbol{y}$, whereas the kernel limit corresponds to the minimum $\ell^2$ solution. Accordingly, we would expect that for problems in which the underlying data distribution $\rho$ is sparse, training our network $f(\boldsymbol{w}, \boldsymbol{x})$ near the rich limit would achieve smaller population risk than had the model been trained near the kernel limit.
+In summary, reproducing the work of Woodworth and colleagues, we have suggested a problem in which training near the rich limit is preferable to training near the kernel limit. In particular, we have shown that for the linear regression problem \ref{linreg}, the rich limit corresponds to the minimum $\ell^1$ solution to the system $\boldsymbol{X}\boldsymbol{\beta} = \boldsymbol{y}$, whereas the kernel limit corresponds to the minimum $\ell^2$ solution. Accordingly, we would expect that for problems in which the underlying data distribution $\rho$ is sparse, training our network $f(\boldsymbol{w}, \boldsymbol{x})$ near the rich limit would achieve smaller population risk than had the model been trained near the rich limit.
 
 \subsubsection{Computational Limitations of Rich Training}
+So far in the discussion of our results we have ignored an obvious deficiency in rich training. Patently, in Figure \ref{fig:l1error} we observe that for $\alpha$ small, the loss of the gradient flow descent path $L(h(\boldsymbol{w}_{\alpha}(t)))$ does not converge within $10^{-4}$ of the global minimum loss value, $0$. In fact, we only see this convergence for $\alpha \approx 1$, which is quite a large initialization scale. Also, we observe that for the gradient descent path with $N=50$ training samples, the excess $\ell^1$ norm and $\ell^1$ population error begin to increase for sufficiently small $\alpha$. This belies our previous assertion that both the excess $\ell^1$ norm and $\ell^1$ population error monotonically decrease as $\alpha \rightarrow 0$.
 
+These anomalous results can be attributed to two facts about the problem. First, as we have previously pointed out, gradient descent is a discretization of the gradient flow dynamics, and so we would expect the gradient descent path to differ from the corresponding gradient flow. This is why I suspect the excess $\ell^1$ norm and $\ell^1$ population error begin to increase for the gradient descent path with $N=50$: when the initialization scale is very small, and so the gradient descent is initialized with $\boldsymbol{w}_{\alpha}(0) \approx \boldsymbol{0}$, a very small stepsize is necessary to attain convergence. 
 
-\section{Conclusion}
+Beyond just the coarseness of the stepsize, though, there is another aspect of the optimization problem that makes training close to the rich limit intractable. Namely, as one may have conjectured from Figure \ref{linearizedmodel}, the model $h(\boldsymbol{w})$ often has a saddle point at $\boldsymbol{w} = \boldsymbol{0}$ \cite{woodworth2020kernel}. Therefore by taking $\alpha \rightarrow 0$ in the rich limit, we are initializing the model closer and closer the saddle point of the objective $L(h(\boldsymbol{w}))$. Undoubtedly, this small initialization complicates the optimization problem since it takes longer and longer for the gradient flow path to escape the vicinity of the saddle point. We conjecture that this is exactly the problem we are facing in our simulation: for $\alpha$ small, we are not able to escape the saddle point within the specified $10^4$ epochs. In fact, for $\alpha$ sufficiently small, we would not expect the gradient flow path to ever depart from $\boldsymbol{0}$ within a reasonable amount of time. 
+
+This reality of training in the rich regime gives rise to a tradeoff between optimization and generalization as characterized by Woodworth and colleagues. That is, in practice, one must choose $\alpha$ sufficiently small to train near the rich limit and achieve the corresponding $\ell^1$ implicit regularization in the network weights. Yet, one can not train with $\alpha$ too small or else the gradient descent path will never escape the saddle point $\boldsymbol{0}$ and attain the desired convergence.
+
+\subsection{A New Problem: Sparse Logistic Regression}\label{sparselogistic}
+In Section \ref{sparselinear}, we illustrated both theoretically and experimentally that for the linear regression problem (\ref{linreg}), the kernel limit $\lim_{\alpha \to \infty}\boldsymbol{\beta}_{\boldsymbol{w}_{\alpha}^*}$ corresponds to the minimum $\ell^2$ solution of the linear system $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$, whereas the kernel limit $\lim_{\alpha \to 0}\boldsymbol{\beta}_{\boldsymbol{w}_{\alpha}^*}$ corresponds to the minimum $\ell^1$ solution. Consequently, for problems in which the population risk (\ref{poprisk}) can be minimized by a sparse weight vector, we would prefer training near the rich limit to training near its kernel counterpart. 
+
+Although this result is of significant merit, contemporary network architectures are substantially more complicated than the single-layer network we considered. Moreover, almost all of these networks are not differentiable in their weights $\boldsymbol{w} \in \mathbb{R}^p$. Consider, for example, the ReLU nonlinearity $\max\{0, x \}$ applied element-wise to the output of the hidden layers of our network $f$. Without the differentiability of our model $h$, none of the results formulated by Chizat and colleagues can be applied to tell us how the networks behave in the $\alpha \rightarrow \infty$ and $\alpha \rightarrow 0$ limits \cite{chizat2018note}. 
+
+Still, as articulated by Woodworth and colleagues, we suspect that the kernel and rich limits do exist for these nondifferentiable problems. Furthermore, we conjecture that the rich limit $\alpha \rightarrow 0$ corresponds to some form of implicit $\ell^1$ regularization, as it did for the linear regression problem. For the remainder of the paper, one should understand that we refer to the \enquote{kernel} and \enquote{rich} limits colloquially. Specifically, the gradient flow paths of $L(h(\boldsymbol{w}))$ and $L(\bar{h}(\boldsymbol{w}))$ with $\boldsymbol{w}_{\alpha}(0) = \boldsymbol{\bar{w}}_{\alpha}(0) = \alpha \boldsymbol{w}_0$ do not necessarily exist. In practice, though, one can still employ gradient descent or a subgradient method to find a minimizer of the objective function. 
+
+\subsubsection{Logistic Regression}
+
+In order to investigate whether or not rich training functions as an implicit $\ell^1$ regularizer outside of vanilla linear regression, we look at the sparse logistic problem detailed by Wei and colleagues \cite{wei2019regularization}. 
+
+For this problem, we consider data $(\boldsymbol{x}, y) \sim \rho$ for $\boldsymbol{x} \in \mathcal{X} = \{ +1, 0, -1 \}^n$, $y \in \{+1, -1\}$. The distribution $\rho$ is defined such that 
+\begin{align*}
+    &y = +1, \quad \boldsymbol{x}^Te_1 = +1, \quad \boldsymbol{x}^Te_2 = 0 \quad \text{w/ prob. 1/4}\\
+    &y = +1, \quad \boldsymbol{x}^Te_1 = -1, \quad \boldsymbol{x}^Te_2 = 0 \quad \text{w/ prob. 1/4}\\
+    &y = -1, \quad \boldsymbol{x}^Te_1 = 0, \quad \boldsymbol{x}^Te_2 = +1 \quad \text{w/ prob. 1/4}\\
+    &y = -1, \quad \boldsymbol{x}^Te_1 = 0, \quad \boldsymbol{x}^Te_2 = -1 \quad \text{w/ prob. 1/4}
+\end{align*}
+and $\boldsymbol{x}^Te_i \sim \{+1, -1 \}$ is drawn uniformly at random for $3 \leq i \leq n$. From this definition of $\rho$, it should be clear that the output $y$ is entirely determined by the first two coordinates of the input vector $\boldsymbol{x}$. Although we have not yet suggested a model $h: \boldsymbol{w} \mapsto f(\boldsymbol{w}, \boldsymbol{x})$, one should anticipate that the population risk is minimized by a sparse vector $\boldsymbol{w} \in \mathbb{R}^p$.
+
+To associate a model with this data distribution $\rho$, the authors investigate the case of $h(\boldsymbol{w}) = f(\boldsymbol{w}, \boldsymbol{x})$ a simple network consisting of a single hidden layer with $m$ neurons:
+\begin{align}\label{relunn}
+    f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^m v_j[\boldsymbol{u}_j^T\boldsymbol{x}]_+.
+\end{align}
+Here, $[\cdot]_+$ is the ReLU activation $\max\{0, x \}$ and $\boldsymbol{w}$ is the collection of all $m \times (n+1)$ parameters $\{ (v_j, \boldsymbol{u}_j) \}_{i=1}^m$. Unlike the weights of the linear regression model, which are initialized deterministically, the weights of the ReLU neural network (\ref{relunn}) are initialized randomly: $v \sim \mathcal{N}(0, r_v^2)$ and $\boldsymbol{u} \sim \mathcal{N}(\boldsymbol{0}, r_u^2\mathbbm{I}_{n \times n})$. Also, we remark that the ReLU neural network is 2-positive homogeneous in its weights $\boldsymbol{w}$. Accordingly, we use the kernel limit to refer to the case in which $r_v^2, \ r_u^2 \rightarrow \infty$ and the rich limit to refer to the case in which $r_v^2, \ r_u^2 \rightarrow 0$. 
+
+Right away, we notice that our model $h: \boldsymbol{w} \mapsto f(\boldsymbol{w}, \boldsymbol{x})$ is not differentiable for all $\boldsymbol{w} \in \mathbb{R}^p$, as we previously addressed. Also, the network is not linear in its input space $\mathcal{X} \subseteq \mathbb{R}^n$, which is the case for most contemporary deep learning models. In this way, we view the model (\ref{relunn}) as more advanced than the linear regression model (\ref{linreg}) we previously studied.
+
+Since our output values $y \in \{+1, -1\}$ are binary labels, we let $L$ be the logistic loss function
+\begin{align}\label{logloss}
+    L(f(\boldsymbol{w}, \boldsymbol{x})) = \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}} \left[\log \left( 1 + \exp(-y f(\boldsymbol{w}, \boldsymbol{x})) \right) \right] = \frac{1}{N} \sum_{i=1}^N \log \left( 1 + \exp(-y_i f(\boldsymbol{w}, \boldsymbol{x}_i)) \right),
+\end{align}
+where $\mathcal{D}$ is the empirical distribution determined by the training data $\{ \boldsymbol{x}_i, y_i \}_{i=1}^N$. Just as the MSE (\ref{mse}) is the empirical risk corresponding to the square loss, (\ref{logloss}) is simply the empirical risk corresponding to the $\{+1, -1\}$ logistic loss $\ell(y, y') = \log( 1 + \exp(-y \cdot y'))$. 
+
+Having given both the data distribution $\rho$ and the model $h: \boldsymbol{w} \mapsto f(\boldsymbol{w}, \boldsymbol{x})$, we justify that the problem we have defined is indeed sparse. Specifically, if we choose $\boldsymbol{w}$ such that $\boldsymbol{u}_1 = e_1$, $\boldsymbol{u}_2 = -e_1$, $\boldsymbol{u}_3 = e_2$, and $\boldsymbol{u}_4 = -e_2$, then $\boldsymbol{w}$ minimizes $\boldsymbol{w} \mapsto \mathbb{E}_{(\boldsymbol{x}, y) \sim \rho} \left[\log \left( 1 + \exp(-y f(\boldsymbol{w}, \boldsymbol{x})) \right) \right]$ \cite{wei2019regularization}. Equivalently, the population loss is minimized by a network $f(\boldsymbol{w}, \boldsymbol{x})$ which contains only four neurons and four nonzero weights. For this reason, we would expect the implicit $\ell^1$ regularization which we hypothesize is associated with the rich limit $r_v^2, \ r_u^2 \rightarrow 0$ to result in a model with good generalization (i.e. low population risk).
+
+Prior to experimenting with the logistic regression problem from \cite{wei2019regularization}, we provide more context for the authors' work and comment on how it relates to our research. First, Wei and colleagues provide an explicit characterization of the neural tangent kernel at the network (\ref{relunn}) initialization:
+\begin{align*}
+    K(\boldsymbol{x}, \boldsymbol{x}') = \mathbb{E}_{v \sim \mathcal{N}(0, r_v^2), \ \boldsymbol{u} \sim \mathcal{N}(0, r_u^2)}[ \left\langle \nabla_{(v, \boldsymbol{u})}f(\boldsymbol{w}, \boldsymbol{x}),  \nabla_{(v, \boldsymbol{u})}f(\boldsymbol{w}, \boldsymbol{x}') \right\rangle]
+\end{align*}
+where $\nabla_{(v, \boldsymbol{u})}f(\boldsymbol{w}, \boldsymbol{x}) = ([\boldsymbol{u}^T\boldsymbol{x}]_+, v\mathbbm{1}_{\boldsymbol{u}^T\boldsymbol{x} \geq 0}\boldsymbol{x}) \in \mathbb{R}^{n + 1}$ is the gradient of $f$ with respect to an arbitrary pair of weights $(v, \boldsymbol{u})$ (since they are initialized \textit{i.i.d.}). We point out that for $\boldsymbol{u}^T\boldsymbol{x}=0$, $\nabla_{(v, \boldsymbol{u})}f(\boldsymbol{w}, \boldsymbol{x})$ does not exist, although $([\boldsymbol{u}^T\boldsymbol{x}]_+, v\boldsymbol{x})$ is certainly contained in the subdifferential of $f$ at $(v, \boldsymbol{u}) = (v, \boldsymbol{0})$. Although the neural tangent kernels corresponding to the linear regression (\ref{linreg}) and ReLU neural network (\ref{relunn}) are both deterministic at their initializations, the latter involves evaluating an expectation over the distribution of weight initializations $(v, \boldsymbol{u})$.
+
+Wei and colleagues are interested in the neural tangent kernel $K$ because they study the predictor function $f^{\text{kernel}}$ in the RKHS determined by $K$: $f^{\text{kernel}}(\boldsymbol{x}, \boldsymbol{\gamma}) = \sum_{i=1}^N \boldsymbol{\gamma}_i K(\boldsymbol{x}_i, \boldsymbol{x})$. More explicitly, from the theory of Jacot and colleagues \cite{jacot2018neural}, the authors remark that by performing gradient descent in the infinite-width limit, one would obtain such a function $f^{\text{kernel}}$. Making no theoretical claims, the results of Chizat and colleagues \cite{chizat2018lazy}, on the other hand, suggest the possibility that training with large $r_v^2$, $r_u^2$ may similarly result in such a kernel predictor function.
+
+Now that we have introduced $f^{\text{kernel}}$, we state the main result formulated and proven and proven by Wei and colleagues: 
+\begin{manualtheorem}{2.1}[from \cite{wei2019regularization}]\label{weithm2.1}
+Let $\rho$ be the distribution defined previously. With probability $1 - n^{-5}$ over the random draw of $N \lesssim n^2$ samples $(x_1, y_1), \ldots, (x_N, y_N)$ from $\rho$, for all choices of $\boldsymbol{\gamma}$, the kernel prediction function $f^{\text{kernel}}(\cdot, \boldsymbol{\gamma})$ will have at least $\Omega(1)$ error
+\begin{align*}
+    \mathbb{P}_{(\boldsymbol{x}, y) \sim \rho}[f^{\text{kernel}}(\boldsymbol{x}; \boldsymbol{\gamma})y \leq 0] = \Omega(1).
+\end{align*}
+Moreover, us define the $\ell^2$ regularized logistic loss $L_{\lambda}$
+\begin{align*}
+    L_{\lambda}(f(\boldsymbol{w}, \boldsymbol{x})) = \mathbb{E}_{(\boldsymbol{x}, y) \sim \mathcal{D}} \left[\log \left( 1 + \exp(-y f(\boldsymbol{w}, \boldsymbol{x})) \right) \right] + \lambda \|\boldsymbol{w} \|_F^2,
+\end{align*}
+where $\boldsymbol{w} \in \mathbb{R}^{m \times (n+1)}$, $\boldsymbol{w}_{i,:} = (v_i, \boldsymbol{u}_i)$ is the matrix containing the network parameters. Then for $\lambda \leq \text{poly}(N)^{-1}$, the regularized neural net solution $f(\boldsymbol{w}_{\lambda}, \boldsymbol{x})$ trained with at least four hidden units can have good approximation with $\mathcal{O}(n^2)$ samples because we have the following generalization error bound:
+\begin{align*}
+   \mathbb{P}_{(x,y) \sim \rho}[f(\boldsymbol{w}_{\lambda}, \boldsymbol{x})y \leq 0] \lesssim \sqrt{\frac{n}{N}}.
+\end{align*}
+This implies a $\Omega(n)$ sample-complexity gap between the regularized neural net and kernel prediction function.
+\end{manualtheorem}
+Plainly, Theorem \ref{weithm2.1} states that the gradient descent on the $\ell^2$ regularized objective $L_{\lambda}(f(\boldsymbol{w}, \boldsymbol{x}))$ achieves a model which generalizes well over the population distribution of data $\rho$ with only $n^2$ samples, whereas any estimator contained in the RKHS determined by the neural tangent kernel $K$ does not.
 
 \begin{figure}[H]
 \centering
-\subfloat[$\alpha = 10^{-1}$]{\includegraphics[width=.45\linewidth]{Imgs/Sparse Lof}}\hfill
-\subfloat[$\alpha = 1$]{\includegraphics[width=.45\linewidth]{Imgs/NTK/NTK_1/NTK_1_change_total_cropped.png}}\par 
-\subfloat[$\alpha = 10^{1}$]{\includegraphics[width=.45\linewidth]{Imgs/NTK/NTK_10/NTK_10_change_total_cropped.png}}
-\caption{The change in the neural tangent kernel (NTK) on the grid of $N= 10$ training points $\{ \boldsymbol{x}_i \}_{i=1}^{10}$ throughout training with gradient descent. For each of $\alpha = 10^{-1}, \ 1, \ 10^{1}$, we display the difference between the NTK at initialization $\boldsymbol{w}_{\alpha}(0)$ and at the end of training $\boldsymbol{w}_{\alpha}(t_{\text{end}})$.}\label{img:ntkchange}
+\subfloat[$N=200$]{\includegraphics[width=.45\linewidth]{Imgs/Sparse Logistic Regression/test_error_200.png}}\hfill
+\subfloat[$N = 100$]{\includegraphics[width=.45\linewidth]{Imgs/Sparse Logistic Regression/test_error_100.png}}\par 
+\subfloat[$N = 50$]{\includegraphics[width=.45\linewidth]{Imgs/Sparse Logistic Regression/test_error_50.png}}
+\caption{}\label{}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{Imgs/Sparse Logistic Regression/param_l1_avg.png}
+    \caption{}
+    \label{}
+\end{figure}
+
+\section{Conclusion}
+
+
 
 \pagebreak
 % References
