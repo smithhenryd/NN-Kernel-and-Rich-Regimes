@@ -552,6 +552,14 @@ This implies a $\Omega(n)$ sample-complexity gap between the regularized neural 
 \end{manualtheorem}
 Plainly, Theorem \ref{weithm2.1} states that the gradient descent on the $\ell^2$ regularized objective $L_{\lambda}(f(\boldsymbol{w}, \boldsymbol{x}))$ achieves a model which generalizes well over the population distribution of data $\rho$ with only $n^2$ samples, whereas any estimator contained in the RKHS determined by the neural tangent kernel $K$ does not.
 
+Now that we have detailed this result from \cite{wei2019regularization}, we compare the $\ell^2$ regularized gradient descent solution $\boldsymbol{w}_{\lambda}$ to the unregularized solution $\boldsymbol{w}_{r_v^2, r_u^2}^{\star}$ (i.e. using the unregularized loss (\ref{logloss})) in the rich limit $r_v^2, r_u^2 \rightarrow 0$. Namely, as we have previously discussed, we know that there exists implicit $\ell^0$ sparsity in the logistic regression problem we have posed: using only four nonzero weights, one can minimize the population risk $\mathbb{E}_{(\boldsymbol{x}, y) \sim \rho} \left[\log \left( 1 + \exp(-y f(\boldsymbol{w}, \boldsymbol{x})) \right) \right]$. To impose this sparsity in their gradient descent solution, Wei and colleagues utilize an explicit $\ell^2$ regularizer in their loss function $L_{\lambda}$. However, from our previous knowledge of simple regularized problem, such as ridge regression and LASSO, we are doubtful whether an explicit $\ell^2$ regularization term will capture the sparsity in the network parameters. Rather, we hypothesize that $\ell^1$ regularization would achieve better model generalization. It is for this reason that we are interested in the rich limit $r_v^2, r_u^2 \rightarrow 0$: if the gradient descent close to the rich limit does correspond to implicit $\ell^1$ regularization, then we would expect the corresponding model to achieve better generalization than $\boldsymbol{w}_{\lambda}$.
+
+\subsubsection{Computational Experiments Near the Rich Limit}
+
+To explore the possibility that training the ReLU neural network (\ref{relunn}) near the rich limit $r_v^2, r_u^2 \rightarrow 0$ for the sparse logistic regression problem corresponds to implicit $\ell^1$ regularization, we conduct a number of experiments.
+
+Since we would ultimately like to compare the gradient descent solution with $r_v^2, r_u^2$ small to the gradient descent solution for the regularized problem $\boldsymbol{w}_{\lambda}$, we strive to mimic the s. 
+
 \begin{figure}[H]
 \centering
 \subfloat[$N=200$]{\includegraphics[width=.45\linewidth]{Imgs/Sparse Logistic Regression/test_error_200.png}}\hfill
