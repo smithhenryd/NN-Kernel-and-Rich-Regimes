@@ -3,7 +3,7 @@
 #SBATCH --output=print_output_modified.txt
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=25G
+#SBATCH --mem=80G
 #SBATCH -p gpu
 #SBATCH -G 1
 #SBATCH -t 2-00:00:00
