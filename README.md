@@ -2,7 +2,7 @@
 
 Senior Project for Statistics &amp; Data Science at Yale University
 
-Henry Smith
+Completed by Henry Smith
 
 Advised by Professor Harrison Zhou
 
