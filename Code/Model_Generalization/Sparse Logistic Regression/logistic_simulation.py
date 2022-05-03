@@ -15,12 +15,12 @@ units = 10
 
 # Get our training, test data
 try:
-    with open('training_data_logistic_100.pk', 'rb') as f:
+    with open('training_data_logistic_200.pk', 'rb') as f:
         X_train, Y_train = pickle.load(f)
 
 except FileNotFoundError:
-    X_train, Y_train = get_logistic_dataset(100, d)
-    with open('training_data_logistic_100.pk', 'wb') as f:
+    X_train, Y_train = get_logistic_dataset(200, d)
+    with open('training_data_logistic_200.pk', 'wb') as f:
         pickle.dump((X_train, Y_train), f)
 
 try:
@@ -56,11 +56,11 @@ for i in range(N):
   NN_weights = [i.numpy() for i in NN.weights]
   weights.append(NN_weights)
 
-#with open('train_err_simulations_100_0.01_2.pk', 'wb') as f:
-        # pickle.dump(train_err_arrays, f)
+with open('train_err_simulations_200.pk', 'wb') as f:
+        pickle.dump(train_err_arrays, f)
 
-#with open('test_err_simulations_100_0.01_2.pk', 'wb') as f:
-        #pickle.dump(test_err_arrays, f)
+with open('test_err_simulations_200.pk', 'wb') as f:
+        pickle.dump(test_err_arrays, f)
 
-with open('network_weights_simulations_100_1.pk', 'wb') as f:
+with open('network_weights_simulations_200.pk', 'wb') as f:
         pickle.dump(weights, f)

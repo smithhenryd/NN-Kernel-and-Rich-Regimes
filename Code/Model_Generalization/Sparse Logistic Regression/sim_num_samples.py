@@ -164,7 +164,7 @@ def sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320, 640], num_trial
 
 if __name__ == "__main__":
     
-    smallest_N = sim_num_samples(threshold=0.6, d_list=[160, 320, 640])
+    smallest_N = sim_num_samples(threshold=0.6, d_list=[20, 40, 80, 160, 320])
 
     with open('smallest_N_list.pk', 'wb') as f:
         pickle.dump(smallest_N, f)
