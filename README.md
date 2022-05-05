@@ -1,4 +1,4 @@
-# Kernel and Rich Regimes in Deep Learning
+# Implicit Regularization in Deep Learning: The Kernel and Rich Regimes
 
 Senior Project for Statistics &amp; Data Science at Yale University
 
