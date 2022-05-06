@@ -5,7 +5,7 @@
 % GitHub, but it's recommended that you obtain the template directly from
 % GitHub to ensure that you are using the latest version.
 
-\documentclass[final]{beamer}
+\documentclass[final, 20pt]{beamer}
 
 % ====================
 % Packages
@@ -13,14 +13,28 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[size=custom,width=120,height=72,scale=1.0]{beamerposter}
+% Poster dimensions
+\usepackage[size=custom,width=120,height=85,scale=1.0]{beamerposter}
+% Set font size
+\setbeamerfont{block body}{family=\Lato,size={\fontsize{30}{40}}}
+\usepackage[font=normalsize]{caption}
+
 \usetheme{gemini}
 \usecolortheme{gemini}
+\usepackage{csquotes}
+\usepackage[font=large]{subfig}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.14}
+
+% For math
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{bbm}
+
 
 % ====================
 % Lengths
@@ -31,7 +45,7 @@
 \newlength{\sepwidth}
 \newlength{\colwidth}
 \setlength{\sepwidth}{0.025\paperwidth}
-\setlength{\colwidth}{0.3\paperwidth}
+\setlength{\colwidth}{0.45\paperwidth}
 
 \newcommand{\separatorcolumn}{\begin{column}{\sepwidth}\end{column}}
 
@@ -39,30 +53,15 @@
 % Title
 % ====================
 
-\title{Some fancy title: followed by some more text}
+\title{Implicit Regularization in Deep Learning: The Kernel and Rich Regimes}
 
-\author{Alyssa P. Hacker \inst{1} \and Ben Bitdiddle \inst{2} \and Lem E. Tweakit \inst{2}}
+\author{Henry Smith\\Advised by Professor Harrison Zhou}
 
-\institute[shortinst]{\inst{1} Some Institute \samelineand \inst{2} Another Institute}
-
-% ====================
-% Footer (optional)
-% ====================
+\institute[shortinst]{Yale University}
 
 \footercontent{
-  \href{https://www.example.com}{https://www.example.com} \hfill
-  ABC Conference 2025, New York --- XYZ-1234 \hfill
-  \href{mailto:alyssa.p.hacker@example.com}{alyssa.p.hacker@example.com}}
-% (can be left out to remove footer)
-
-% ====================
-% Logo (optional)
-% ====================
-
-% use this to include logos on the left and/or right side of the header:
-% \logoright{\includegraphics[height=7cm]{logo1.pdf}}
-% \logoleft{\includegraphics[height=7cm]{logo2.pdf}}
-
+\hfill Department of Statistics \& Data Science \hfill 
+henry.smith@yale.edu \hfill}
 % ====================
 % Body
 % ====================
@@ -74,243 +73,78 @@
 \separatorcolumn
 
 \begin{column}{\colwidth}
+ 
+  \begin{block}{Motivation}
+  Over the past couple of decades, neural networks have risen through the ranks to replace random forests and SVMs as the premier models for prediction. In large part, this proliferation in deep learning models has been due to their good generalization properties. From a theoretical perspective, though, little is known as to why neural networks generalize so well. In our research, we examine two limits present in neural network training, the \enquote{kernel} and \enquote{rich} limits. Principally, we are interested in what these limits tell us about the generalization properties of neural networks.
+  \end{block}
 
-  \begin{block}{A block title}
+  \begin{block}{Introduction to the Kernel and Rich Limits}
 
-    Some block contents, followed by a diagram, followed by a dummy paragraph. Foo
+    \heading{Problem Setup}
+    Consider a differentiable model $h: \boldsymbol{w} \mapsto f(\boldsymbol{w}, \boldsymbol{x})$ which maps each weight vector $\boldsymbol{w} \in \mathbb{R}^p$ to a neural network function $f(\boldsymbol{w}, \cdot): \mathbb{R}^n \rightarrow \mathbb{R}$. Assume that the model $h$ is $D$-positive homogeneous, meaning $h(\alpha \boldsymbol{w}) = \alpha^D h(\boldsymbol{w})$ for each $\alpha > 0$. Also, suppose that we have some differentiable loss function $L$ which measures the misfit of each neural network function on our training data $\{ (\boldsymbol{x}_i, y_i) \}_{i=1}^N$.
+    
+    We would like to understand the \textbf{gradient flow} $(\boldsymbol{w}_{\alpha}(t))_{t \geq 0}$ on the objective $\frac{1}{\alpha^2}L(\alpha h(\boldsymbol{w}))$:
+    \begin{align*}
+    \boldsymbol{w}_{\alpha}'(t) = - \nabla\left( \frac{1}{\alpha^2}L(h(\boldsymbol{w}_{\alpha}(t))) \right) =  - \frac{1}{\alpha^2} Dh(\boldsymbol{w}_{\alpha}(t))^T \nabla L(h(\boldsymbol{w}_{\alpha}(t))), \quad \boldsymbol{w}_{\alpha}(0) = \alpha^{1/D}\boldsymbol{w}_0.
+    \end{align*}
+    From the practitioner's perspective, gradient flow is no more than a continuous time analog of gradient descent.
+    
+    \heading{Scaling Up}
+    In particular, we are interested in what happens to the gradient flow solution $\boldsymbol{w}_{\alpha}^{\star} = \lim_{t \to \infty} \boldsymbol{w}_{\alpha}(t)$ when the scale $\alpha$ of the initialization $\boldsymbol{w}_{\alpha}(0) = \alpha^{1/D}\boldsymbol{w}_0$ grows arbitrarily large. Equivalently, what happens to the gradient flow when we initialize the weights our neural network to have larger and larger norm?
+    
+    The work of Chizat and colleagues demonstrates that in this limit $\alpha \rightarrow \infty$, training the model $h$ is equivalent to training the linearization of $h$ around its initialization $\boldsymbol{w}_{\alpha}(0)$ \cite{chizat2018lazy}. That is, training $h$, which may be highly nonconvex as a function of its weights $\boldsymbol{w} \in \mathbb{R}^p$, is simplified to training an affine model. This $\alpha \rightarrow \infty$ limit of network training is called the \textbf{kernel limit}.
+    
+    Conversely, when the scale of the initialization grows very small $\alpha \rightarrow 0$, training the model $h$ is very different from training the linearization of $h$ around its initialization. This is called the \textbf{rich limit} of network training.
 
     \begin{figure}
-      \centering
-      \begin{tikzpicture}[scale=6]
-        \draw[step=0.25cm,color=gray] (-1,-1) grid (1,1);
-        \draw (1,0) -- (0.2,0.2) -- (0,1) -- (-0.2,0.2) -- (-1,0)
-          -- (-0.2,-0.2) -- (0,-1) -- (0.2,-0.2) -- cycle;
-      \end{tikzpicture}
-      \caption{A figure caption.}
+        \centering
+        \subfloat[$\alpha = 10^{-1}$]{\includegraphics[width=.5\linewidth]{Poster/Poster_Imgs/visualize_linearized_0.1.png}}\hfill
+        \subfloat[$\alpha = 10$]{\includegraphics[width=.5\linewidth]{Poster/Poster_Imgs/visualize_linearized_10.png}}\hfill
+        \caption{We plot a linear model $f(w_1, w_2, x) = (w_1^2 - w_2^2)x$ (blue) as a function of its weights $(w_1, w_2) \in \mathbb{R}^2$ at the fixed input $x = 1$. In addition, we visualize the linearization of the model $f(w_1, w_2, 1)$ around its initialization  $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$, $\bar{f}(w_1, w_2, 1) = f(\boldsymbol{w}_{\alpha}(0)) + D_{(w_1, w_2)} f(\boldsymbol{w}_{\alpha}(0), \boldsymbol{x})\\ 
+        \cdot ((w_1, w_2) - \boldsymbol{w}_{\alpha}(0))$ (orange). Notice that for (a),  $f(w_1, w_2, 1)$ is very different from $\bar{f}$ about $\boldsymbol{w}_{\alpha}(0)$, whereas for (b),  $f(w_1, w_2, 1)$ is very close to $\bar{f}$.}
+        \label{fig:my_label}
     \end{figure}
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ultricies
-    eget libero ac ullamcorper. Integer et euismod ante. Aenean vestibulum
-    lobortis augue, ut lobortis turpis rhoncus sed. Proin feugiat nibh a
-    lacinia dignissim. Proin scelerisque, risus eget tempor fermentum, ex
-    turpis condimentum urna, quis malesuada sapien arcu eu purus.
-
   \end{block}
-
-  \begin{block}{A block containing a list}
-
-    Nam vulputate nunc felis, non condimentum lacus porta ultrices. Nullam sed
-    sagittis metus. Etiam consectetur gravida urna quis suscipit.
-
-    \begin{itemize}
-      \item \textbf{Mauris tempor} risus nulla, sed ornare
-      \item \textbf{Libero tincidunt} a duis congue vitae
-      \item \textbf{Dui ac pretium} morbi justo neque, ullamcorper
-    \end{itemize}
-
-    Eget augue porta, bibendum venenatis tortor.
-
-  \end{block}
-
-  \begin{alertblock}{A highlighted block}
-
-    This block catches your eye, so \textbf{important stuff} should probably go
-    here.
-
-    Curabitur eu libero vehicula, cursus est fringilla, luctus est. Morbi
-    consectetur mauris quam, at finibus elit auctor ac. Aliquam erat volutpat.
-    Aenean at nisl ut ex ullamcorper eleifend et eu augue. Aenean quis velit
-    tristique odio convallis ultrices a ac odio.
-
-    \begin{itemize}
-      \item \textbf{Fusce dapibus tellus} vel tellus semper finibus. In
-        consequat, nibh sed mattis luctus, augue diam fermentum lectus.
-      \item \textbf{In euismod erat metus} non ex. Vestibulum luctus augue in
-        mi condimentum, at sollicitudin lorem viverra.
-      \item \textbf{Suspendisse vulputate} mauris vel placerat consectetur.
-        Mauris semper, purus ac hendrerit molestie, elit mi dignissim odio, in
-        suscipit felis sapien vel ex.
-    \end{itemize}
-
-    Aenean tincidunt risus eros, at gravida lorem sagittis vel. Vestibulum ante
-    ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
-
-  \end{alertblock}
-
 \end{column}
-
 \separatorcolumn
 
 \begin{column}{\colwidth}
 
-  \begin{block}{A block containing an enumerated list}
-
-    Vivamus congue volutpat elit non semper. Praesent molestie nec erat ac
-    interdum. In quis suscipit erat. \textbf{Phasellus mauris felis, molestie
-    ac pharetra quis}, tempus nec ante. Donec finibus ante vel purus mollis
-    fermentum. Sed felis mi, pharetra eget nibh a, feugiat eleifend dolor. Nam
-    mollis condimentum purus quis sodales. Nullam eu felis eu nulla eleifend
-    bibendum nec eu lorem. Vivamus felis velit, volutpat ut facilisis ac,
-    commodo in metus.
-
-    \begin{enumerate}
-      \item \textbf{Morbi mauris purus}, egestas at vehicula et, convallis
-        accumsan orci. Orci varius natoque penatibus et magnis dis parturient
-        montes, nascetur ridiculus mus.
-      \item \textbf{Cras vehicula blandit urna ut maximus}. Aliquam blandit nec
-        massa ac sollicitudin. Curabitur cursus, metus nec imperdiet bibendum,
-        velit lectus faucibus dolor, quis gravida metus mauris gravida turpis.
-      \item \textbf{Vestibulum et massa diam}. Phasellus fermentum augue non
-        nulla accumsan, non rhoncus lectus condimentum.
-    \end{enumerate}
-
-  \end{block}
-
-  \begin{block}{Fusce aliquam magna velit}
-
-    Et rutrum ex euismod vel. Pellentesque ultricies, velit in fermentum
-    vestibulum, lectus nisi pretium nibh, sit amet aliquam lectus augue vel
-    velit. Suspendisse rhoncus massa porttitor augue feugiat molestie. Sed
-    molestie ut orci nec malesuada. Sed ultricies feugiat est fringilla
-    posuere.
-
+    \begin{block}{Connection with Implicit Regularization}
+    
+    In \cite{woodworth2020kernel}, Woodworth and colleagues consider the linear regression model $f(\boldsymbol{w}, \boldsymbol{x}) = \langle \boldsymbol{\beta}_{\boldsymbol{w}}, \boldsymbol{x} \rangle$ with coefficient vector $\boldsymbol{\beta}_{\boldsymbol{w}} = \boldsymbol{w}_+^2 - \boldsymbol{w}_-^2$. Here, the weights of our neural network are $\boldsymbol{w} = [\boldsymbol{w}_+, \boldsymbol{w}_-]^T \in \mathbb{R}^{2n}$, and $\boldsymbol{v}^2$ denotes element-wise squaring of $\boldsymbol{v} \in \mathbb{R}^n$. They suppose that the loss function is the empirical risk $L(f(\boldsymbol{w}, \cdot)) = \sum_{i=1}^N [y_i - f(\boldsymbol{w}, \boldsymbol{x}_i)]^2$,
+    where the training data $\{(\boldsymbol{x}_i, y_i) \}_{i=1}^N$ satisfies $N \ll n$. More precisely, they assume that there are many solutions to the system $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$. 
+    
+    For this particular linear regression problem, the gradient flow solution in the kernel limit $\alpha \rightarrow \infty$ corresponds to the minimum $\ell^2$ solution of the system $\boldsymbol{X} \boldsymbol{\beta} = \boldsymbol{y}$, whereas the solution in the rich limit $\alpha \rightarrow 0$ corresponds to the minimum $\ell^1$ solution \cite{woodworth2020kernel}. This result suggests the immense benefit of training near the rich limit for problems in which the input data $\boldsymbol{x} \in \mathbb{R}^n$ is very high-dimensional but is suspected to have implicit sparsity. 
+    
+    \end{block}
+    
+    \begin{block}{A New Example: The Logistic Regression Problem}
+    
     \begin{figure}
-      \centering
-      \begin{tikzpicture}
-        \begin{axis}[
-            scale only axis,
-            no markers,
-            domain=0:2*pi,
-            samples=100,
-            axis lines=center,
-            axis line style={-},
-            ticks=none]
-          \addplot[red] {sin(deg(x))};
-          \addplot[blue] {cos(deg(x))};
-        \end{axis}
-      \end{tikzpicture}
-      \caption{Another figure caption.}
+        \centering
+        \subfloat{\includegraphics[width=.5\linewidth]{Imgs/Sparse Logistic Regression/param_l1_avg.png}}\hfill
+        \subfloat{\includegraphics[width=.5\linewidth]{Imgs/Sparse Logistic Regression/min_N_60.png}}\hfill
+        \caption{(left) The $\ell^1$ norm of the gradient descent solution vector, where the gradient descent path is initialized with scale $r_v = r_{\boldsymbol{u}}$. Since the starting point of gradient descent is random, we average over $K=20$ trials. (right) The smallest number of training samples necessary to attain test error $< 0.4$ for input dimension $n$. For this experiment, the initialization scale is $r_v = r_{\boldsymbol{u}} = 10^{-1}$, and so training is performed close to the rich limit.}
+        \label{fig:my_label}
     \end{figure}
-
-  \end{block}
-
-  \begin{block}{Nam cursus consequat egestas}
-
-    Nulla eget sem quam. Ut aliquam volutpat nisi vestibulum convallis. Nunc a
-    lectus et eros facilisis hendrerit eu non urna. Interdum et malesuada fames
-    ac ante \textit{ipsum primis} in faucibus. Etiam sit amet velit eget sem
-    euismod tristique. Praesent enim erat, porta vel mattis sed, pharetra sed
-    ipsum. Morbi commodo condimentum massa, \textit{tempus venenatis} massa
-    hendrerit quis. Maecenas sed porta est. Praesent mollis interdum lectus,
-    sit amet sollicitudin risus tincidunt non.
-
-    Etiam sit amet tempus lorem, aliquet condimentum velit. Donec et nibh
-    consequat, sagittis ex eget, dictum orci. Etiam quis semper ante. Ut eu
-    mauris purus. Proin nec consectetur ligula. Mauris pretium molestie
-    ullamcorper. Integer nisi neque, aliquet et odio non, sagittis porta justo.
-
-    \begin{itemize}
-      \item \textbf{Sed consequat} id ante vel efficitur. Praesent congue massa
-        sed est scelerisque, elementum mollis augue iaculis.
-        \begin{itemize}
-          \item In sed est finibus, vulputate
-            nunc gravida, pulvinar lorem. In maximus nunc dolor, sed auctor eros
-            porttitor quis.
-          \item Fusce ornare dignissim nisi. Nam sit amet risus vel lacus
-            tempor tincidunt eu a arcu.
-          \item Donec rhoncus vestibulum erat, quis aliquam leo
-            gravida egestas.
-        \end{itemize}
-      \item \textbf{Sed luctus, elit sit amet} dictum maximus, diam dolor
-        faucibus purus, sed lobortis justo erat id turpis.
-      \item \textbf{Pellentesque facilisis dolor in leo} bibendum congue.
-        Maecenas congue finibus justo, vitae eleifend urna facilisis at.
-    \end{itemize}
-
-  \end{block}
-
-\end{column}
-
-\separatorcolumn
-
-\begin{column}{\colwidth}
-
-  \begin{exampleblock}{A highlighted block containing some math}
-
-    A different kind of highlighted block.
-
-    $$
-    \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
-    $$
-
-    Interdum et malesuada fames $\{1, 4, 9, \ldots\}$ ac ante ipsum primis in
-    faucibus. Cras eleifend dolor eu nulla suscipit suscipit. Sed lobortis non
-    felis id vulputate.
-
-    \heading{A heading inside a block}
-
-    Praesent consectetur mi $x^2 + y^2$ metus, nec vestibulum justo viverra
-    nec. Proin eget nulla pretium, egestas magna aliquam, mollis neque. Vivamus
-    dictum $\mathbf{u}^\intercal\mathbf{v}$ sagittis odio, vel porta erat
-    congue sed. Maecenas ut dolor quis arcu auctor porttitor.
-
-    \heading{Another heading inside a block}
-
-    Sed augue erat, scelerisque a purus ultricies, placerat porttitor neque.
-    Donec $P(y \mid x)$ fermentum consectetur $\nabla_x P(y \mid x)$ sapien
-    sagittis egestas. Duis eget leo euismod nunc viverra imperdiet nec id
-    justo.
-
-  \end{exampleblock}
-
-  \begin{block}{Nullam vel erat at velit convallis laoreet}
-
-    Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
-    inceptos himenaeos. Phasellus libero enim, gravida sed erat sit amet,
-    scelerisque congue diam. Fusce dapibus dui ut augue pulvinar iaculis.
-
-    \begin{table}
-      \centering
-      \begin{tabular}{l r r c}
-        \toprule
-        \textbf{First column} & \textbf{Second column} & \textbf{Third column} & \textbf{Fourth} \\
-        \midrule
-        Foo & 13.37 & 384,394 & $\alpha$ \\
-        Bar & 2.17 & 1,392 & $\beta$ \\
-        Baz & 3.14 & 83,742 & $\delta$ \\
-        Qux & 7.59 & 974 & $\gamma$ \\
-        \bottomrule
-      \end{tabular}
-      \caption{A table caption.}
-    \end{table}
-
-    Donec quis posuere ligula. Nunc feugiat elit a mi malesuada consequat. Sed
-    imperdiet augue ac nibh aliquet tristique. Aenean eu tortor vulputate,
-    eleifend lorem in, dictum urna. Proin auctor ante in augue tincidunt
-    tempor. Proin pellentesque vulputate odio, ac gravida nulla posuere
-    efficitur. Aenean at velit vel dolor blandit molestie. Mauris laoreet
-    commodo quam, non luctus nibh ullamcorper in. Class aptent taciti sociosqu
-    ad litora torquent per conubia nostra, per inceptos himenaeos.
-
-    Nulla varius finibus volutpat. Mauris molestie lorem tincidunt, iaculis
-    libero at, gravida ante. Phasellus at felis eu neque suscipit suscipit.
-    Integer ullamcorper, dui nec pretium ornare, urna dolor consequat libero,
-    in feugiat elit lorem euismod lacus. Pellentesque sit amet dolor mollis,
-    auctor urna non, tempus sem.
-
-  \end{block}
-
+    
+    To investigate whether or not training near the rich limit results in implicit $\ell^1$ regularization for more advanced problems, we consider the sparse logistic regression problem posed by Wei and colleagues \cite{wei2019regularization}. Specifically, we suppose that the data  $(\boldsymbol{x}, y) \sim \rho$ is generated such that only the first two coordinates of $\boldsymbol{x} \in \{+1, 0, -1\}^n$ determine $y \in \{+1, -1\}$. For our model, we choose a ReLU neural network with a single hidden layer containing $m$ hidden units: $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^m v_i \cdot \text{max}\{0, \boldsymbol{u}_i^T\boldsymbol{x}\}$.
+    The weights $\{(v_i, \boldsymbol{u}_i)\}_{i=1}^N$ of the network are initialized according to $v_i \sim \mathcal{N}(0, r_v^2), \ \boldsymbol{u}_i \sim \mathcal{N}(\boldsymbol{0}, r_{\boldsymbol{u}}^2 \mathbbm{I})$.
+    
+    Our experiments suggest that the rich limit $r_v, r_{\boldsymbol{u}} \rightarrow 0$, does, in fact, impose implicit $\ell^1$ regularization on the gradient descent solution. Even more remarkable, our empirical results provide evidence that the generalization error of the ReLU network trained in the rich limit is bounded by $\mathbb{P}_{(\boldsymbol{x}, y) \sim \rho}(f(\boldsymbol{w}, \boldsymbol{x})y \leq 0) \lesssim \sqrt{\frac{d}{n}}$. This is the same [asymptotic] bound on the generalization error that Wei and colleagues achieved by including an explicit $\ell^2$ regularizer in the loss function.
+    
+    That is, by simply decreasing the scale with which we initialize the network weights, we have achieved commensurate performance to when we use an explicit $\ell^2$ regularizer. This result points to the immense role of implicit regularization in neural network generalization, and it suggests the necessity of further research into the kernel and rich limits.
+    \end{block}
   \begin{block}{References}
-
-    \nocite{*}
-    \footnotesize{\bibliographystyle{plain}\bibliography{poster}}
-
+    \footnotesize{\bibliographystyle{plain}\bibliography{Poster/poster}}
   \end{block}
 
 \end{column}
 
 \separatorcolumn
 \end{columns}
+
 \end{frame}
 
 \end{document}
