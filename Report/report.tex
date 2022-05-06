@@ -341,10 +341,10 @@ Letting the initialization scale $\alpha$ vary between $10^{-1}$ and $10^{1}$ in
 
 \begin{figure}[H]
 \animategraphics[loop, controls, width=\textwidth]{10}{Imgs/Linearized_Model/GIF_imgs/visualize_linearized_}{0}{99}
-\caption{The linear regression model $f(w_1, w_2)(1)$ (blue) and the corresponding linearized model $\bar{f}(w_1, w_2)(1)$ (orange) for initialization scale $10^{-1} < \alpha < 10^1$.}\label{gif:linearization}
+\caption{The linear regression model $f(w_1, w_2)(1)$ (blue) and the corresponding linearized model $\bar{f}(w_1, w_2)(1)$ (orange) for initialization scale $10^{-1} \leq \alpha \leq 10^1$.}\label{gif:linearization}
 \end{figure}
 
-From our illustrations, it is evident that for $\alpha \ll 1$, the gradient flow on $L(h(\boldsymbol{w}))$ with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ would result in quite a different model than that resulting from the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ with $\boldsymbol{\bar{w}}_{\alpha}(0) = \boldsymbol{w}_{\alpha}(0)$. But as $\alpha$ grows away from $0$, then $h$ approaches $\bar{h}$ around $\boldsymbol{w}_{\alpha}(0)$ and the two solutions achieved by gradient flow $\lim_{t \to \infty} \boldsymbol{w}(t)$, $\lim_{t \to \infty} \boldsymbol{\bar{w}}(t)$ are nearly identical.
+From our illustrations, it is evident that for $\alpha \ll 1$, the gradient flow on $L(h(\boldsymbol{w}))$ with initialization $\boldsymbol{w}_{\alpha}(0) = \alpha \mathbbm{1}$ would result in quite a different model than that resulting from the gradient flow on $L(\bar{h}(\boldsymbol{w}))$ with $\boldsymbol{\bar{w}}_{\alpha}(0) = \boldsymbol{w}_{\alpha}(0)$. But as $\alpha$ grows away from $0$, then $h$ approaches $\bar{h}$ around $\boldsymbol{w}_{\alpha}(0)$ and the two solutions achieved by gradient flow $\lim_{t \to \infty} \boldsymbol{w}_{\alpha}(t)$, $\lim_{t \to \infty} \boldsymbol{\bar{w}}_{\alpha}(t)$ are nearly identical.
 
 
 \subsection{The Neural Tangent Kernel}\label{visualizeNTK}
