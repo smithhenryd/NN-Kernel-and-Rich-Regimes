@@ -130,7 +130,7 @@ henry.smith@yale.edu \hfill}
     \end{figure}
     
     To investigate whether or not training near the rich limit results in implicit $\ell^1$ regularization for more advanced problems, we consider the sparse logistic regression problem posed by Wei and colleagues \cite{wei2019regularization}. Specifically, we suppose that the data  $(\boldsymbol{x}, y) \sim \rho$ is generated such that only the first two coordinates of $\boldsymbol{x} \in \{+1, 0, -1\}^n$ determine $y \in \{+1, -1\}$. For our model, we choose a ReLU neural network with a single hidden layer containing $m$ hidden units: $f(\boldsymbol{w}, \boldsymbol{x}) = \sum_{i=1}^m v_i \cdot \text{max}\{0, \boldsymbol{u}_i^T\boldsymbol{x}\}$.
-    The weights $\{(v_i, \boldsymbol{u}_i)\}_{i=1}^N$ of the network are initialized according to $v_i \sim \mathcal{N}(0, r_v^2), \ \boldsymbol{u}_i \sim \mathcal{N}(\boldsymbol{0}, r_{\boldsymbol{u}}^2 \mathbbm{I})$.
+    The weights $\{(v_i, \boldsymbol{u}_i)\}_{i=1}^m$ of the network are initialized according to $v_i \sim \mathcal{N}(0, r_v^2), \ \boldsymbol{u}_i \sim \mathcal{N}(\boldsymbol{0}, r_{\boldsymbol{u}}^2 \mathbbm{I})$.
     
     Our experiments suggest that the rich limit $r_v, r_{\boldsymbol{u}} \rightarrow 0$, does, in fact, impose implicit $\ell^1$ regularization on the gradient descent solution. Even more remarkable, our empirical results provide evidence that the generalization error of the ReLU network trained in the rich limit is bounded by $\mathbb{P}_{(\boldsymbol{x}, y) \sim \rho}(f(\boldsymbol{w}, \boldsymbol{x})y \leq 0) \lesssim \sqrt{\frac{d}{n}}$. This is the same [asymptotic] bound on the generalization error that Wei and colleagues achieved by including an explicit $\ell^2$ regularizer in the loss function.
     
