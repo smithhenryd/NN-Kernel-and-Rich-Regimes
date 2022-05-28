@@ -12,4 +12,4 @@ View the [final project report](https://github.com/smithhenryd/NN-Kernel-and-Ric
 
 For proofs of the main results from "On Lazy Training in Differentiable Programming" by Chizat, Oyallon, and Bach, see [another report I completed](https://github.com/smithhenryd/Lazy-Training/blob/main/S%26DS_432_Final_Report_Henry_Smith.pdf).
 
-![alt text](https://github.com/smithhenryd/NN-Kernel-and-Rich-Regimes/blob/main/Imgs/Linearized_Model/linearized_model.gif)
+![A neural network function with two weights evaluated around its initialization](https://github.com/smithhenryd/NN-Kernel-and-Rich-Regimes/blob/main/Imgs/Linearized_Model/linearized_model.gif)
