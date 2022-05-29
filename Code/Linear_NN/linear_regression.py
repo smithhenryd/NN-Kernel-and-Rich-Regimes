@@ -7,7 +7,7 @@ d = 20
 N = 10
 
 # Create the training dataset:
-## Recall that \beta parametrizes the simple linear regression model:
+## Recall that \beta parameterizes the simple linear regression model:
 ## y_i = \langle \beta, x_i \rangle
 beta = tf.random.normal([d, 1])
 
