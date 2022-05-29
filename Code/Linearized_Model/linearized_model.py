@@ -3,26 +3,24 @@ from ..Linear_NN.model import Linear_Regression
 
 class Linearized_Model(tf.keras.Model):
     """
-    The linearized version of a preexisting, D-homogeneous TensorFlow model, as discussed in
+    The linearization of a preexisting TensorFlow model around its initialization w0, as discussed in
     Chizat et al. 2018 as well as in Woodworth et al. 2020
     """
 
-    def __init__(self, model, train_x, alpha=1, hom=1, **kwargs):
+    def __init__(self, model, train_x, **kwargs):
         """
         Initializes the network, which is simply 'model' linearized around its initialization 'w0'
 
-        model: a tensorflow.keras.Model object, representing the [nonlinear], D-homogeneous model
-        for which one would like to compute the linearized model
+        model: a tensorflow.keras.Model object, representing the [nonlinear] model for which one would like to compute 
+        the linearized model
         NOTE: the model must have current weight vector equal to its initialization (i.e. it should not be trained yet)
         
-        train_x: an  N x d dimensional Tensor whose rows are the vectors with which the model is trained 
-        alpha: a nonnegative float, representing the scale with which 'model' was initialized
-        hom: a positive integer, the degree of homogeneity of 'model'
+        train_x: an  N x d dimensional Tensor whose rows are the input vectors with which the model is trained 
         """
 
         super(Linearized_Model, self).__init__(**kwargs)
 
-        self.linearized_layer_1 = Linearized_Layer(model, train_x, alpha, hom, **kwargs)
+        self.linearized_layer_1 = Linearized_Layer(model, train_x, **kwargs)
 
     def call(self, train_x) -> tf.Tensor:
         """
@@ -50,7 +48,7 @@ class Linearized_Layer(tf.keras.layers.Layer):
     The single layer of the linearized network
     """
 
-    def __init__(self, model, train_x, alpha, hom, **kwargs):
+    def __init__(self, model, train_x, **kwargs):
         """
         Initializes the linearized layer
         """
@@ -58,7 +56,6 @@ class Linearized_Layer(tf.keras.layers.Layer):
         super(Linearized_Layer, self).__init__(**kwargs)
         
         # Compute the bias of the model at w = w0 on the training data
-        self.bias_scale = alpha**hom
         self.bias = model(train_x)
 
         # Compute the gradient of the model with respect to the weights w at w = w0, evaluated on the training data 
@@ -94,7 +91,7 @@ class Linearized_Layer(tf.keras.layers.Layer):
         """
         Evaluates model at training data
         """
-        return self.bias_scale*self.bias + tf.matmul(self.grads,tf.reshape(self.w - self.init, [-1, 1]))
+        return self.bias + tf.matmul(self.grads,tf.reshape(self.w - self.init, [-1, 1]))
     
     def evaluate(self, model, inputs):
         """
@@ -107,19 +104,20 @@ class Linearized_Layer(tf.keras.layers.Layer):
         # And the gradients
         grads = self._compute_gradients(model, inputs)
 
-        return self.bias_scale*bias + tf.matmul(grads,tf.reshape(self.w - self.init, [-1, 1]))
+        return bias + tf.matmul(grads,tf.reshape(self.w - self.init, [-1, 1]))
 
 class LinearizedCallback(tf.keras.callbacks.Callback):
     """
     Modifies a Linearized_Model object so that when training is complete, calling
     model (inputs) will evaluate the model on arbitrary [rather than training] inputs
-    (this eliminates the need for the 'evaluate' method in the original object)
+    (i.e. this Callback object eliminates the need for the 'evaluate' method in the original object)
     """
     def __init__(self, model, **kwargs):
         """
         Initializes the callback object
 
         model: the nonlinear tensorflow.keras.Model object corresponding to the Linearized_Model
+        NOTE: the model must have current weight vector equal to its initialization (i.e. it should not be trained yet)
         """
 
         super(LinearizedCallback, self).__init__(**kwargs)
@@ -146,7 +144,7 @@ if __name__ == "__main__":
     # Suppose we will train the model with N input vectors
     N = 5
     train_x = tf.random.normal([N, d])
-    linearized_model = Linearized_Model(model, train_x, alpha=1, hom=2)
+    linearized_model = Linearized_Model(model, train_x)
     
     tf.print(f"Training outputs: {linearized_model(train_x)}")
 
