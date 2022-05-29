@@ -29,6 +29,7 @@ def get_ReLU_NN(d, units, rw =1, ru=1, lambd=0)->tf.keras.Model:
     init_u = np.vstack(u)
 
     # Initialize the hidden layer in the network with this weight matrix
+    # NOTE: the ReLU neural network does **not** include a bias term (otherwise, it would not be positively homogeneous)
     init_u = tf.constant_initializer(value=np.transpose(init_u))
     model.add(tf.keras.layers.Dense(units=units, input_shape=(d,), activation="relu", use_bias=False, kernel_initializer=init_u, kernel_regularizer=tf.keras.regularizers.L2(lambd)))
 

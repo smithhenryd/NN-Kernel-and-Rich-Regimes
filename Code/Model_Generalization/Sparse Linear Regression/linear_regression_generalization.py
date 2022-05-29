@@ -86,13 +86,13 @@ def train_linreg_network(train_data, test_data, w0, alphas, lr, loss_threshold=1
     train_losses = []
     test_losses = []
 
-    # Store the number of epochs to converge
+    # Store the number of epochs to convergence
     num_epochs_conv = []
 
     # And store the final weights of the network
     final_weights = []
 
-    # We will use the MSER as out loss function for all models
+    # We will use the MSE as our loss function for all models
     MSE = tf.keras.losses.MeanSquaredError()
 
     for i in alphas:
