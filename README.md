@@ -1,10 +1,8 @@
 # Implicit Regularization in Deep Learning: The Kernel and Rich Regimes
 
-Senior Project for Statistics &amp; Data Science at Yale University
+Senior Project for Statistics &amp; Data Science at Yale University completed by Henry Smith.
 
-Completed by Henry Smith
-
-I am grateful to have been advised by Professor Harrison Zhou.
+I am grateful to have been advised by Dr. Harrison Zhou.
 
 Code Requirements: Python 3.7-3.9, TensorFlow 2.8
 
